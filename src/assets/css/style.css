@@ -1,0 +1,32 @@
+body {
+    font-family: "Crimson Text", serif;
+    line-height: 1.5;
+    font-size: 15px;
+    color: #000000;
+    background: #E8E5DE;
+    position: relative;
+    min-height: 100vh;
+}
+article{ 
+    padding-bottom: 4rem;
+    @media (max-width: 48em) {
+        padding-bottom: 6rem;
+    }
+
+}
+header {
+    background: #E8E5DE;
+}
+
+footer {
+    position: absolute;
+    bottom: 0;
+    width: 98%;
+    background: #f4f2ef;
+}
+
+.custom-hero {
+    padding-top: 100px;
+    padding-bottom: 50px;
+    text-align: center;
+}
