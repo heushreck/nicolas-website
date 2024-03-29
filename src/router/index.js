@@ -18,7 +18,7 @@ const router = createRouter({
       name: 'blog',
       component: () => BlogView,
       meta: {
-        title: 'Nicolas Neudeck - Blog',
+        title: 'Blog - Nicolas Neudeck',
       },
     },
     {
@@ -26,7 +26,7 @@ const router = createRouter({
       name: 'about',
       component: () => import('../views/AboutView.vue'),
       meta: {
-        title: 'Nicolas Neudeck - About',
+        title: 'About - Nicolas Neudeck',
       },
     },
     {
@@ -34,7 +34,7 @@ const router = createRouter({
       name: 'privacy',
       component: () => import('../views/PrivacyView.vue'),
       meta: {
-        title: 'Nicolas Neudeck - Privacy',
+        title: 'Privacy - Nicolas Neudeck',
       },
     },
     { 
@@ -42,15 +42,15 @@ const router = createRouter({
       component: () => import('../views/BlogEntryView.vue'),
       name: 'blogEntry',
       meta: {
-        title: 'Nicolas Neudeck - Blog',
+        title: 'Blog - Nicolas Neudeck',
       },
     },
     { 
-      path: '/blog/search/:searchQuery',
-      component: () => import('../views/BlogSearchView.vue'),
-      name: 'blogSearch',
+      path: '/search/:searchQuery',
+      component: () => import('../views/SearchView.vue'),
+      name: 'search',
       meta: {
-        title: 'Nicolas Neudeck - Search',
+        title: 'Search - Nicolas Neudeck',
       },
     },
   ]

@@ -7,7 +7,7 @@
     <div class="max-w-screen-lg flex flex-wrap items-center justify-between mx-auto p-4">
         <div v-html="markdownToHtml" class="markdown"></div>
         <div class="mt-4">
-            <RouterLink v-for="tag in blogEntry.tags" :to="`/blog/search/${tag}`" :key="tag" :class="`text-xs font-medium me-2 px-2.5 py-0.5 rounded ${randomColor()}`">{{ tag }}</RouterLink>
+            <RouterLink v-for="tag in blogEntry.tags" :to="`/search/${tag}`" :key="tag" :class="`text-xs font-medium me-2 px-2.5 py-0.5 rounded ${randomColor()}`">{{ tag }}</RouterLink>
         </div>
     </div>
 </template>
