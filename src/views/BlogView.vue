@@ -14,6 +14,6 @@
 
 <script setup>
 import BlogCard from '../components/BlogCard.vue';
-import blogEntries from '../data/blogentries.json';
+import blogEntries from '../data/blog_entries/blogentries.json';
 const blogentries = blogEntries;
 </script>

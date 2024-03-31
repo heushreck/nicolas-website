@@ -114,7 +114,7 @@ def main(markdown_file_path):
     id = markdown_file_path.split('/')[-1].split('.')[0]
 
     # Path to save the modified HTML file
-    html_file_path = f'src/data/html_files/{id}.html'
+    html_file_path = f'src/data/blog_entries/html_files/{id}.html'
 
     # Read the markdown file
     with open(markdown_file_path, 'r', encoding='utf-8') as file:
@@ -131,7 +131,7 @@ def main(markdown_file_path):
         file.write(modified_html_content)
 
     # read a json file
-    with open('src/data/blogentries.json', 'r') as f:
+    with open('src/data/blog_entries/blogentries.json', 'r') as f:
         data = json.load(f)
 
     # add d to data
@@ -140,7 +140,7 @@ def main(markdown_file_path):
             blogentry["text"] = modified_html_content
 
     # save d as json
-    with open('src/data/blogentries.json', 'w') as f:
+    with open('src/data/blog_entries/blogentries.json', 'w') as f:
         json.dump(data, f)
 
     print(f'HTML file saved to {html_file_path}')
