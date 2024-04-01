@@ -7,9 +7,6 @@
                 <RouterLink to="/about" class="hover:underline me-4 md:me-6">About</RouterLink>
             </li>
             <li>
-                <RouterLink to="/privacy" class="hover:underline me-4 md:me-6">Privacy Policy</RouterLink>
-            </li>
-            <li>
                 <a href="mailto:nicolas.neudeck@outlook.de" class="hover:underline me-4 md:me-6">Contact</a>
             </li>
             <li>
