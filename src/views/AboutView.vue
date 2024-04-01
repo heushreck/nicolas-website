@@ -4,7 +4,7 @@
         <hr class="w-48 h-1 mx-auto my-4 bg-gray-600 border-0 rounded md:my-10">
         <h1 class="mb-4 text-md text-gray-700 dark:text-white md:text-sm lg:text-lg">My name is Nicolas, I am a Data and AI Enthusiast from Munich, Germany.</h1>
     </div>
-    <div class="max-w-screen-md flex flex-wrap items-center justify-between mx-auto p-4 column">
+    <div class="max-w-screen-lg flex flex-wrap items-center justify-between mx-auto p-4 column mb-4">
       <h2 class="mb-4 text-2xl font-bold text-gray-900 dark:text-white">Curriculum Vitae</h2>
       <div class="w-full mb-8 md:w-1/2 lg:w-1/3 lg:mb-0">
         <img class="rounded-full" src="https://media.licdn.com/dms/image/D5603AQG2VQT_-XU17A/profile-displayphoto-shrink_800_800/0/1633939892232?e=1717027200&v=beta&t=fn6hX3gVla0yK2mAmG4o3QxetIatC3r2yWRp6qccR6Q" alt="image description">

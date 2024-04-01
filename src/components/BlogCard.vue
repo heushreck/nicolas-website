@@ -1,5 +1,5 @@
 <template>
-    <div class="max-w-sm bg-white border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
+    <div id="blogCard" class="max-w-sm border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
         <RouterLink :to="`/blog/${id}`">
             <img class="rounded-t-lg" :src="image" alt="" />
         </RouterLink>
@@ -47,3 +47,9 @@
     );    
 
 </script>
+
+<style scoped>
+    #blogCard  {
+        background: #f4f2ef;
+    }
+</style>
