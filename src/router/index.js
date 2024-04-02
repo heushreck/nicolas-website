@@ -29,14 +29,6 @@ const router = createRouter({
         title: 'About - Nicolas Neudeck',
       },
     },
-    {
-      path: '/privacy',
-      name: 'privacy',
-      component: () => import('../views/PrivacyView.vue'),
-      meta: {
-        title: 'Privacy - Nicolas Neudeck',
-      },
-    },
     { 
       path: '/blog/:blogEntryId',
       component: () => import('../views/BlogEntryView.vue'),
