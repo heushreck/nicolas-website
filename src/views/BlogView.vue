@@ -6,7 +6,7 @@
   </div>
   <div class="max-w-screen-lg flex flex-wrap items-center justify-between mx-auto p-4">
     <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-      <BlogCard v-for="blogentry in blogentries" :id="blogentry.id" :title="blogentry.title" :image="blogentry.image" :shortDescription="blogentry.shortDescription" :date="blogentry.date" />
+      <BlogCard v-for="blogentry in blogentries" :key="blogentry.id" :id="blogentry.id" :title="blogentry.title" :image="blogentry.image" :shortDescription="blogentry.shortDescription" :date="blogentry.date" />
     </div>
   </div>
 

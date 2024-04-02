@@ -1,6 +1,5 @@
 import './assets/css/index.css'
 import './assets/css/style.css'
-import '../node_modules/flowbite-vue/dist/index.css'
 
 
 import { createApp } from 'vue'

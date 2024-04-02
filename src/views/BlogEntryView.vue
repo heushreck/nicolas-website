@@ -28,7 +28,7 @@
     <div class="max-w-screen-lg flex flex-col justify-between mx-auto p-4">
         <div v-html="markdownToHtml" class="markdown"></div>
         <div class="mt-4">
-            <RouterLink v-for="tag in blogEntry.tags" :to="`/search/${tag}`" :key="tag" :class="`text-xs font-medium me-2 px-2.5 py-0.5 rounded ${randomColor()}`">{{ tag }}</RouterLink>
+            <RouterLink v-for="tag in blogEntry.tags" :to="`/search/${tag}`" :key="tag" :class="`${randomColor()}`">{{ tag }}</RouterLink>
         </div>
     </div>
 </template>
@@ -37,7 +37,6 @@
 import { computed } from 'vue';
 import { useRoute } from 'vue-router'
 import blogEntries from '../data/blog_entries/blogentries.json';
-import { marked } from 'marked';
 import { RouterLink } from 'vue-router';
 const blogentries = blogEntries;
 const route = useRoute()
@@ -113,7 +112,7 @@ const randomColor = () => {
         //'bg-indigo-100 text-indigo-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-indigo-400 border border-indigo-400',
         //'bg-purple-100 text-purple-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-purple-400 border border-purple-400',
         //'bg-pink-100 text-pink-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-pink-400 border border-pink-400'
-        'bg-emerald-100 text-emerald-800 text-xs font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-emerald-400 border border-emerald-400'
+        'bg-emerald-100 text-emerald-800 text-sm font-medium me-2 px-2.5 py-0.5 rounded dark:bg-gray-700 dark:text-emerald-400 border border-emerald-400'
     ];
     return colors[Math.floor(Math.random() * colors.length)];
 }

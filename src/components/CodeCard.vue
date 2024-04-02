@@ -28,38 +28,7 @@
 </template>
 
 <script setup>
-import { onMounted } from 'vue'
-import { initFlowbite } from 'flowbite'
-
-// initialize components based on data attribute selectors
-onMounted(() => {
-    initFlowbite();
-    const clipboard = FlowbiteInstances.getInstance('CopyClipboard', 'code-block');
-
-    const $defaultMessage = document.getElementById('default-message');
-    const $successMessage = document.getElementById('success-message');
-
-    clipboard.updateOnCopyCallback((clipboard) => {
-        showSuccess();
-
-        // reset to default state
-        setTimeout(() => {
-            resetToDefault();
-        }, 2000);
-    })
-
-    const showSuccess = () => {
-        $defaultMessage.classList.add('hidden');
-        $successMessage.classList.remove('hidden');
-    }
-
-    const resetToDefault = () => {
-        $defaultMessage.classList.remove('hidden');
-        $successMessage.classList.add('hidden');
-    }
-})
-
-const props = defineProps({
+defineProps({
     code: {
         type: String,
         required: true
@@ -69,6 +38,4 @@ const props = defineProps({
         required: true
     }
 });
-
-
 </script>

@@ -2,13 +2,19 @@
     <div class="custom-hero">
         <h1 class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white">About Me</h1>
         <hr class="w-48 h-1 mx-auto my-4 bg-gray-600 border-0 rounded md:my-10">
-        <h1 class="mb-4 text-md text-gray-700 dark:text-white md:text-sm lg:text-lg">My name is Nicolas, I am a Data and AI Enthusiast from Munich, Germany.</h1>
+        <h1 class="mb-4 text-lg text-gray-900 dark:text-white md:text-sm lg:text-xl">My name is Nicolas, I am a Data and AI Enthusiast from Munich, Germany.</h1>
     </div>
-    <div class="max-w-screen-lg flex flex-wrap items-center justify-between mx-auto p-4 column mb-4">
-      <h2 class="mb-4 text-2xl font-bold text-gray-900 dark:text-white">Curriculum Vitae</h2>
-      <div class="w-full mb-8 md:w-1/2 lg:w-1/3 lg:mb-0">
-        <img class="rounded-full" src="https://media.licdn.com/dms/image/D5603AQG2VQT_-XU17A/profile-displayphoto-shrink_800_800/0/1633939892232?e=1717027200&v=beta&t=fn6hX3gVla0yK2mAmG4o3QxetIatC3r2yWRp6qccR6Q" alt="image description">
+    <div class="max-w-screen-lg flex flex-col justify-between mx-auto p-4 column mb-4">
+      <div class="flex 2xm:flex-row xl:flex-row lg:flex-row md:flex-row flex-col items-center">
+        <div class="lg:w-1/5 md:w-1/5 sm:w-1/2 me-4 sm:mb-4">
+          <img class="rounded-full" src="https://media.licdn.com/dms/image/D5603AQG2VQT_-XU17A/profile-displayphoto-shrink_800_800/0/1633939892232?e=1717027200&v=beta&t=fn6hX3gVla0yK2mAmG4o3QxetIatC3r2yWRp6qccR6Q" alt="image description">
+        </div>
+        <div class="lg:w-4/5 md:w-4/5 sm:w-1/2">
+          Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.
+        </div>
       </div>
+      <h2 class="mt-10 text-3xl text-gray-900 dark:text-white">Curriculum Vitae</h2>
+      <hr class="w-24 h-0.5 bg-gray-600 border-0 rounded my-4 mb-8">
       <ol class="relative border-s border-emerald-600 dark:border-gray-700">                  
           <li class="mb-8 ms-4">
               <div class="absolute w-3 h-3 bg-emerald-200 rounded-full mt-1.5 -start-1.5 border border-emerald-600 dark:border-gray-900 dark:bg-gray-700"></div>
@@ -69,36 +75,3 @@
       
     </div>
 </template>
-
-<script setup>
-import CodeCard from '../components/CodeCard.vue';
-const title = '';
-const code = `'use client';
-
-import Link from 'next/link';
-import { Navbar } from 'flowbite-react'xw;
-
-function Component() {
-  return (
-    <Navbar fluid rounded>
-      <Navbar.Brand as={Link} href=&#x22;https://flowbite-react.com&#x22;>
-        <img src=&#x22;/favicon.svg&#x22; className=&#x22;mr-3 h-6 sm:h-9&#x22; alt=&#x22;Flowbite React Logo&#x22; />
-        <span className=&#x22;self-center whitespace-nowrap text-xl font-semibold dark:text-white&#x22;>Flowbite React</span>
-      </Navbar.Brand>
-      <Navbar.Toggle />
-      <Navbar.Collapse>
-        <Navbar.Link href=&#x22;#&#x22; active>
-          Home
-        </Navbar.Link>
-        <Navbar.Link as={Link} href=&#x22;#&#x22;>
-          About
-        </Navbar.Link>
-        <Navbar.Link href=&#x22;#&#x22;>Services</Navbar.Link>
-        <Navbar.Link href=&#x22;#&#x22;>Pricing</Navbar.Link>
-        <Navbar.Link href=&#x22;#&#x22;>Contact</Navbar.Link>
-      </Navbar.Collapse>
-    </Navbar>
-  );
-}
-`
-</script>
