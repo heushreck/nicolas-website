@@ -28,9 +28,9 @@ npm run lint
 
 ## Add a Blog Entry
 
-1. Write the blog entry in a markdown file.
+1. Write the blog entry in a markdown file and save it to `blog_entries/md_files`.
 2. Visit https://markdowntohtml.com/#converter and convert the Markdown file into a html file. 
-3. Save the html file in the `src/data/blog_entries/html_files` folder.
+3. Save the html file in the `blog_entries/html_files` folder.
 4. Add a entry in the `src/data/blog_entries/blogentries.json` JSON file. Add everything except for text.
 5. Style the HTML file
     ```sh
