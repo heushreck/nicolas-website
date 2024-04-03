@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "flowbite": "^2.3.0",
+    "gsap": "^3.12.5",
     "tailwind-merge": "^2.2.2",
     "vue": "^3.4.21",
     "vue-router": "^4.3.0"
