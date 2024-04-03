@@ -41,6 +41,8 @@
 
 <script setup>
 import { RouterLink } from 'vue-router';
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Collapse } from 'flowbite';
 
 const search = () => {

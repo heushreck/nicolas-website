@@ -24,7 +24,6 @@ import BlogCard from '../components/BlogCard.vue';
 import blogEntries from '../data/blog_entries/blogentries.json';
 import gsap from 'gsap';
 const blogentries = blogEntries;
-// sort by date
 blogentries.sort((a, b) => new Date(b.date) - new Date(a.date));
 
 const beforeEnter = (el) => {
