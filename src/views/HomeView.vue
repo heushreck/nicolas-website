@@ -49,4 +49,5 @@ import BlogCard from '../components/BlogCard.vue';
 import blogEntries from '../data/blog_entries/blogentries.json';
 // get latest three blog entries by looking at date
 const latestBlogEntries = blogEntries.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 3);
+const a = 5;
 </script>
