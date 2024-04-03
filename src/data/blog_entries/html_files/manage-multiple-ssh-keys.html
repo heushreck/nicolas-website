@@ -1,0 +1,68 @@
+<p>Use SSH keys and define host aliases in the SSH config file (each alias for an account).</p>
+<p><strong>How to?</strong></p>
+<ol>
+<li><a href="https://help.github.com/articles/generating-a-new-ssh-key/">Generate SSH key pairs for accounts</a> and <a href="https://help.github.com/articles/adding-a-new-ssh-key-to-your-github-account/">add them to GitHub accounts</a>.</li>
+<li><p>Edit/Create SSH config file (<code>~/.ssh/config</code>):</p>
+<pre><code class="lang-bash"><span class="hljs-comment"># Default GitHub account: personal</span>
+<span class="hljs-attribute">Host</span> github.com
+   HostName github.com
+   IdentityFile ~/.ssh/id_personal
+   IdentitiesOnly <span class="hljs-literal">yes</span>
+
+<span class="hljs-comment"># Work GitHub account: work</span>
+Host github-work
+   HostName github.com
+   IdentityFile ~/.ssh/id_work
+   IdentitiesOnly <span class="hljs-literal">yes</span>
+</code></pre>
+<blockquote>
+<p>NOTE: If you use any account frequently, you should use the default hostname (github.com).</p>
+</blockquote>
+</li>
+<li><p><a href="https://help.github.com/articles/adding-a-new-ssh-key-to-the-ssh-agent/">Add SSH private keys to your agent</a>:</p>
+<pre><code class="lang-bash">ssh-<span class="hljs-keyword">add</span><span class="bash"> ~/.ssh/id_personal
+</span>ssh-<span class="hljs-keyword">add</span><span class="bash"> ~/.ssh/id_work</span>
+</code></pre>
+</li>
+<li><p>Test your connection:</p>
+<pre><code class="lang-bash">ssh-keyscan github.com &amp;<span class="hljs-keyword">gt</span>;&amp;<span class="hljs-keyword">gt</span>; ~<span class="hljs-regexp">/.ssh/known</span>_hosts
+ssh -T git@github.com
+ssh -T git@github-work
+</code></pre>
+<p>If everything is OK, you will see these messages:</p>
+<pre><code class="lang-plaintext">Hi personal! Yo<span class="hljs-string">u've successfully authenticated, but GitHub does not provide shell access.
+
+Hi work! You'</span>ve successfully authenticated, but GitHub does <span class="hljs-keyword">not</span> provide shell access.
+</code></pre>
+</li>
+<li><p>Now all are set, you need to remember:</p>
+<pre><code class="lang-bash">git@github-work:org/project.git =&amp;<span class="hljs-keyword">gt</span>; <span class="hljs-keyword">user</span> <span class="hljs-title">is</span> work
+git@github.com:org/project.git  =&amp;<span class="hljs-keyword">gt</span>; <span class="hljs-keyword">user</span> <span class="hljs-title">is</span> personal
+</code></pre>
+</li>
+<li><p>If you need to clone a repository, just do:</p>
+<pre><code class="lang-bash">git clone git@github-work:org1/project1<span class="hljs-selector-class">.git</span> /path/to/project1
+cd /path/to/project1
+git config user<span class="hljs-selector-class">.email</span> <span class="hljs-string">"email@example.com"</span>
+git config user<span class="hljs-selector-class">.name</span>  <span class="hljs-string">"FirstName LastName"</span>
+</code></pre>
+</li>
+<li><p>If you already have the repo set up, after the SSH config instructions, you need to change the URL of <code>origin</code>, just do:</p>
+<pre><code class="lang-bash"><span class="hljs-string">cd </span>/<span class="hljs-string">path/</span><span class="hljs-string">to/</span><span class="hljs-string">project2
+</span><span class="hljs-string">git </span><span class="hljs-string">remote </span><span class="hljs-built_in">set-url</span> <span class="hljs-string">origin </span><span class="hljs-string">git@</span><span class="hljs-string">github-work:org2/</span><span class="hljs-string">project2.</span><span class="hljs-string">git
+</span><span class="hljs-string">git </span><span class="hljs-string">config </span><span class="hljs-string">user.</span><span class="hljs-string">email </span><span class="hljs-string">"email@example.com"</span>
+<span class="hljs-string">git </span><span class="hljs-string">config </span><span class="hljs-string">user.</span><span class="hljs-string">name </span> <span class="hljs-string">"FirstName LastName"</span>
+</code></pre>
+</li>
+<li><p>If you are creating a new repository on local:</p>
+<pre><code class="lang-bash">cd /path/to/project3
+git init
+git remote <span class="hljs-keyword">add</span><span class="bash"> origin git@github-work:org3/project3.git
+</span>git config <span class="hljs-keyword">user</span>.email <span class="hljs-string">"superman@example.com"</span>
+git config <span class="hljs-keyword">user</span>.name  <span class="hljs-string">"Super Man"</span>
+git <span class="hljs-keyword">add</span><span class="bash"> .
+</span>git commit -m <span class="hljs-string">"Initial commit"</span>
+git push -u origin master
+</code></pre>
+</li>
+</ol>

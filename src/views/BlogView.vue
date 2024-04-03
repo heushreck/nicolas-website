@@ -13,7 +13,7 @@
         tag="div"
         class="grid grid-cols-2 md:grid-cols-3 gap-4"
       >
-        <BlogCard v-for="(blogentry, index) in blogentries" :data-index="index" :key="blogentry.id" :id="blogentry.id" :title="blogentry.title" :image="blogentry.image" :shortDescription="blogentry.shortDescription" :date="blogentry.date" />
+        <BlogCard v-for="(blogentry, index) in blogentries" :data-index="index" :key="blogentry.id" :id="blogentry.id" :title="blogentry.title" :image="blogentry.image" :shortDescription="blogentry.shortDescription" :date="prettyDate(blogentry.date)" />
       </transition-group>
     </div>
   </div>
@@ -24,6 +24,8 @@ import BlogCard from '../components/BlogCard.vue';
 import blogEntries from '../data/blog_entries/blogentries.json';
 import gsap from 'gsap';
 const blogentries = blogEntries;
+// sort by date
+blogentries.sort((a, b) => new Date(b.date) - new Date(a.date));
 
 const beforeEnter = (el) => {
   el.style.opacity = 0;
@@ -38,6 +40,11 @@ const enter = (el, done) => {
     onComplete: done,
     delay: 0.2 + el.dataset.index * 0.2,
   });
+};
+
+const prettyDate = (date) => {
+  const options = { year: 'numeric', month: 'long', day: 'numeric' };
+  return new Date(date).toLocaleDateString('en-US', options);
 };
 
 </script>

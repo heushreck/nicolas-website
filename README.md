@@ -1,14 +1,6 @@
-# vue-test-router
+# Nicolas Website
 
-This template should help get you started developing with Vue 3 in Vite.
-
-## Recommended IDE Setup
-
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+This is my personal website, build with Vue.js, Flowbite and Tailwind CSS.
 
 ## Project Setup
 
@@ -33,3 +25,14 @@ npm run build
 ```sh
 npm run lint
 ```
+
+## Add a Blog Entry
+
+1. Write the blog entry in a markdown file.
+2. Visit https://markdowntohtml.com/#converter and convert the Markdown file into a html file. 
+3. Save the html file in the `src/data/blog_entries/html_files` folder.
+4. Add a entry in the `src/data/blog_entries/blogentries.json` JSON file. Add everything except for text.
+5. Style the HTML file
+    ```sh
+    python style.py src/data/blog_entries/html_files/<file_name>.html
+    ```
