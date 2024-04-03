@@ -28,13 +28,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install ESLint
+      - name: Install DEV dependencies
         run: |
-          npm install eslint@8.10.0
+          npm install --only=dev
 
       - name: Run ESLint
-        run: npx eslint .
-          --config .eslintrc.js
-          --ext .vue,.js,.jsx,.cjs,.mjs
-          --ignore-path .gitignore
+        run: npm run lint
         continue-on-error: true
