@@ -68,6 +68,13 @@ useSeoMeta({
   ogDescription: 'My Personal Website about AI Engineering.',
   ogTitle: 'AI Engineer | Nicolas Neudeck',
   ogImage: 'https://i.postimg.cc/XYM5KnK4/DSC2584-50.jpg',
+  ogType: 'website',
   twitterCard: 'summary',
+  twitterTitle: 'AI Engineer | Nicolas Neudeck',
+  twitterDescription: 'My Personal Website about AI Engineering.',
+  twitterImage: 'https://i.postimg.cc/XYM5KnK4/DSC2584-50.jpg',
+  twitterSite: '@NeudeckNicolas',
+  twitterCreator: '@NeudeckNicolas',
+  twitterUrl: 'https://nicolas-website.onrender.com/'
 })
 </script>
