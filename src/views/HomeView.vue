@@ -47,35 +47,35 @@ import FwbAccordionContent from '../components/FwbAccordion/FwbAccordionContent.
 import accordionItems from '../data/home/interests.json';
 import BlogCard from '../components/BlogCard.vue';
 import blogEntries from '../data/blog_entries/blogentries.json';
-import { useHead, useSeoMeta } from '@unhead/vue'
+// import { useHead, useSeoMeta } from '@unhead/vue'
 const latestBlogEntries = blogEntries.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 3);
-useHead({
-  title: 'AI Engineer | Nicolas Neudeck',
-  meta: [
-    {
-      name: 'description',
-      content: 'My Personal Website about AI Engineering.'
-    },
-    {
-      name: 'keywords',
-      content: 'AI, Engineer, Nicolas Neudeck, Machine Learning, Scalable Architectures, Computer Science, Cooperation, Best Practices, Code Quality, Exceptional Products'
-    }
-  ]
-})
-useSeoMeta({
-  title: 'AI Engineer | Nicolas Neudeck',
-  description: 'My Personal Website about AI Engineering.',
-  ogDescription: 'My Personal Website about AI Engineering.',
-  ogTitle: 'AI Engineer | Nicolas Neudeck',
-  ogImage: 'https://i.postimg.cc/XYM5KnK4/DSC2584-50.jpg',
-  ogType: 'website',
-  ogUrl: 'https://nicolasneudeck.com/',
-  twitterCard: 'summary',
-  twitterTitle: 'AI Engineer | Nicolas Neudeck',
-  twitterDescription: 'My Personal Website about AI Engineering.',
-  twitterImage: 'https://i.postimg.cc/XYM5KnK4/DSC2584-50.jpg',
-  twitterSite: '@NeudeckNicolas',
-  twitterCreator: '@NeudeckNicolas',
-  twitterUrl: 'https://nicolasneudeck.com/'
-})
+// useHead({
+//   title: 'AI Engineer | Nicolas Neudeck',
+//   meta: [
+//     {
+//       name: 'description',
+//       content: 'My Personal Website about AI Engineering.'
+//     },
+//     {
+//       name: 'keywords',
+//       content: 'AI, Engineer, Nicolas Neudeck, Machine Learning, Scalable Architectures, Computer Science, Cooperation, Best Practices, Code Quality, Exceptional Products'
+//     }
+//   ]
+// })
+// useSeoMeta({
+//   title: 'AI Engineer | Nicolas Neudeck',
+//   description: 'My Personal Website about AI Engineering.',
+//   ogDescription: 'My Personal Website about AI Engineering.',
+//   ogTitle: 'AI Engineer | Nicolas Neudeck',
+//   ogImage: 'https://i.postimg.cc/XYM5KnK4/DSC2584-50.jpg',
+//   ogType: 'website',
+//   ogUrl: 'https://nicolasneudeck.com/',
+//   twitterCard: 'summary',
+//   twitterTitle: 'AI Engineer | Nicolas Neudeck',
+//   twitterDescription: 'My Personal Website about AI Engineering.',
+//   twitterImage: 'https://i.postimg.cc/XYM5KnK4/DSC2584-50.jpg',
+//   twitterSite: '@NeudeckNicolas',
+//   twitterCreator: '@NeudeckNicolas',
+//   twitterUrl: 'https://nicolasneudeck.com/'
+// })
 </script>
