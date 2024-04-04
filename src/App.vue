@@ -5,13 +5,13 @@
     </div>
   </header>
 
-  <article>
+  <main>
     <router-view v-slot="{ Component }">
       <transition name="fade">
         <component :is="Component"></component>
       </transition>
     </router-view>
-  </article>
+  </main>
 
   <Footer />
 </template>

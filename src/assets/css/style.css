@@ -7,7 +7,7 @@ body {
     position: relative;
     min-height: 100vh;
 }
-article{ 
+main { 
     padding-bottom: 4rem;
     @media (max-width: 48em) {
         padding-bottom: 6rem;
