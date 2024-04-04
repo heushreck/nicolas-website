@@ -1,5 +1,7 @@
-<p>Use SSH keys and define host aliases in the SSH config file (each alias for an account).</p>
-<p><strong>How to?</strong></p>
+<p>GitHub allows developers to collaborate in teams on projects and maintain version control over our code. Like many others, I work at a company, but also develop my own projects on the side. This means I have a personal GitHub account, a GitHub account from the company, and recently, a third account from a client where I also contribute to the repository. Managing multiple SSH keys on one machine has always been a bit cumbersome, but in this tutorial, I&#39;ll explain how I seamlessly switch from one GitHub account to the next and be able to commit and push in different repositories.</p>
+<h2 id="solution">Solution</h2>
+<p>The solution is to define <strong>host aliases</strong> in the SSH config file (each alias for an account) and have seperate directories for each github account.</p>
+<p>This is how:</p>
 <ol>
 <li><a href="https://help.github.com/articles/generating-a-new-ssh-key/">Generate SSH key pairs for accounts</a> and <a href="https://help.github.com/articles/adding-a-new-ssh-key-to-your-github-account/">add them to GitHub accounts</a>.</li>
 <li><p>Edit/Create SSH config file (<code>~/.ssh/config</code>):</p>
@@ -24,8 +26,9 @@ Host github-work
 </span>ssh-<span class="hljs-keyword">add</span><span class="bash"> ~/.ssh/id_work</span>
 </code></pre>
 </li>
-<li><p>Test your connection:</p>
-<pre><code class="lang-bash">ssh-keyscan github.com &amp;<span class="hljs-keyword">gt</span>;&amp;<span class="hljs-keyword">gt</span>; ~<span class="hljs-regexp">/.ssh/known</span>_hosts
+</ol>
+<h2 id="test-your-connection-">Test your connection:</h2>
+<pre><code class="lang-bash">ssh-keyscan github.com <span class="hljs-meta">&gt;&gt; </span>~<span class="hljs-regexp">/.ssh/known</span>_hosts
 ssh -T git@github.com
 ssh -T git@github-work
 </code></pre>
@@ -34,35 +37,42 @@ ssh -T git@github-work
 
 Hi work! You'</span>ve successfully authenticated, but GitHub does <span class="hljs-keyword">not</span> provide shell access.
 </code></pre>
-</li>
-<li><p>Now all are set, you need to remember:</p>
-<pre><code class="lang-bash">git@github-work:org/project.git =&amp;<span class="hljs-keyword">gt</span>; <span class="hljs-keyword">user</span> <span class="hljs-title">is</span> work
-git@github.com:org/project.git  =&amp;<span class="hljs-keyword">gt</span>; <span class="hljs-keyword">user</span> <span class="hljs-title">is</span> personal
+<p>Now all are set, you need to remember:</p>
+<pre><code class="lang-bash">git@github-work:org/project.git &gt; <span class="hljs-keyword">user</span> <span class="hljs-title">is</span> work
+git@github.com:org/project.git  &gt; <span class="hljs-keyword">user</span> <span class="hljs-title">is</span> personal
 </code></pre>
-</li>
-<li><p>If you need to clone a repository, just do:</p>
+<p>If you need to clone a repository, just do:</p>
 <pre><code class="lang-bash">git clone git@github-work:org1/project1<span class="hljs-selector-class">.git</span> /path/to/project1
 cd /path/to/project1
 git config user<span class="hljs-selector-class">.email</span> <span class="hljs-string">"email@example.com"</span>
 git config user<span class="hljs-selector-class">.name</span>  <span class="hljs-string">"FirstName LastName"</span>
 </code></pre>
-</li>
-<li><p>If you already have the repo set up, after the SSH config instructions, you need to change the URL of <code>origin</code>, just do:</p>
+<h2 id="migrate-repository">Migrate repository</h2>
+<p>If you already have the repo set up, after the SSH config instructions, you need to change the URL of <code>origin</code>, just do:</p>
 <pre><code class="lang-bash"><span class="hljs-string">cd </span>/<span class="hljs-string">path/</span><span class="hljs-string">to/</span><span class="hljs-string">project2
 </span><span class="hljs-string">git </span><span class="hljs-string">remote </span><span class="hljs-built_in">set-url</span> <span class="hljs-string">origin </span><span class="hljs-string">git@</span><span class="hljs-string">github-work:org2/</span><span class="hljs-string">project2.</span><span class="hljs-string">git
 </span><span class="hljs-string">git </span><span class="hljs-string">config </span><span class="hljs-string">user.</span><span class="hljs-string">email </span><span class="hljs-string">"email@example.com"</span>
 <span class="hljs-string">git </span><span class="hljs-string">config </span><span class="hljs-string">user.</span><span class="hljs-string">name </span> <span class="hljs-string">"FirstName LastName"</span>
 </code></pre>
+<h2 id="set-up-git-configuration">Set up Git Configuration</h2>
+<p>to avoid the constant need to manually configure your git email and name like this:</p>
+<pre><code class="lang-bash">git config user<span class="hljs-selector-class">.email</span> <span class="hljs-string">"email@example.com"</span>
+git config user<span class="hljs-selector-class">.name</span>  <span class="hljs-string">"FirstName LastName"</span>
+</code></pre>
+<p>You can create mutilple Git Config files:</p>
+<ol>
+<li><p>Edit your <code>~/.gitconfig</code> file</p>
+<pre><code class="lang-bash">[user]
+ <span class="hljs-attr">email</span> = email@personal.com
+ <span class="hljs-attr">name</span> = FirstName LastName
+[includeIf <span class="hljs-string">"gitdir:~/work_repositories/"</span>]
+   <span class="hljs-attr">path</span> = ~/work_repositories/.gitconfig
+</code></pre>
 </li>
-<li><p>If you are creating a new repository on local:</p>
-<pre><code class="lang-bash">cd /path/to/project3
-git init
-git remote <span class="hljs-keyword">add</span><span class="bash"> origin git@github-work:org3/project3.git
-</span>git config <span class="hljs-keyword">user</span>.email <span class="hljs-string">"superman@example.com"</span>
-git config <span class="hljs-keyword">user</span>.name  <span class="hljs-string">"Super Man"</span>
-git <span class="hljs-keyword">add</span><span class="bash"> .
-</span>git commit -m <span class="hljs-string">"Initial commit"</span>
-git push -u origin master
+<li>Create and edit a second Git Config file for your work account (<code>~/work_repositories/.gitconfig</code>): <pre><code class="lang-bash">[user]
+ <span class="hljs-section">email</span> = <span class="hljs-section">email</span>@work.com
+ name = FirstName LastName
 </code></pre>
 </li>
 </ol>
+<p>Everytime you are in the <code>~/work_repositories/</code> directory, your work email will be used when you commit and push code.</p>

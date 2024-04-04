@@ -64,7 +64,7 @@ def add_classes_to_elements(html_content):
             replace_with_code_block(pre_tag, pre_tag.get_text())
     
     for p_tag in soup.find_all('p'):
-        p_tag['class'] = p_tag.get('class', []) + ['mb-3']
+        p_tag['class'] = p_tag.get('class', []) + ['mb-3', 'text-justify']
         p_tag['style'] = 'color: #4B5563;'
 
     for ul_tag in soup.find_all('ul'):
