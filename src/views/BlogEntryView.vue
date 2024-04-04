@@ -76,7 +76,7 @@ useSeoMeta({
   ogDescription: () => blogEntry.shortDescription,
   ogTitle: () => blogEntry.title + ' | Nicolas Neudeck',
   ogImage: () => blogEntry.image,
-  twitterCard: 'summary_large_image',
+  twitterCard: 'summary',
 })
 
 onMounted(() => {
