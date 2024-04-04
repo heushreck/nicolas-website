@@ -2,6 +2,8 @@
 
 This is my personal website, build with Vue.js, Flowbite and Tailwind CSS.
 
+Check it out at https://nicolasneudeck.com/
+
 ## Project Setup
 
 ```sh
