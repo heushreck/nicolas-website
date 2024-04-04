@@ -1,7 +1,7 @@
 <template>
     <div id="blogCard" class="max-w-sm border border-gray-200 rounded-lg shadow dark:bg-gray-800 dark:border-gray-700">
         <RouterLink :to="`/blog/${id}`">
-            <img class="rounded-t-lg" :src="image" alt="" />
+            <img class="rounded-t-lg" :src="image" alt="Blog title Image" title="Blog title Image" />
         </RouterLink>
         <div class="p-5">
             <RouterLink :to="`/blog/${id}`">

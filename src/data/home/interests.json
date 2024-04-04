@@ -9,7 +9,7 @@
     },
     {
       "headerText": "Ragas",
-      "headerIcon": "<img class=\"w-6 h-6 me-2\" src=\"https://docs.ragas.io/en/stable/_static/ragas-logo.png\" alt=\"Flowbite logo\" />",
+      "headerIcon": "<img class=\"w-6 h-6 me-2\" src=\"https://docs.ragas.io/en/stable/_static/ragas-logo.png\" alt=\"Flowbite logo\" title=\"Blog title Image\"/>",
       "content": [
         { "text": "Ragas is a tool designed to assess and quantify the performance of Retrieval Augmented Generation (RAG) pipelines, which enhance language model applications by incorporating external data into their context." },
         { "text": "I find immense value in evaluating RAG pipelines to transform prompt engineering into a more scientific and data-driven practice." }

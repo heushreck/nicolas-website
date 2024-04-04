@@ -4,7 +4,7 @@
             <h1 class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white">Search</h1>
             <hr class="w-48 h-1 mx-auto my-4 bg-gray-600 border-0 rounded md:my-10">
             <div class="flex flex-row mb-4 items-center">
-                <h1 class="text-md text-gray-700 dark:text-white md:text-sm lg:text-lg">Blog articles tagged with </h1>
+                <h2 class="text-md text-gray-700 dark:text-white md:text-sm lg:text-lg">Blog articles tagged with </h2>
                 <div class="ms-2 bg-emerald-100 text-emerald-800 text-sm font-medium px-2.5 py-0.5 rounded border border-emerald-400">{{ searchQuery }}</div>
             </div>
         </div>

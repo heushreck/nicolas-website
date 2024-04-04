@@ -3,7 +3,7 @@
         <div class="custom-hero flex flex-col items-center">
             <h1 class="max-w-screen-lg mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white">{{ blogEntry.title }}</h1>
             <hr class="w-48 h-1 mx-auto my-4 bg-gray-600 border-0 rounded md:my-10">
-            <h1 class="mb-4 text-lg text-gray-900 dark:text-white md:text-sm lg:text-xl">{{ blogEntry.date }}</h1>
+            <h2 class="mb-4 text-lg text-gray-900 dark:text-white md:text-sm lg:text-xl">{{ date }}</h2>
             <div class="max-w-screen-lg flex flex flex-row items-center mx-auto place-content-center">
                 <button type="button" @click="handleShare('linkedIn')" class="text-white bg-emerald-600 hover:bg-emerald-800 focus:ring-4 focus:outline-none focus:ring-emerald-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center me-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
                     <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 448 512">
@@ -55,7 +55,6 @@ const blogEntryId = route.params.blogEntryId;
 const blogEntry = blogentries.find(blogentry => blogentry.id === blogEntryId);
 document.title = blogEntry.title;
 
-// use head with blogEntry.title
 useHead({
     title: () => blogEntry.title + ' | Nicolas Neudeck',
     meta: [
@@ -76,6 +75,7 @@ useSeoMeta({
   ogDescription: () => blogEntry.shortDescription,
   ogTitle: () => blogEntry.title + ' | Nicolas Neudeck',
   ogImage: () => blogEntry.image,
+  ogUrl: () => window.location.href,
   twitterCard: 'summary',
 })
 
@@ -84,6 +84,13 @@ onMounted(() => {
     window.Prism.manual = true;
     Prism.highlightAll();
 });
+
+const prettyDate = (date) => {
+  const options = { year: 'numeric', month: 'long', day: 'numeric' };
+  return new Date(date).toLocaleDateString('en-US', options);
+};
+
+const date = prettyDate(blogEntry.date);
 
 const markdownToHtml = computed(() => {
     return blogEntry.text;

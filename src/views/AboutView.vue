@@ -3,7 +3,7 @@
       <div class="custom-hero">
           <h1 class="mb-4 text-4xl font-extrabold leading-none tracking-tight text-gray-900 md:text-5xl lg:text-6xl dark:text-white">About Me</h1>
           <hr class="w-48 h-1 mx-auto my-4 bg-gray-600 border-0 rounded md:my-10">
-          <h1 class="mb-4 text-lg text-gray-900 dark:text-white md:text-sm lg:text-xl">My name is Nicolas, I am a Data and AI Enthusiast from Munich, Germany.</h1>
+          <h2 class="mb-4 text-lg text-gray-900 dark:text-white md:text-sm lg:text-xl">My name is Nicolas, I am a Data and AI Enthusiast from Munich, Germany.</h2>
       </div>
       <div class="max-w-screen-lg flex flex-col justify-between mx-auto p-4 column mb-4">
         <div class="flex 2xm:flex-row xl:flex-row lg:flex-row md:flex-row flex-col items-center mb-8">
