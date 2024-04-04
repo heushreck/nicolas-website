@@ -76,3 +76,20 @@
       </div>
     </div>
 </template>
+
+<script setup>
+import { useHead } from '@unhead/vue'
+useHead({
+  title: 'About Me | Nicolas Neudeck',
+  meta: [
+    {
+      name: 'description',
+      content: 'My Personal Website about AI Engineering.'
+    },
+    {
+      name: 'keywords',
+      content: 'AI, Engineer, Nicolas Neudeck, Machine Learning, Scalable Architectures, Computer Science, Cooperation, Best Practices, Code Quality, Exceptional Products'
+    }
+  ]
+})
+</script>

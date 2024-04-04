@@ -47,6 +47,27 @@ import FwbAccordionContent from '../components/FwbAccordion/FwbAccordionContent.
 import accordionItems from '../data/home/interests.json';
 import BlogCard from '../components/BlogCard.vue';
 import blogEntries from '../data/blog_entries/blogentries.json';
-// get latest three blog entries by looking at date
+import { useHead, useSeoMeta } from '@unhead/vue'
 const latestBlogEntries = blogEntries.sort((a, b) => new Date(b.date) - new Date(a.date)).slice(0, 3);
+useHead({
+  title: 'AI Engineer | Nicolas Neudeck',
+  meta: [
+    {
+      name: 'description',
+      content: 'My Personal Website about AI Engineering.'
+    },
+    {
+      name: 'keywords',
+      content: 'AI, Engineer, Nicolas Neudeck, Machine Learning, Scalable Architectures, Computer Science, Cooperation, Best Practices, Code Quality, Exceptional Products'
+    }
+  ]
+})
+useSeoMeta({
+  title: 'AI Engineer | Nicolas Neudeck',
+  description: 'My Personal Website about AI Engineering.',
+  ogDescription: 'My Personal Website about AI Engineering.',
+  ogTitle: 'AI Engineer | Nicolas Neudeck',
+  ogImage: 'https://i.postimg.cc/XYM5KnK4/DSC2584-50.jpg',
+  twitterCard: 'summary_large_image',
+})
 </script>

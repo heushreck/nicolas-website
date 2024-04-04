@@ -46,12 +46,38 @@ import 'prismjs/components/prism-bash'
 import 'prismjs/components/prism-json'
 import 'prismjs/components/prism-python'
 import blogEntries from '../data/blog_entries/blogentries.json';
+import { useHead, useSeoMeta } from '@unhead/vue'
+
 
 const blogentries = blogEntries;
 const route = useRoute()
 const blogEntryId = route.params.blogEntryId;
 const blogEntry = blogentries.find(blogentry => blogentry.id === blogEntryId);
 document.title = blogEntry.title;
+
+// use head with blogEntry.title
+useHead({
+    title: () => blogEntry.title + ' | Nicolas Neudeck',
+    meta: [
+        {
+            name: 'description',
+            content: () => blogEntry.shortDescription
+        },
+        {
+            name: 'keywords',
+            content: () => 'Nicolas Neudeck, Blog, AI Engineer, ' + blogEntry.tags.join(', ')
+        },
+    ],
+});
+
+useSeoMeta({
+  title: () => blogEntry.title + ' | Nicolas Neudeck',
+  description: () => blogEntry.shortDescription,
+  ogDescription: () => blogEntry.shortDescription,
+  ogTitle: () => blogEntry.title + ' | Nicolas Neudeck',
+  ogImage: () => blogEntry.image,
+  twitterCard: 'summary_large_image',
+})
 
 onMounted(() => {
     window.Prism = window.Prism || {};

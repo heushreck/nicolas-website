@@ -23,6 +23,23 @@
 import BlogCard from '../components/BlogCard.vue';
 import blogEntries from '../data/blog_entries/blogentries.json';
 import gsap from 'gsap';
+import { useHead } from '@unhead/vue';
+
+useHead({
+  title: 'Blog | Nicolas Neudeck',
+  meta: [
+    {
+      name: 'description',
+      content: 'Interesting stuff I cam across...'
+    },
+    {
+      name: 'keywords',
+      content: 'Nicolas Neudeck, Blog, Stories, Insights, AI Engineer'
+    },
+  ],
+});
+
+
 const blogentries = blogEntries;
 blogentries.sort((a, b) => new Date(b.date) - new Date(a.date));
 
