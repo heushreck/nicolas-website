@@ -30,3 +30,10 @@ footer {
     padding-bottom: 50px;
     text-align: center;
 }
+
+@media only screen and (max-width: 600px) {
+    .custom-hero {
+        padding-top: 50px;
+        padding-bottom: 25px;
+    }
+}

@@ -7,10 +7,10 @@
       </div>
       <div class="max-w-screen-lg flex flex-col justify-between mx-auto p-4 column mb-4">
         <div class="flex 2xm:flex-row xl:flex-row lg:flex-row md:flex-row flex-col items-center mb-8">
-          <div class="lg:w-1/5 md:w-1/5 sm:w-1/2 me-8 sm:mb-4">
+          <div class="lg:w-1/5 md:w-1/5 sm:w-1/2 sm:me-8 md:mb-0 mb-4">
             <img class="rounded-full" src="https://media.licdn.com/dms/image/D5603AQG2VQT_-XU17A/profile-displayphoto-shrink_800_800/0/1633939892232?e=1717027200&v=beta&t=fn6hX3gVla0yK2mAmG4o3QxetIatC3r2yWRp6qccR6Q" alt="image description">
           </div>
-          <div class="text-lg lg:w-4/5 md:w-4/5 sm:w-1/2">
+          <div class="text-lg lg:w-4/5 md:w-4/5 sm:w-1/2 text-justify">
             I've always been drawn to the world of data. During my computer science studies at the Technical University of Munich, I focused on databases and machine learning. My experiences at E.ON and Amazon further sharpened my abilities in SQL and Python, and introduced me to the fascinating realm of serverless architecture. Currently, I'm expanding my toolkit with Rust, Docker, Kubernetes, mastering the art of building efficient CI/CD pipelines, and diving into unit testing. To me, the ability to learn and grow through acquiring new skills is the best opportunity an employer can provide. Outside of work, I'm actively involved in the Munich data science scene, enjoy participating in hackathons, and am passionate about entrepreneurship.
           </div>
         </div>
