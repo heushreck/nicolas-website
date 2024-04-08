@@ -7,7 +7,7 @@
     </div>
     <div class="max-w-screen-lg flex flex-col justify-between mx-auto p-4 mb-8">
       <div class="text-lg text-justify">
-        Welcome to this corner of the web, where I present my passions, projects, and efforts. These virtual walls house not only a selection of my work but also a series of carefully compiled tutorials and creative solutions that I could not easily find elsewhere on the internet. I'm a passionate AI engineer who is constantly motivated by the spirit of cooperation that exists among computer scientists around the world. In my daily activities, I focus on creating scalable architectures for machine learning applications, while also deeply caring about efficiency, adhering to best practices, and maintaining code quality, principles I consider essential for delivering exceptional products.
+        As an AI Engineer, my focus is on designing, developing, and maintaining AI models and systems to tackle challenges and enhance decision-making within organizations. I have a deep interest in scalable architecture, DevOps pipelines, efficient programming, code quality, and best practices. On this page, I aim to share insights, tutorials, and some unique discoveries that might not be easily found elsewhere, all of which reflect my journey and learning in the field.
       </div>
       <!-- My Current Interests -->
       <h2 class="mt-16 text-3xl text-gray-900 dark:text-white">My Current Interests</h2>

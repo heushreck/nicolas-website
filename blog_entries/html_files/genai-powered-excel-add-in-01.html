@@ -1,0 +1,236 @@
+<p>In this tutorial series, we&#39;ll build a Generative AI-enhanced Excel Add-in, providing an ideal starting point for those aiming to develop quick and impressive GenAI Use-Cases. We&#39;ll utilize Vue.js for the frontend, shown as an Office Add-in within the Microsoft Excel Application. Python and FastAPI will power the backend. We will call the OpenAI GPT Language model, customized with specific instructions to generate the GenAI component.</p>
+<p>This marks <strong>Part 1</strong> of our tutorial series, focusing on setup and the installation process. By the end, we&#39;ll have a functional Excel Add-in capable of colorizing all highlighted cells with the press of a button.</p>
+<h2 id="prerequisites">Prerequisites</h2>
+<ul>
+<li>A Microsoft 365 subscription (including Office on the web).</li>
+<li>Node.js v18.18.2 (Visite <a href="https://nodejs.org/">Node.js site</a> to download and install).</li>
+<li><p>The latest version of Yeoman and the Yeoman generator for Office Add-ins.</p>
+<pre><code class="lang-bash">npm <span class="hljs-keyword">install</span> -g yo generator-office
+</code></pre>
+</li>
+<li><p>Vue.js</p>
+<pre><code class="lang-bash"><span class="hljs-built_in">npm</span> install -g @vue/cli
+</code></pre>
+</li>
+</ul>
+<h2 id="-generate-a-new-vue-app-"><strong>Generate a new Vue app</strong></h2>
+<p>To generate a new Vue app, use the Vue CLI.</p>
+<pre><code class="lang-bash">vue <span class="hljs-keyword">create</span> plot_pilot
+</code></pre>
+<p>Then, select the <code>Default</code> preset for &quot;Vue 3&quot;.</p>
+<h2 id="-generate-the-manifest-file-"><strong>Generate the manifest file</strong></h2>
+<p>Each Add-in requires a manifest file to define its settings and capabilities.</p>
+<ol>
+<li><p>Navigate to your app folder (Our App will be called plot_pilot because is automatically creates Plot for your data)</p>
+<pre><code class="lang-bash"><span class="hljs-built_in">cd</span> plot_pilot
+</code></pre>
+</li>
+<li><p>Use the Yeoman generator to generate the manifest file for your Add-in.</p>
+<pre><code class="lang-bash"><span class="hljs-attribute">yo office</span>
+</code></pre>
+<p>When prompted, provide the following information to create your Add-in project.</p>
+<ul>
+<li><strong>Choose a project type:</strong> <code>Office Add-in project containing the manifest only</code></li>
+<li><strong>What do you want to name your Add-in?</strong> <code>PlotPilot</code></li>
+<li><strong>Which Office client application would you like to support?</strong> <code>Excel</code></li>
+</ul>
+</li>
+</ol>
+<p>After completion, the wizard creates a <code>PlotPilot</code> folder containing a <strong>manifest.xml</strong> file. You&#39;ll use the manifest to sideload and test your Add-in.</p>
+<h2 id="clean-up">Clean Up</h2>
+<p>We need to rearrange some of the files. </p>
+<ul>
+<li>The folder <code>plot_pilot/PlotPilot/assets/</code> can be moved in <code>plot_pilot/public/assets/</code></li>
+<li>The file <code>plot_pilot/PlotPilot/manifest.xml</code> can be moved to <code>plot_pilot/manifest.xml</code></li>
+<li><p>Edit the plot_pilot/package.json file:</p>
+<ul>
+<li><p>Add <em><code>&quot;office-toolbox&quot;</code></em> to the <em><code>&quot;dependencies&quot;</code></em></p>
+<pre><code class="lang-json"><span class="hljs-string">"dependencies"</span>: {
+...
+<span class="hljs-string">"office-toolbox"</span>: <span class="hljs-string">"^0.1.1"</span>
+}
+</code></pre>
+</li>
+<li><p>Add the “validate” script to the scripts</p>
+<pre><code class="lang-json"><span class="hljs-string">"scripts"</span>: {
+...
+<span class="hljs-string">"validate"</span>: <span class="hljs-string">"office-toolbox validate -m manifest.xml"</span>
+}
+</code></pre>
+</li>
+</ul>
+</li>
+<li><p>Delete the whole <code>plot_pilot/PlotPilot/</code>  folder, we do not need it anymore.</p>
+</li>
+<li>Also delete the <code>plot_pilot/src/assets/</code> and <code>plot_pilot/src/components/</code> folders, we do not need them anymore.</li>
+<li><p>Your folder structure should look like this:</p>
+<p><img src="https://i.postimg.cc/gJ1D3cFx/build-a-genai-powered-excel-add-in-01-image-01.webp" alt="Screenshot 2024-04-08 at 16.53.35.png"></p>
+</li>
+</ul>
+<h2 id="secure-the-app">Secure the app</h2>
+<p>While not strictly required in all Add-in scenarios, using an HTTPS endpoint for your Add-in is strongly recommended. Add-ins that are not SSL-secured (HTTPS) generate unsecure content warnings and errors during use. If you plan to run your Add-in in Office on the web or publish your Add-in to AppSource, it must be SSL-secured. If your Add-in accesses external data and services, it should be SSL-secured to protect data in transit. Self-signed certificates can be used for development and testing, so long as the certificate is trusted on the local machine.</p>
+<ol>
+<li><p>Enable HTTPS for your app. In the root folder of the Vue project, open the <strong>vue.config.js</strong> file and replace the file contents with the following code.</p>
+<pre><code class="lang-javascript"><span class="hljs-keyword">const</span> fs = <span class="hljs-built_in">require</span>(<span class="hljs-string">"fs"</span>);
+<span class="hljs-keyword">const</span> path = <span class="hljs-built_in">require</span>(<span class="hljs-string">"path"</span>);
+<span class="hljs-keyword">const</span> homedir = <span class="hljs-built_in">require</span>(<span class="hljs-string">'os'</span>).homedir()
+
+<span class="hljs-built_in">module</span>.exports = {
+ <span class="hljs-attr">devServer</span>: {
+   <span class="hljs-attr">port</span>: <span class="hljs-number">3000</span>,
+   <span class="hljs-attr">https</span>: {
+     <span class="hljs-attr">key</span>: fs.readFileSync(path.resolve(<span class="hljs-string">`<span class="hljs-subst">${homedir}</span>/.office-addin-dev-certs/localhost.key`</span>)),
+     <span class="hljs-attr">cert</span>: fs.readFileSync(path.resolve(<span class="hljs-string">`<span class="hljs-subst">${homedir}</span>/.office-addin-dev-certs/localhost.crt`</span>)),
+     <span class="hljs-attr">ca</span>: fs.readFileSync(path.resolve(<span class="hljs-string">`<span class="hljs-subst">${homedir}</span>/.office-addin-dev-certs/ca.crt`</span>)),
+     }
+   }
+}
+</code></pre>
+</li>
+<li><p>Install the Add-in&#39;s certificates for all users on your machine valid for 30 days.</p>
+<pre><code class="lang-bash"><span class="hljs-comment">npx</span> <span class="hljs-comment">office</span><span class="hljs-literal">-</span><span class="hljs-comment">addin</span><span class="hljs-literal">-</span><span class="hljs-comment">dev</span><span class="hljs-literal">-</span><span class="hljs-comment">certs</span> <span class="hljs-comment">install</span> <span class="hljs-literal">-</span><span class="hljs-literal">-</span><span class="hljs-comment">machine</span> <span class="hljs-literal">-</span><span class="hljs-literal">-</span><span class="hljs-comment">days</span> <span class="hljs-comment">30</span>
+</code></pre>
+</li>
+</ol>
+<h2 id="explore-the-project">Explore the project</h2>
+<p>Open the Code in VSCode or any other IDE.</p>
+<ul>
+<li><p>The <strong>manifest.xml</strong> file in the root directory of the project defines the settings and capabilities of the Add-in. To learn more about the <strong>manifest.xml</strong> file, see <a href="https://learn.microsoft.com/en-us/office/dev/add-ins/develop/xml-manifest-overview">Office Add-ins XML manifest</a>.</p>
+<ul>
+<li><p>You can change the Display name and description for the Add-in here
+I change a couple Resources in the <code>&lt;bt:ShortStrings&gt;</code> tag</p>
+<pre><code class="lang-xml"><span class="hljs-tag">&lt;<span class="hljs-name">bt:ShortStrings</span>&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">bt:String</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"GetStarted.Title"</span> <span class="hljs-attr">DefaultValue</span>=<span class="hljs-string">"Generate awesome Plots!"</span> /&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">bt:String</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"CommandsGroup.Label"</span> <span class="hljs-attr">DefaultValue</span>=<span class="hljs-string">"Nicolas Add-ins"</span> /&gt;</span>
+  <span class="hljs-tag">&lt;<span class="hljs-name">bt:String</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"TaskpaneButton.Label"</span> <span class="hljs-attr">DefaultValue</span>=<span class="hljs-string">"Plot Pilot"</span> /&gt;</span>
+<span class="hljs-tag">&lt;/<span class="hljs-name">bt:ShortStrings</span>&gt;</span>
+</code></pre>
+</li>
+</ul>
+</li>
+<li><p>The <strong>./src/App.vue</strong> file contains the HTML markup for the task pane, the CSS that&#39;s applied to the content in the task pane, and the Office JavaScript API code that facilitates interaction between the task pane and Excel.</p>
+</li>
+</ul>
+<h2 id="update-the-app">Update the app</h2>
+<ol>
+<li><p>Open the <em><code>./public/index.html</code></em> file and add the following <code>&lt;script&gt;</code> tag immediately before the <code>&lt;/head&gt;</code> tag.</p>
+<pre><code class="lang-html"><span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">src</span>=<span class="hljs-string">"https://appsforoffice.microsoft.com/lib/1/hosted/office.js"</span>&gt;</span><span class="undefined"></span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+</code></pre>
+</li>
+<li><p>Open <code>*manifest.xml*</code> and find the <code>&lt;bt:Urls&gt;</code> tags inside the <code>&lt;Resources&gt;</code> tag. Locate the <code>&lt;bt:Url&gt;</code> tag with the ID <code>Taskpane.Url</code> and update its <code>DefaultValue</code> attribute. The new <code>DefaultValue</code> is <code>https://localhost:3000/index.html</code>. The entire updated tag should match the following line.</p>
+<pre><code class="lang-html"> &lt;bt:Url <span class="hljs-built_in">id</span>=<span class="hljs-string">"Taskpane.Url"</span> DefaultValue=<span class="hljs-string">"https://localhost:3000/index.html"</span> /&gt;
+</code></pre>
+</li>
+<li><p>Open <strong><code>*./src/main.js*</code></strong> and replace the contents with the following code.</p>
+<pre><code class="lang-javascript"> <span class="hljs-keyword">import</span> { createApp } <span class="hljs-keyword">from</span> <span class="hljs-string">'vue'</span>
+ <span class="hljs-keyword">import</span> App <span class="hljs-keyword">from</span> <span class="hljs-string">'./App.vue'</span>
+
+ <span class="hljs-built_in">window</span>.Office.onReady(<span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+     createApp(App).mount(<span class="hljs-string">'#app'</span>);
+ });
+</code></pre>
+</li>
+<li><p>Open <em><code>./src/App.vue</code></em> and replace the file contents with the following code.</p>
+<pre><code class="lang-html"> <span class="hljs-tag">&lt;<span class="hljs-name">template</span>&gt;</span>
+   <span class="hljs-tag">&lt;<span class="hljs-name">div</span> <span class="hljs-attr">id</span>=<span class="hljs-string">"app"</span>&gt;</span>
+     <span class="hljs-tag">&lt;<span class="hljs-name">header</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"header"</span>&gt;</span>
+       <span class="hljs-tag">&lt;<span class="hljs-name">h2</span>&gt;</span>Welcome to Plot Pilot<span class="hljs-tag">&lt;/<span class="hljs-name">h2</span>&gt;</span>
+     <span class="hljs-tag">&lt;/<span class="hljs-name">header</span>&gt;</span>
+     <span class="hljs-tag">&lt;<span class="hljs-name">main</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"content"</span>&gt;</span>
+       <span class="hljs-tag">&lt;<span class="hljs-name">h3</span>&gt;</span>This is a simple Vue.js Office Add-in app to demonstrate basic styling and structure.<span class="hljs-tag">&lt;/<span class="hljs-name">h3</span>&gt;</span>
+       <span class="hljs-tag">&lt;<span class="hljs-name">p</span>&gt;</span>Highlight a couple of Cells in the Worksheet and color them by clicking the button.<span class="hljs-tag">&lt;/<span class="hljs-name">p</span>&gt;</span>
+       <span class="hljs-tag">&lt;<span class="hljs-name">button</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"button"</span> @<span class="hljs-attr">click</span>=<span class="hljs-string">"onSetColor"</span>&gt;</span>
+         <span class="hljs-tag">&lt;<span class="hljs-name">svg</span> <span class="hljs-attr">class</span>=<span class="hljs-string">"icon"</span> <span class="hljs-attr">xmlns</span>=<span class="hljs-string">"http://www.w3.org/2000/svg"</span> <span class="hljs-attr">viewBox</span>=<span class="hljs-string">"0 0 24 24"</span> <span class="hljs-attr">fill</span>=<span class="hljs-string">"currentColor"</span>&gt;</span>
+           <span class="hljs-tag">&lt;<span class="hljs-name">path</span> <span class="hljs-attr">fill-rule</span>=<span class="hljs-string">"evenodd"</span> <span class="hljs-attr">d</span>=<span class="hljs-string">"M20.599 1.5c-.376 0-.743.111-1.055.32l-5.08 3.385a18.747 18.747 0 0 0-3.471 2.987 10.04 10.04 0 0 1 4.815 4.815 18.748 18.748 0 0 0 2.987-3.472l3.386-5.079A1.902 1.902 0 0 0 20.599 1.5Zm-8.3 14.025a18.76 18.76 0 0 0 1.896-1.207 8.026 8.026 0 0 0-4.513-4.513A18.75 18.75 0 0 0 8.475 11.7l-.278.5a5.26 5.26 0 0 1 3.601 3.602l.502-.278ZM6.75 13.5A3.75 3.75 0 0 0 3 17.25a1.5 1.5 0 0 1-1.601 1.497.75.75 0 0 0-.7 1.123 5.25 5.25 0 0 0 9.8-2.62 3.75 3.75 0 0 0-3.75-3.75Z"</span> <span class="hljs-attr">clip-rule</span>=<span class="hljs-string">"evenodd"</span> /&gt;</span>
+         <span class="hljs-tag">&lt;/<span class="hljs-name">svg</span>&gt;</span>
+         <span class="hljs-tag">&lt;<span class="hljs-name">div</span>&gt;</span>Color Me<span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+       <span class="hljs-tag">&lt;/<span class="hljs-name">button</span>&gt;</span>
+     <span class="hljs-tag">&lt;/<span class="hljs-name">main</span>&gt;</span>
+   <span class="hljs-tag">&lt;/<span class="hljs-name">div</span>&gt;</span>
+ <span class="hljs-tag">&lt;/<span class="hljs-name">template</span>&gt;</span>
+
+ <span class="hljs-tag">&lt;<span class="hljs-name">script</span> <span class="hljs-attr">setup</span>&gt;</span><span class="javascript">
+   <span class="hljs-keyword">import</span> { ref } <span class="hljs-keyword">from</span> <span class="hljs-string">'vue'</span>;
+   <span class="hljs-keyword">const</span> teaGreen = ref(<span class="hljs-string">'rgba(196, 241, 190, 1)'</span>);
+   <span class="hljs-keyword">const</span> paynesGray = ref(<span class="hljs-string">'rgba(82, 91, 118, 1)'</span>);
+   <span class="hljs-keyword">const</span> spaceCadet = ref(<span class="hljs-string">'rgba(32, 30, 80, 1)'</span>);
+   <span class="hljs-keyword">const</span> onSetColor = <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> {
+         <span class="hljs-built_in">window</span>.Excel.run(<span class="hljs-keyword">async</span> context =&gt; {
+           <span class="hljs-keyword">const</span> range = context.workbook.getSelectedRange();
+           range.format.fill.color = <span class="hljs-string">'#a2c3a4'</span>;
+           <span class="hljs-keyword">await</span> context.sync();
+         });
+       };
+
+ </span><span class="hljs-tag">&lt;/<span class="hljs-name">script</span>&gt;</span>
+
+ <span class="hljs-tag">&lt;<span class="hljs-name">style</span>&gt;</span><span class="css">
+
+ <span class="hljs-selector-tag">html</span>, <span class="hljs-selector-tag">body</span> {
+   <span class="hljs-attribute">background-color</span>: <span class="hljs-built_in">rgba</span>(162, 195, 164, 1);
+ }
+
+ <span class="hljs-selector-class">.header</span> {
+   <span class="hljs-attribute">background-color</span>: <span class="hljs-built_in">v-bind</span>(<span class="hljs-string">"spaceCadet"</span>);
+   <span class="hljs-attribute">color</span>: <span class="hljs-built_in">v-bind</span>(<span class="hljs-string">"teaGreen"</span>);
+   <span class="hljs-attribute">text-align</span>: center;
+   <span class="hljs-attribute">padding</span>: <span class="hljs-number">10px</span>;
+   <span class="hljs-attribute">font-size</span>: <span class="hljs-number">20px</span>;
+ }
+
+ <span class="hljs-selector-class">.content</span> {
+   <span class="hljs-attribute">padding</span>: <span class="hljs-number">20px</span>;
+   <span class="hljs-attribute">color</span>: <span class="hljs-built_in">v-bind</span>(<span class="hljs-string">"spaceCadet"</span>);
+ }
+
+ <span class="hljs-selector-class">.button</span> {
+   <span class="hljs-attribute">background-color</span>: <span class="hljs-built_in">v-bind</span>(<span class="hljs-string">"paynesGray"</span>);
+   <span class="hljs-attribute">color</span>: <span class="hljs-built_in">v-bind</span>(<span class="hljs-string">"teaGreen"</span>);
+   <span class="hljs-attribute">border</span>: none;
+   <span class="hljs-attribute">padding</span>: <span class="hljs-number">10px</span> <span class="hljs-number">20px</span>;
+   <span class="hljs-attribute">cursor</span>: pointer;
+   <span class="hljs-attribute">font-size</span>: <span class="hljs-number">16px</span>;
+   <span class="hljs-attribute">display</span>: inline-flex;
+   <span class="hljs-attribute">align-items</span>: center;
+   <span class="hljs-attribute">border-radius</span>: <span class="hljs-number">10px</span>;
+ }
+
+ <span class="hljs-selector-class">.icon</span> {
+   <span class="hljs-attribute">margin-right</span>: <span class="hljs-number">10px</span>;
+   <span class="hljs-attribute">width</span>: <span class="hljs-number">24px</span>;
+   <span class="hljs-attribute">height</span>: <span class="hljs-number">24px</span>;
+ }
+ </span><span class="hljs-tag">&lt;/<span class="hljs-name">style</span>&gt;</span>
+</code></pre>
+</li>
+</ol>
+<h2 id="try-it-out">Try it out</h2>
+<ol>
+<li><p>Start the dev server.</p>
+<pre><code class="lang-bash">npm <span class="hljs-keyword">run</span><span class="bash"> serve</span>
+</code></pre>
+</li>
+<li><p>In a web browser, navigate to <code>https://localhost:3000</code> (notice the <code>https</code>). If the page on <code>https://localhost:3000</code> is blank and without any certificate errors, it means that it&#39;s working.</p>
+</li>
+<li><p>Lets sideload the Excel Add-in on to the web:</p>
+<ol>
+<li>Go to <a href="https://www.office.com/launch/Excel/?auth=2">https://www.office.com/launch/Excel</a> and create a blank Workbook</li>
+<li>Select <strong>Home</strong> &gt; <strong>Add-ins</strong>, then select <strong>More Add-ins</strong>.</li>
+<li>On the <strong>Office Add-ins</strong> dialog, select the <strong>MY ADD-INS</strong> tab, choose <strong>Upload My Add-in</strong>.</li>
+<li><strong>Browse</strong> to the Add-in manifest file, and then select <strong>Upload</strong>. The file should be in <em><code>plot_pilot/manifest.xml</code></em></li>
+<li>After a few seconds a new Item should appear in your Excel Home Bar.</li>
+</ol>
+</li>
+<li><p>Open the Add-in task pane in Excel. On the <strong>Home</strong> tab, choose the <strong>Plot Pilot</strong> button.</p>
+</li>
+<li><p>Select any range of cells in the worksheet.</p>
+<p> <img src="https://i.postimg.cc/SKSw3RzH/build-a-genai-powered-excel-add-in-01-image-02.png" alt="Screenshot 2024-04-08 at 17.00.59.png"></p>
+</li>
+<li><p>Set the color of the selected range to green. In your Add-in&#39;s task pane, choose the <strong>Set color</strong> button.</p>
+<p> <img src="https://i.postimg.cc/fb86Nscy/build-a-genai-powered-excel-add-in-01-image-03.png" alt="Screenshot 2024-04-08 at 17.01.28.png"></p>
+</li>
+</ol>
+<h3 id="resources-">Resources:</h3>
+<p>Microsoft Tutorial on how to create Excel Add-ins:
+<a href="https://learn.microsoft.com/en-us/office/dev/add-ins/quickstarts/excel-quickstart-vue">https://learn.microsoft.com/en-us/office/dev/add-ins/quickstarts/excel-quickstart-vue</a></p>
+<p>Project GitHub link: <a href="https://github.com/heushreck/PlotPilot">https://github.com/heushreck/PlotPilot</a></p>

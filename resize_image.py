@@ -30,6 +30,6 @@ def resize_image_to_4_3_with_background(image_path, output_path):
         print(f"Image resized to 4:3 aspect ratio with white background and saved to {output_path}")
 
 # Example usage
-image_path = 'blog_entries/covers/manage-multiple-ssh-keys.webp'
-output_path = 'blog_entries/covers/manage-multiple-ssh-keys_4_3.webp'
+image_path = 'blog_entries/covers/genai-powered-excel-add-in-01.webp'
+output_path = 'blog_entries/covers/genai-powered-excel-add-in-01_4_3.webp'
 resize_image_to_4_3_with_background(image_path, output_path)
