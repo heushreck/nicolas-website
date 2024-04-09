@@ -24,7 +24,8 @@ export default defineConfig({
     [ 'link', { rel: 'icon', href: '/favicon.ico' } ],
   ],
   sitemap: {
-    hostname: 'https://nicolasneudeck.com'
+    hostname: 'https://nicolasneudeck.com',
+    lastmodDateOnly: false
   },
   lastUpdated: true,
   cleanUrls: true,
