@@ -6,35 +6,73 @@ Check it out at https://nicolasneudeck.com/
 
 ## Project Setup
 
-```sh
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes.
+
+### Prerequisites
+
+What things you need to install the software and how to install them. For example:
+
+- [Node.js](https://nodejs.org/en/) (version 18.8.2 or above)
+- [npm](https://www.npmjs.com/) (usually comes with Node.js)
+
+### Installation
+
+A step-by-step series of examples that tell you how to get a development environment running.
+
+First, clone the repository to your local machine:
+
+```bash
+git clone git@github.com:heushreck/nicolas-website.git
+```
+
+Navigate to the project directory:
+
+```bash
+cd nicolas-website
+```
+
+Install the project dependencies:
+
+```bash
 npm install
 ```
 
-### Compile and Hot-Reload for Development
+### Running the Development Server
 
-```sh
-npm run dev
+To run the local development server and start the VitePress app, use:
+
+```bash
+npm run docs:dev
 ```
 
-### Compile and Minify for Production
+This command will start a local development server. Open [http://localhost:5173/](http://localhost:5173/) to view it in the browser. The page will reload if you make edits.
 
-```sh
-npm run build
+### Building for Production
+
+To build the static files for production, run:
+
+```bash
+npm run docs:build
 ```
 
-### Lint with [ESLint](https://eslint.org/)
+This command will generate a `docs/.vitepress/dist` directory with all the static files ready for deployment.
 
-```sh
-npm run lint
+### Previewing the Build Locally
+
+After building, you might want to preview the site as it will appear once deployed. To do this, run:
+
+```bash
+npm run docs:preview
 ```
 
-## Add a Blog Entry
+This command serves the static files from the `docs/.vitepress/dist` directory on a local server for you to preview.
 
-1. Write the blog entry in a markdown file and save it to `blog_entries/md_files`.
-2. Visit https://markdowntohtml.com/#converter and convert the Markdown file into a html file. 
-3. Save the html file in the `blog_entries/html_files` folder.
-4. Add a entry in the `src/data/blog_entries/blogentries.json` JSON file. Add everything except for text.
-5. Style the HTML file
-    ```sh
-    python style.py src/data/blog_entries/html_files/<file_name>.html
-    ```
+## Deployment
+
+To deploy the built site, you can use Firebase. Make sure you have the Firebase CLI installed and configured. Then run:
+
+```bash
+firebase deploy
+```
+
+This command will deploy your site to Firebase Hosting.
