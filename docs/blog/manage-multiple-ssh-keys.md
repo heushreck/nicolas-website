@@ -40,7 +40,7 @@ head:
       content: '@NeudeckNicolas'
   - - meta
     - name: 'twitter:url'
-      content: http://localhost:5173/blog/manage-multiple-ssh-keys.html
+      content: http://localhost:5173/blog/manage-multiple-ssh-keys
   - - meta
     - name: google-site-verification
       content: y2TPQtEwoTHbX6abRZljBc_41I2dP1hcQqWvlsMvSG0
