@@ -27,4 +27,5 @@ export default defineConfig({
     hostname: 'https://nicolasneudeck.com'
   },
   lastUpdated: true,
+  cleanUrls: true,
 })
