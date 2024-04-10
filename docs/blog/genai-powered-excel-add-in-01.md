@@ -43,7 +43,7 @@ head:
       content: http://localhost:5173/blog/genai-powered-excel-add-in-01
   - - meta
     - name: google-site-verification
-      content: y2TPQtEwoTHbX6abRZljBc_41I2dP1hcQqWvlsMvSG0
+      content: 9agtSktJYcUTkHEIMiXa-0GX5OAFp-aq-M-sGdHEDm8
 ---
 <script setup>
 import Hero from '../../components/Hero.vue'

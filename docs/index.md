@@ -45,7 +45,7 @@ head:
       content: https://nicolasneudeck.com
   - - meta
     - name: google-site-verification
-      content: y2TPQtEwoTHbX6abRZljBc_41I2dP1hcQqWvlsMvSG0
+      content: 9agtSktJYcUTkHEIMiXa-0GX5OAFp-aq-M-sGdHEDm8
 
 ---
 <script setup>
