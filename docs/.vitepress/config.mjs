@@ -21,7 +21,7 @@ export default defineConfig({
     }
   },
   head: [
-    [ 'link', { rel: 'icon', href: '/favicon.ico' } ],
+    [ 'link', { rel: 'icon', href: 'https://nicolasneudeck.com/favicon.ico' } ],
   ],
   sitemap: {
     hostname: 'https://nicolasneudeck.com',
