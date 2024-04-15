@@ -10,7 +10,7 @@ head:
       content: Building a GenAI-powered Excel Add-in | Nicolas Neudeck
   - - meta
     - property: 'og:image'
-      content: https://i.postimg.cc/3NcR42C5/genai-powered-excel-add-in-01.webp
+      content: https://i.postimg.cc/jq9Y4txB/genai-powered-excel-add-in-01.webp
   - - meta
     - property: 'og:url'
       content: http://localhost:5173/blog/genai-powered-excel-add-in-01
@@ -31,7 +31,7 @@ head:
       content: Discover how to create a Excel Add-In with Vue.js in Part 1 of this tutorial series.
   - - meta
     - name: 'twitter:image'
-      content: https://i.postimg.cc/3NcR42C5/genai-powered-excel-add-in-01.webp
+      content: https://i.postimg.cc/jq9Y4txB/genai-powered-excel-add-in-01.webp
   - - meta
     - name: 'twitter:site'
       content: '@NeudeckNicolas'

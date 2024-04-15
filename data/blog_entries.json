@@ -1,28 +1,42 @@
 [
-    {
-      "id": "genai-powered-excel-add-in-01",
-      "title": "Building a GenAI-powered Excel Add-in - Part 01 - Getting Started Developing Office Add-Ins",
-      "image": "https://i.postimg.cc/3NcR42C5/genai-powered-excel-add-in-01.webp",
-      "tags": [
-        "Vue.js",
-        "Office Add-In",
-        "GenAI",
-        "Excel"
-      ],
-      "shortDescription": "Discover how to create a Excel Add-In with Vue.js in Part 1 of this tutorial series.",
-      "date": "2024-04-08"
-    },
-    {
-      "id": "manage-multiple-ssh-keys",
-      "title": "Manage Multiple SSH Key for GitHub on One Machine",
-      "image": "https://i.postimg.cc/JhRrBBsG/manage-multiple-ssh-keys.webp",
-      "tags": [
-        "SSH",
-        "GitHub",
-        "ssh-key",
-        "ssh-config"
-      ],
-      "shortDescription": "Learn how to seamlessly manage multiple GitHub accounts on a single machine using distinct SSH keys, from key generation to repository configuration.",
-      "date": "2024-03-23"
-    }
-  ]
+  {
+    "id": "genai-powered-excel-add-in-02",
+    "title": "Building a GenAI-powered Excel Add-in - Part 02 - Generating Graphs",
+    "image": "https://i.postimg.cc/kgNrCSQd/genai-powered-excel-add-in-02.webp",
+    "tags": [
+      "Vue.js",
+      "Office Add-In",
+      "GenAI",
+      "Excel",
+      "Graphs"
+    ],
+    "shortDescription": "Part 2 of our tutorial series shows how to improve your Excel Add-In by adding interactive features that create graphs from your data.",
+    "date": "2024-04-15"
+  },
+  {
+    "id": "genai-powered-excel-add-in-01",
+    "title": "Building a GenAI-powered Excel Add-in - Part 01 - Getting Started Developing Office Add-Ins",
+    "image": "https://i.postimg.cc/jq9Y4txB/genai-powered-excel-add-in-01.webp",
+    "tags": [
+      "Vue.js",
+      "Office Add-In",
+      "GenAI",
+      "Excel"
+    ],
+    "shortDescription": "Discover how to create a Excel Add-In with Vue.js in Part 1 of this tutorial series.",
+    "date": "2024-04-08"
+  },
+  {
+    "id": "manage-multiple-ssh-keys",
+    "title": "Manage Multiple SSH Key for GitHub on One Machine",
+    "image": "https://i.postimg.cc/JhRrBBsG/manage-multiple-ssh-keys.webp",
+    "tags": [
+      "SSH",
+      "GitHub",
+      "ssh-key",
+      "ssh-config"
+    ],
+    "shortDescription": "Learn how to seamlessly manage multiple GitHub accounts on a single machine using distinct SSH keys, from key generation to repository configuration.",
+    "date": "2024-03-23"
+  }
+]

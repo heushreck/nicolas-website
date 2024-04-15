@@ -76,3 +76,7 @@ firebase deploy
 ```
 
 This command will deploy your site to Firebase Hosting.
+
+## Images:
+
+image3: https://i.postimg.cc/DyXkCHm0/genai-powered-excel-add-in-03.webp
