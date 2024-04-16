@@ -215,7 +215,7 @@ To achieve this, we require specific metadata regarding the chart. This encompas
 
 ```jsx
 const chartData = {
-  chartType : "Line",
+  chart_type : "Line",
   title : 'Sales Data',
   x_axis_label : 'Month',
   y_axis_label : 'Sales',
@@ -235,12 +235,12 @@ const createChart = async() => {
   window.Excel.run(async context => {
     const range = context.workbook.getSelectedRange();
     const sheet = context.workbook.worksheets.getActiveWorksheet();
-    const chart = sheet.charts.add(chartData.chartType, range, "Auto");
+    const chart = sheet.charts.add(chartData.chart_type, range, "Auto");
     chart.title.text = chartData.title;
     chart.legend.format.fill.setSolidColor("white");
     chart.dataLabels.format.font.size = 15;
     chart.dataLabels.format.font.color = "black";
-    switch (chartData.chartType) {
+    switch (chartData.chart_type) {
       case "Line":
         chart.axes.valueAxis.title.text = chartData.y_axis_label;
         chart.axes.categoryAxis.title.text = chartData.x_axis_label;
