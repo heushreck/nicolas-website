@@ -1,8 +1,23 @@
 [
   {
+    "id": "genai-powered-excel-add-in-03",
+    "title": "Building a GenAI-powered Excel Add-in - Part 03 - Backend Integration",
+    "image": "https://lh3.googleusercontent.com/d/1cqDFDEUTuAe70fcY04Zi5w0gedx0bGRm",
+    "tags": [
+      "Vue.js",
+      "Office Add-In",
+      "GenAI",
+      "Excel",
+      "Graphs",
+      "FastAPI"
+    ],
+    "shortDescription": "In Part 3 of the tutorial, learn how to build and integrate a backend server using FastAPI and Python, and connect them to our Frontend.",
+    "date": "2024-05-10"
+  },
+  {
     "id": "genai-powered-excel-add-in-02",
     "title": "Building a GenAI-powered Excel Add-in - Part 02 - Generating Graphs",
-    "image": "https://i.postimg.cc/kgNrCSQd/genai-powered-excel-add-in-02.webp",
+    "image": "https://lh3.googleusercontent.com/d/1zKBZ3gxrLUX3voiRtMqLXA9Wqzw4cPkt",
     "tags": [
       "Vue.js",
       "Office Add-In",
@@ -16,7 +31,7 @@
   {
     "id": "genai-powered-excel-add-in-01",
     "title": "Building a GenAI-powered Excel Add-in - Part 01 - Getting Started Developing Office Add-Ins",
-    "image": "https://i.postimg.cc/jq9Y4txB/genai-powered-excel-add-in-01.webp",
+    "image": "https://lh3.googleusercontent.com/d/1ZY-pwRiFh2lsTCGdJ9uHx5PDNCeeCa0F",
     "tags": [
       "Vue.js",
       "Office Add-In",
@@ -29,7 +44,7 @@
   {
     "id": "manage-multiple-ssh-keys",
     "title": "Manage Multiple SSH Key for GitHub on One Machine",
-    "image": "https://i.postimg.cc/JhRrBBsG/manage-multiple-ssh-keys.webp",
+    "image": "https://lh3.googleusercontent.com/d/1zQAgyPCTArKyPpte3UnE0O8V67SNLmb",
     "tags": [
       "SSH",
       "GitHub",

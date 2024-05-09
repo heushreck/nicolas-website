@@ -10,10 +10,10 @@ head:
       content: Building a GenAI-powered Excel Add-in | Nicolas Neudeck
   - - meta
     - property: 'og:image'
-      content: https://i.postimg.cc/kgNrCSQd/genai-powered-excel-add-in-02.webp
+      content: https://lh3.googleusercontent.com/d/1zKBZ3gxrLUX3voiRtMqLXA9Wqzw4cPkt
   - - meta
     - property: 'og:url'
-      content: http://localhost:5173/blog/genai-powered-excel-add-in-02
+      content: https://nicolasneudeck.com/blog/genai-powered-excel-add-in-02
   - - meta
     - property: keywords
       content: 'Vue.js, Office Add-In, GenAI, Excel, Nicolas, Neudeck'
@@ -31,7 +31,7 @@ head:
       content: Part 2 of our tutorial series shows how to improve your Excel Add-In by adding interactive features that create graphs from your data.
   - - meta
     - name: 'twitter:image'
-      content: https://i.postimg.cc/kgNrCSQd/genai-powered-excel-add-in-02.webp
+      content: https://lh3.googleusercontent.com/d/1zKBZ3gxrLUX3voiRtMqLXA9Wqzw4cPkt
   - - meta
     - name: 'twitter:site'
       content: '@NeudeckNicolas'
@@ -40,7 +40,7 @@ head:
       content: '@NeudeckNicolas'
   - - meta
     - name: 'twitter:url'
-      content: http://localhost:5173/blog/genai-powered-excel-add-in-02
+      content: https://nicolasneudeck.com/blog/genai-powered-excel-add-in-02
   - - meta
     - name: google-site-verification
       content: 9agtSktJYcUTkHEIMiXa-0GX5OAFp-aq-M-sGdHEDm8
@@ -214,7 +214,7 @@ With the UI changes implemented, our next objective is to modify the button pres
 To achieve this, we require specific metadata regarding the chart. This encompasses the [chart type](https://learn.microsoft.com/en-us/javascript/api/excel/excel.chart?view=excel-js-preview#excel-excel-chart-charttype-member), title, axis labels, and additional predefined attributes:
 
 ```jsx
-const chartData = {
+let chartData = {
   chart_type : "Line",
   title : 'Sales Data',
   x_axis_label : 'Month',
@@ -269,7 +269,7 @@ The asynchronous `createChart` function performs the following tasks:
 
 With this setup, you can refresh the Add-In in Excel, select your data, and click on generate graph. A line graph with a trendline should appear.
 
-![Your Graph](https://i.postimg.cc/kg4jp1k4/genai-powered-excel-add-in-02-excel.png)
+![Your Graph](https://lh3.googleusercontent.com/d/1RagyfFXUBrHbKnoN5djueSJGUOhMcrJP)
 
 ### What's next
 
