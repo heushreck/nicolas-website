@@ -44,7 +44,7 @@
   {
     "id": "manage-multiple-ssh-keys",
     "title": "Manage Multiple SSH Key for GitHub on One Machine",
-    "image": "https://lh3.googleusercontent.com/d/1zQAgyPCTArKyPpte3UnE0O8V67SNLmb",
+    "image": "https://lh3.googleusercontent.com/d/10637FKB8VLAtrXJtvyEoHEFzoOBWpHXn",
     "tags": [
       "SSH",
       "GitHub",
@@ -53,5 +53,19 @@
     ],
     "shortDescription": "Learn how to seamlessly manage multiple GitHub accounts on a single machine using distinct SSH keys, from key generation to repository configuration.",
     "date": "2024-03-23"
+  },
+  {
+    "id": "aws-lambda-timeout-handler",
+    "title": "AWS Python Lambda Timeout Handler",
+    "image": "https://lh3.googleusercontent.com/d/1rqALtXKJxWeXrQPnI5lNmYeSkVj87Ass",
+    "tags": [
+      "AWS",
+      "Lambda",
+      "Timeout",
+      "Serverless",
+      "Signal"
+    ],
+    "shortDescription": "Learn how to handle AWS Python Lambda timeouts effectively using a timeout handler to manage long-running processes and ensure seamless execution, even past the 15-minute limit.",
+    "date": "2024-08-02"
   }
 ]
