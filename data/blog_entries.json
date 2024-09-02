@@ -1,5 +1,19 @@
 [
   {
+    "id": "aws-python-lambda-layer",
+    "title": "Creating and Deploying Custom Lambda Layers for Python Functions",
+    "image": "https://lh3.googleusercontent.com/d/143dWzO4qTrRQ3O2D1xBh7h7z6Udba_a4",
+    "tags": [
+      "AWS",
+      "Lambda",
+      "Layer",
+      "Python",
+      "Dependencies"
+    ],
+    "shortDescription": "A step-by-step guide on creating and deploying custom AWS Lambda layers to include additional Python dependencies, featuring a bash script for building layers locally.",
+    "date": "2024-09-02"
+  },
+  {
     "id": "genai-powered-excel-add-in-03",
     "title": "Building a GenAI-powered Excel Add-in - Part 03 - Backend Integration",
     "image": "https://lh3.googleusercontent.com/d/1cqDFDEUTuAe70fcY04Zi5w0gedx0bGRm",

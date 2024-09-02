@@ -66,6 +66,10 @@ As an AI Engineer, my focus is on designing, developing, and maintaining AI mode
 <h2 class="heading">My Current Interests</h2>
 <hr class="hr-line">
 
+::: details Automated AWS Deployment
+Automate the deployment of resources across multiple accounts and regions using a pipeline, ensuring efficient setup for both development and production environments. This approach supports consistent configurations, integrates with CI/CD processes, and includes rollback capabilities for improved stability.
+:::
+
 ::: details LangChain
 LangChain is a comprehensive framework enabling the development of context-aware and reasoning-driven applications powered by language models, supported by Python and JavaScript libraries, templates, and deployment tools.
 
@@ -76,12 +80,6 @@ My focus lies in understanding the RAG pipeline intricately, while also construc
 Ragas is a tool designed to assess and quantify the performance of Retrieval Augmented Generation (RAG) pipelines, which enhance language model applications by incorporating external data into their context.
 
 I find immense value in evaluating RAG pipelines to transform prompt engineering into a more scientific and data-driven practice.
-:::
-
-::: details Vue.js
-Vue.js is a progressive JavaScript framework designed for building user interfaces and single-page applications, distinguished by its simplicity, flexibility, and fine-grained reactivity system that makes it easy to understand and integrate with other projects or libraries.
-
-I wanted to get into Vue.js to build my website, leveraging its simplicity and reactivity, and I also use Tailwind CSS to ensure a streamlined, modern design with a utility-first approach for an engaging user experience.
 :::
 
 <h2 class="heading">Newest Insights & Stories</h2>

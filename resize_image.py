@@ -30,6 +30,6 @@ def resize_image_to_4_3_with_background(image_path, output_path):
         print(f"Image resized to 4:3 aspect ratio with white background and saved to {output_path}")
 
 # Example usage
-image_path = 'blog_entries/covers/genai-powered-excel-add-in-01.webp'
-output_path = 'blog_entries/covers/genai-powered-excel-add-in-01_4_3.webp'
+image_path = 'data/covers/aws-python-lambda-layer.webp'
+output_path = 'data/covers/aws-python-lambda-layer1.webp'
 resize_image_to_4_3_with_background(image_path, output_path)

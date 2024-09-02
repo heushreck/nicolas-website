@@ -3,7 +3,7 @@
         <div class="about-container">
             <div class="image-text-container">
                 <div class="image">
-                    <img style="border-radius: 9999px;" src="https://media.licdn.com/dms/image/D5603AQG2VQT_-XU17A/profile-displayphoto-shrink_800_800/0/1633939892232?e=1717027200&v=beta&t=fn6hX3gVla0yK2mAmG4o3QxetIatC3r2yWRp6qccR6Q" alt="image description">
+                    <img style="border-radius: 50%;" src="https://lh3.googleusercontent.com/d/1zq_j6Z3S_AsvgVJML56sy7IdR48-RDwz" alt="image description">
                 </div>
                 <div class="text">
                     During my computer science studies at the Technical University of Munich, I focused on databases, data engineering, and machine learning. Alongside my studies, I worked part-time at companies like E.ON and Amazon, where I got hands-on programming experience. This helped me improve my SQL and Python skills, and learn about cloud services and containerization. Currently, I'm learning Rust, Kubernetes, CI/CD pipelines, and how to test software more effectively. Outside of work, I'm involved in the Munich data science community, enjoy participating in hackathons, and am interested in entrepreneurship.
@@ -17,7 +17,8 @@
                     <time class="time">Since Sepember 2023</time>
                     <h3 class="h3">AI Engineer at BCG X</h3>
                     <ul class="ul">
-                        <li>Build Gen AI Usecases using Vector Databases, Langchain, AWS and LLM function calling.</li>
+                        <li>Developed several GenAI use cases using Python, AWS (Lambda, ECS, RDS), GCP, and LangChain (e.g., platform to compare proposals). Built a RAG Output Quality Framework and enhanced product performance and efficiency.</li>
+                        <li>Developed scalable real-time AI applications for CallCenters with AWS (Kinesis, Bedrock, Sagemaker), including real-time audio transcription, data streaming and automated cross-region deployments, handling 2000+ LLM requests/min.</li>
                     </ul>
                 </li>
                 <li class="list-item">
@@ -99,13 +100,13 @@
 }
 .image {
     margin-bottom: 1rem;
-    border-radius: 9999px; 
+    border-radius: 50%;
 
     @media (min-width: 640px) { 
         width: 50%; 
     }
     @media (min-width: 768px) { 
-    margin-bottom: 0; 
+        margin-bottom: 0; 
         width: 20%; 
     }
     @media (min-width: 1024px) { 
