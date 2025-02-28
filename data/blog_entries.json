@@ -81,5 +81,20 @@
     ],
     "shortDescription": "Learn how to handle AWS Python Lambda timeouts effectively using a timeout handler to manage long-running processes and ensure seamless execution, even past the 15-minute limit.",
     "date": "2024-08-02"
+  },
+  {
+    "id": "python-kvs-audio-consumer",
+    "title": "Building Python Audio Consumers for Amazon Connect Kinesis Media Streams",
+    "image": "https://lh3.googleusercontent.com/d/1WRWdjaxVMvVRaYK-hEcqUXwTHzXGZVHn",
+    "tags": [
+      "AWS",
+      "Amazon Connect",
+      "Python",
+      "Kinesis Video Stream",
+      "Audio Consumer",
+      "KVS Consumer"
+    ],
+    "shortDescription": "Learn how to stream, process, and save live audio from Amazon Connect using Kinesis Video Streams and Python",
+    "date": "2024-11-11"
   }
 ]
