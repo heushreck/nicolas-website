@@ -10,7 +10,7 @@ head:
       content: Building a GenAI-powered Excel Add-in | Nicolas Neudeck
   - - meta
     - property: 'og:image'
-      content: https://lh3.googleusercontent.com/d/1ZY-pwRiFh2lsTCGdJ9uHx5PDNCeeCa0F
+      content: /images/genai-powered-excel-add-in-01.webp
   - - meta
     - property: 'og:url'
       content: https://nicolasneudeck.com/blog/genai-powered-excel-add-in-01
@@ -31,7 +31,7 @@ head:
       content: Discover how to create a Excel Add-In with Vue.js in Part 1 of this tutorial series.
   - - meta
     - name: 'twitter:image'
-      content: https://lh3.googleusercontent.com/d/1ZY-pwRiFh2lsTCGdJ9uHx5PDNCeeCa0F
+      content: /images/genai-powered-excel-add-in-01.webp
   - - meta
     - name: 'twitter:site'
       content: '@NeudeckNicolas'
@@ -151,7 +151,7 @@ We need to rearrange some of the files.
 - Also delete the `plot_pilot/src/assets/` and `plot_pilot/src/components/` folders, we do not need them anymore.
 - Your folder structure should look like this:
 
-  ![Screenshot 2024-04-08 at 16.53.35.png](https://lh3.googleusercontent.com/d/1FgJ_XnVQzz32J7QzL-ywMNdtAXNUi-WJ)
+  ![Screenshot 2024-04-08 at 16.53.35.png](/images/genai-powered-excel-add-in-01-image-01.webp)
 
 ## Secure the app
 
@@ -325,11 +325,11 @@ Open the Code in VSCode or any other IDE.
    
 5. Select any range of cells in the worksheet.
     
-    ![Screenshot 2024-04-08 at 17.00.59.png](https://lh3.googleusercontent.com/d/1pquOzFBWoTFM1FKh9PeZF1qd55aF_-VL)
+    ![Screenshot 2024-04-08 at 17.00.59.png](/images/genai-powered-excel-add-in-01-image-02.png)
     
 6. Set the color of the selected range to green. In your Add-in's task pane, choose the **Set color** button.
     
-    ![Screenshot 2024-04-08 at 17.01.28.png](https://lh3.googleusercontent.com/d/16zzLqEdDnqrpBRpus7FUJp4U9TL5vsnC)
+    ![Screenshot 2024-04-08 at 17.01.28.png](/images/genai-powered-excel-add-in-01-image-03.png)
         
 
 ### Resources:

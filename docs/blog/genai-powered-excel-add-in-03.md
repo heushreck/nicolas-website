@@ -10,7 +10,7 @@ head:
       content: Building a GenAI-powered Excel Add-in | Nicolas Neudeck
   - - meta
     - property: 'og:image'
-      content: https://lh3.googleusercontent.com/d/1cqDFDEUTuAe70fcY04Zi5w0gedx0bGRm
+      content: /images/genai-powered-excel-add-in-03.webp
   - - meta
     - property: 'og:url'
       content: https://nicolasneudeck.com/blog/genai-powered-excel-add-in-03
@@ -31,7 +31,7 @@ head:
       content: In Part 3 of the tutorial, learn how to build and integrate a backend server using FastAPI and Python, and connect them to our Frontend.
   - - meta
     - name: 'twitter:image'
-      content: https://lh3.googleusercontent.com/d/1cqDFDEUTuAe70fcY04Zi5w0gedx0bGRm
+      content: /images/genai-powered-excel-add-in-03.webp
   - - meta
     - name: 'twitter:site'
       content: '@NeudeckNicolas'

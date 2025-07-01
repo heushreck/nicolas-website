@@ -10,7 +10,7 @@ head:
       content: Building a GenAI-powered Excel Add-in | Nicolas Neudeck
   - - meta
     - property: 'og:image'
-      content: https://lh3.googleusercontent.com/d/1zKBZ3gxrLUX3voiRtMqLXA9Wqzw4cPkt
+      content: /images/genai-powered-excel-add-in-02.webp
   - - meta
     - property: 'og:url'
       content: https://nicolasneudeck.com/blog/genai-powered-excel-add-in-02
@@ -31,7 +31,7 @@ head:
       content: Part 2 of our tutorial series shows how to improve your Excel Add-In by adding interactive features that create graphs from your data.
   - - meta
     - name: 'twitter:image'
-      content: https://lh3.googleusercontent.com/d/1zKBZ3gxrLUX3voiRtMqLXA9Wqzw4cPkt
+      content: /images/genai-powered-excel-add-in-02.webp
   - - meta
     - name: 'twitter:site'
       content: '@NeudeckNicolas'
@@ -269,7 +269,7 @@ The asynchronous `createChart` function performs the following tasks:
 
 With this setup, you can refresh the Add-In in Excel, select your data, and click on generate graph. A line graph with a trendline should appear.
 
-![Your Graph](https://lh3.googleusercontent.com/d/1RagyfFXUBrHbKnoN5djueSJGUOhMcrJP)
+![Your Graph](/images/genai-powered-excel-add-in-02-excel.png)
 
 ### What's next
 

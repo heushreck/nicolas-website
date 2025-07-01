@@ -10,7 +10,7 @@ head:
       content: Custom Lambda Layers for Python Functions | Nicolas Neudeck
   - - meta
     - property: 'og:image'
-      content: https://lh3.googleusercontent.com/d/143dWzO4qTrRQ3O2D1xBh7h7z6Udba_a4
+      content: /images/aws-python-lambda-layer.webp
   - - meta
     - property: 'og:url'
       content: https://nicolasneudeck.com/blog/aws-python-lambda-layer
@@ -31,7 +31,7 @@ head:
       content: A step-by-step guide on creating and deploying custom AWS Lambda layers to include additional Python dependencies, featuring a bash script for building layers locally.
   - - meta
     - name: 'twitter:image'
-      content: https://lh3.googleusercontent.com/d/143dWzO4qTrRQ3O2D1xBh7h7z6Udba_a4
+      content: /images/aws-python-lambda-layer.webp
   - - meta
     - name: 'twitter:site'
       content: '@NeudeckNicolas'

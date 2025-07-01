@@ -3,7 +3,7 @@
         <div class="about-container">
             <div class="image-text-container">
                 <div class="image">
-                    <img style="border-radius: 50%;" src="https://lh3.googleusercontent.com/d/1zq_j6Z3S_AsvgVJML56sy7IdR48-RDwz" alt="image description">
+                    <img style="border-radius: 50%;" src="/images/profile_picture.jpg" alt="image description">
                 </div>
                 <div class="text">
                     During my computer science studies at the Technical University of Munich, I focused on databases, data engineering, and machine learning. Alongside my studies, I worked part-time at companies like E.ON and Amazon, where I got hands-on programming experience. This helped me improve my SQL and Python skills, and learn about cloud services and containerization. Currently, I'm learning Rust, Kubernetes, CI/CD pipelines, and how to test software more effectively. Outside of work, I'm involved in the Munich data science community, enjoy participating in hackathons, and am interested in entrepreneurship.

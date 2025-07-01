@@ -10,7 +10,7 @@ head:
       content: Manage Multiple SSH Key for GitHub on One Machine | Nicolas Neudeck
   - - meta
     - property: 'og:image'
-      content: https://lh3.googleusercontent.com/d/10637FKB8VLAtrXJtvyEoHEFzoOBWpHXn
+      content: /images/manage-multiple-ssh-keys.webp
   - - meta
     - property: 'og:url'
       content: https://nicolasneudeck.com/blog/manage-multiple-ssh-keys
@@ -31,7 +31,7 @@ head:
       content: Learn how to seamlessly manage multiple GitHub accounts on a single machine using distinct SSH keys, from key generation to repository configuration.
   - - meta
     - name: 'twitter:image'
-      content: https://lh3.googleusercontent.com/d/10637FKB8VLAtrXJtvyEoHEFzoOBWpHXn
+      content: /images/manage-multiple-ssh-keys.webp
   - - meta
     - name: 'twitter:site'
       content: '@NeudeckNicolas'

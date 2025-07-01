@@ -10,7 +10,7 @@ head:
       content: AWS Python Lambda Timeout Handler | Nicolas Neudeck
   - - meta
     - property: 'og:image'
-      content: https://lh3.googleusercontent.com/d/1rqALtXKJxWeXrQPnI5lNmYeSkVj87Ass
+      content: /images/aws-lambda-timeout-handler.webp
   - - meta
     - property: 'og:url'
       content: https://nicolasneudeck.com/blog/aws-lambda-timeout-handler
@@ -31,7 +31,7 @@ head:
       content: Learn how to handle AWS Python Lambda timeouts effectively using a timeout handler to manage long-running processes and ensure seamless execution, even past the 15-minute limit.
   - - meta
     - name: 'twitter:image'
-      content: https://lh3.googleusercontent.com/d/1rqALtXKJxWeXrQPnI5lNmYeSkVj87Ass
+      content: /images/aws-lambda-timeout-handler.webp
   - - meta
     - name: 'twitter:site'
       content: '@NeudeckNicolas'

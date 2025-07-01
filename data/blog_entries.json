@@ -2,7 +2,7 @@
   {
     "id": "aws-python-lambda-layer",
     "title": "Creating and Deploying Custom Lambda Layers for Python Functions",
-    "image": "https://lh3.googleusercontent.com/d/143dWzO4qTrRQ3O2D1xBh7h7z6Udba_a4",
+    "image": "/images/aws-python-lambda-layer.webp",
     "tags": [
       "AWS",
       "Lambda",
@@ -16,7 +16,7 @@
   {
     "id": "genai-powered-excel-add-in-03",
     "title": "Building a GenAI-powered Excel Add-in - Part 03 - Backend Integration",
-    "image": "https://lh3.googleusercontent.com/d/1cqDFDEUTuAe70fcY04Zi5w0gedx0bGRm",
+    "image": "/images/genai-powered-excel-add-in-03.webp",
     "tags": [
       "Vue.js",
       "Office Add-In",
@@ -31,7 +31,7 @@
   {
     "id": "genai-powered-excel-add-in-02",
     "title": "Building a GenAI-powered Excel Add-in - Part 02 - Generating Graphs",
-    "image": "https://lh3.googleusercontent.com/d/1zKBZ3gxrLUX3voiRtMqLXA9Wqzw4cPkt",
+    "image": "/images/genai-powered-excel-add-in-02.webp",
     "tags": [
       "Vue.js",
       "Office Add-In",
@@ -45,7 +45,7 @@
   {
     "id": "genai-powered-excel-add-in-01",
     "title": "Building a GenAI-powered Excel Add-in - Part 01 - Getting Started Developing Office Add-Ins",
-    "image": "https://lh3.googleusercontent.com/d/1ZY-pwRiFh2lsTCGdJ9uHx5PDNCeeCa0F",
+    "image": "/images/genai-powered-excel-add-in-01.webp",
     "tags": [
       "Vue.js",
       "Office Add-In",
@@ -58,7 +58,7 @@
   {
     "id": "manage-multiple-ssh-keys",
     "title": "Manage Multiple SSH Key for GitHub on One Machine",
-    "image": "https://lh3.googleusercontent.com/d/10637FKB8VLAtrXJtvyEoHEFzoOBWpHXn",
+    "image": "/images/manage-multiple-ssh-keys.webp",
     "tags": [
       "SSH",
       "GitHub",
@@ -71,7 +71,7 @@
   {
     "id": "aws-lambda-timeout-handler",
     "title": "AWS Python Lambda Timeout Handler",
-    "image": "https://lh3.googleusercontent.com/d/1rqALtXKJxWeXrQPnI5lNmYeSkVj87Ass",
+    "image": "/images/aws-lambda-timeout-handler.webp",
     "tags": [
       "AWS",
       "Lambda",
@@ -85,7 +85,7 @@
   {
     "id": "python-kvs-audio-consumer",
     "title": "Building Python Audio Consumers for Amazon Connect Kinesis Media Streams",
-    "image": "https://lh3.googleusercontent.com/d/1WRWdjaxVMvVRaYK-hEcqUXwTHzXGZVHn",
+    "image": "/images/python-kvs-audio-consumer.webp",
     "tags": [
       "AWS",
       "Amazon Connect",

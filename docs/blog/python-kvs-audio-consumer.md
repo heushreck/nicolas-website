@@ -10,7 +10,7 @@ head:
       content: Building Python Audio Consumers for Amazon Connect Kinesis Media Streams | Nicolas Neudeck
   - - meta
     - property: 'og:image'
-      content: https://lh3.googleusercontent.com/d/1WRWdjaxVMvVRaYK-hEcqUXwTHzXGZVHn
+      content: /images/python-kvs-audio-consumer.webp
   - - meta
     - property: 'og:url'
       content: https://nicolasneudeck.com/blog/python-kvs-audio-consumer
@@ -31,7 +31,7 @@ head:
       content: Learn how to stream, process, and save live audio from Amazon Connect using Kinesis Video Streams and Python
   - - meta
     - name: 'twitter:image'
-      content: https://lh3.googleusercontent.com/d/1WRWdjaxVMvVRaYK-hEcqUXwTHzXGZVHn
+      content: /images/python-kvs-audio-consumer.webp
   - - meta
     - name: 'twitter:site'
       content: '@NeudeckNicolas'
@@ -105,7 +105,7 @@ The Python implementation converts raw incoming audio bytes into `WAV` format ev
 
 Below is a simplified architecture diagram:
 
-![Architecture](https://lh3.googleusercontent.com/d/1E5mf8kf3BM7dIBfcr-elzQz_aGYyNZXS)
+![Architecture](/images/python-kvs-audio-consumer-image-01.png)
 
 ## Understanding the Data Structure
 
