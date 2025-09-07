@@ -70,16 +70,8 @@ As an AI Engineer, my focus is on designing, developing, and maintaining AI mode
 Automate the deployment of resources across multiple accounts and regions using a pipeline, ensuring efficient setup for both development and production environments. This approach supports consistent configurations, integrates with CI/CD processes, and includes rollback capabilities for improved stability.
 :::
 
-::: details LangChain
-LangChain is a comprehensive framework enabling the development of context-aware and reasoning-driven applications powered by language models, supported by Python and JavaScript libraries, templates, and deployment tools.
-
-My focus lies in understanding the RAG pipeline intricately, while also constructing chains of prompts to develop complex generative AI tools.
-:::
-
-::: details Ragas
-Ragas is a tool designed to assess and quantify the performance of Retrieval Augmented Generation (RAG) pipelines, which enhance language model applications by incorporating external data into their context.
-
-I find immense value in evaluating RAG pipelines to transform prompt engineering into a more scientific and data-driven practice.
+::: details Typescript
+For my current role, I am learning TypeScript—a language widely used for both frontend and backend development. With a background in Python and Java, I find TypeScript straightforward to read and adopt. The main challenges lie in understanding Node.js threading and web server architecture, but overall the transition has been smooth.
 :::
 
 <h2 class="heading">Newest Insights & Stories</h2>

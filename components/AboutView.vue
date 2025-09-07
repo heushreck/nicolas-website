@@ -3,10 +3,10 @@
         <div class="about-container">
             <div class="image-text-container">
                 <div class="image">
-                    <img style="border-radius: 50%;" src="/images/profile_picture.jpg" alt="image description">
+                    <img src="/images/profile_picture2.jpg" alt="Nicolas Neudeck">
                 </div>
                 <div class="text">
-                    During my computer science studies at the Technical University of Munich, I focused on databases, data engineering, and machine learning. Alongside my studies, I worked part-time at companies like E.ON and Amazon, where I got hands-on programming experience. This helped me improve my SQL and Python skills, and learn about cloud services and containerization. Currently, I'm learning Rust, Kubernetes, CI/CD pipelines, and how to test software more effectively. Outside of work, I'm involved in the Munich data science community, enjoy participating in hackathons, and am interested in entrepreneurship.
+                    <p>During my computer science studies at the Technical University of Munich, I focused on databases, data engineering, and machine learning. Alongside my studies, I worked part-time at companies like E.ON and Amazon, where I got hands-on programming experience. This helped me improve my SQL and Python skills, and learn about cloud services and containerization. Currently, I'm learning Rust, Kubernetes, CI/CD pipelines, and how to test software more effectively. Outside of work, I'm involved in the Munich data science community, enjoy participating in hackathons, and am interested in entrepreneurship.</p>
                 </div>
             </div>
             <h2 class="heading">Curriculum Vitae</h2>
@@ -14,10 +14,19 @@
             <ol class="ordered-list">                  
                 <li class="list-item">
                     <div class="circle"></div>
-                    <time class="time">Since Sepember 2023</time>
+                    <time class="time">Since September 2025</time>
+                    <h3 class="h3">Founding Engineer at Superglue</h3>
+                    <ul class="ul">
+                        <li>Building a <a href="https://github.com/superglue-ai/superglue" target="_blank">great product</a>!</li>
+                    </ul>
+                </li>
+                <li class="list-item">
+                    <div class="circle"></div>
+                    <time class="time">September 2023 - August 2025</time>
                     <h3 class="h3">AI Engineer at BCG X</h3>
                     <ul class="ul">
                         <li>Developed several GenAI use cases using Python, AWS (Lambda, ECS, RDS), GCP, and LangChain (e.g., platform to compare proposals). Built a RAG Output Quality Framework and enhanced product performance and efficiency.</li>
+                        <li>Acted as technical lead on client-facing AI engagements; steered delivery teams, coordinated with client developers and architects, and briefed senior business stakeholders on progress, trade-offs, and roadmap.</li>
                         <li>Developed scalable real-time AI applications for CallCenters with AWS (Kinesis, Bedrock, Sagemaker), including real-time audio transcription, data streaming and automated cross-region deployments, handling 2000+ LLM requests/min.</li>
                     </ul>
                 </li>
@@ -74,58 +83,79 @@
 <style scoped>
 .about-container {
     display: flex; 
-    padding: 1rem; 
-    margin-bottom: 1rem; 
+    padding: 2rem; 
+    margin: 0 auto;
     flex-direction: column; 
     justify-content: space-between; 
-    max-width: 1024px; 
+    max-width: 1200px; 
 }
+
 .image-text-container {
     display: flex; 
-    margin-bottom: 2rem; 
+    margin-bottom: 3rem; 
     flex-direction: column; 
     align-items: center;
-    gap: 1.5rem;
-
+    gap: 2rem;
+    padding: 2rem 0;
 
     @media (min-width: 768px) { 
-    flex-direction: row; 
-    }
-    @media (min-width: 1024px) { 
-    flex-direction: row; 
-    }
-    @media (min-width: 1280px) { 
-    flex-direction: row; 
+        flex-direction: row; 
+        align-items: flex-start;
+        gap: 3rem;
     }
 }
+
 .image {
-    margin-bottom: 1rem;
-    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    
+    img {
+        width: 160px;
+        height: 160px;
+        border-radius: 50%;
+        object-fit: cover;
+        object-position: center;
+        transform: scale(1.2);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
+    
+    img:hover {
+        transform: scale(1.3);
+    }
 
-    @media (min-width: 640px) { 
-        width: 50%; 
-    }
     @media (min-width: 768px) { 
-        margin-bottom: 0; 
-        width: 20%; 
+        img {
+            width: 150px;
+            height: 150px;
+        }
     }
+    
     @media (min-width: 1024px) { 
-        width: 20%; 
+        img {
+            width: 160px;
+            height: 160px;
+        }
     }
 }
-.text {
-    font-size: 1.125rem;
-    line-height: 1.75rem; 
-    text-align: justify; 
 
-    @media (min-width: 640px) { 
-        width: 50%; 
+.text {
+    flex: 1;
+    font-size: 1.125rem;
+    line-height: 1.8; 
+    text-align: left;
+    color: #374151;
+    
+    p {
+        margin: 0;
+        padding: 0;
     }
+
     @media (min-width: 768px) { 
-        width: 80%; 
-    }
-    @media (min-width: 1024px) { 
-        width: 80%; 
+        text-align: justify;
+        padding-left: 1rem;
     }
 }
 .ordered-list {
