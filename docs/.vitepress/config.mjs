@@ -1,7 +1,8 @@
 import { defineConfig } from 'vitepress'
+import { withMermaid } from 'vitepress-plugin-mermaid'
 
 // https://vitepress.dev/reference/site-config
-export default defineConfig({
+export default withMermaid(defineConfig({
   title: "Nicolas Neudeck",
   description: "My personal website about AI Engineering.",
   appearance: false,
@@ -29,4 +30,4 @@ export default defineConfig({
   },
   lastUpdated: true,
   cleanUrls: true,
-})
+}))

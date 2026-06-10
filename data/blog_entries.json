@@ -1,5 +1,33 @@
 [
   {
+    "id": "json-editing-with-llms",
+    "title": "JSON Editing with LLMs - Getting it Right",
+    "image": "/images/json-editing-with-llms.webp",
+    "tags": [
+      "LLMs",
+      "JSON",
+      "AI Agents",
+      "Structured Output",
+      "JSON Patch"
+    ],
+    "shortDescription": "Three architectural iterations on how an AI agent should apply edits to JSON tool configurations - structured output, search & replace, and JSON Patch.",
+    "date": "2026-01-22"
+  },
+  {
+    "id": "documentation-context-engineering",
+    "title": "Why Fetching Documentation for Context Engineering is Hard",
+    "image": "/images/documentation-context-engineering.webp",
+    "tags": [
+      "AI Agents",
+      "Documentation",
+      "Context Engineering",
+      "Integrations",
+      "RAG"
+    ],
+    "shortDescription": "Turning third-party documentation into reliable context for AI agents is one of the toughest engineering problems in building integrations.",
+    "date": "2025-11-21"
+  },
+  {
     "id": "aws-python-lambda-layer",
     "title": "Creating and Deploying Custom Lambda Layers for Python Functions",
     "image": "/images/aws-python-lambda-layer.webp",

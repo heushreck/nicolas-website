@@ -6,18 +6,31 @@
                     <img src="/images/profile_picture2.jpg" alt="Nicolas Neudeck">
                 </div>
                 <div class="text">
-                    <p>During my computer science studies at the Technical University of Munich, I focused on databases, data engineering, and machine learning. Alongside my studies, I worked part-time at companies like E.ON and Amazon, where I got hands-on programming experience. This helped me improve my SQL and Python skills, and learn about cloud services and containerization. Currently, I'm learning Rust, Kubernetes, CI/CD pipelines, and how to test software more effectively. Outside of work, I'm involved in the Munich data science community, enjoy participating in hackathons, and am interested in entrepreneurship.</p>
+                    <p>I'm an AI engineer focused on building agentic systems and the infrastructure that runs them. Over the past decade — at E.ON, Amazon, BCG X, and most recently as a founding engineer at superglue — I've worked across the stack on real-time data pipelines, GenAI applications at scale, and cloud architecture supporting millions of requests. From June 2026, I'm joining Sierra to build conversational AI agents. I care about scalable systems, code quality, and shipping software that holds up under real-world load. Outside of work, I'm part of the Munich data science community, enjoy hackathons, and am drawn to entrepreneurship.</p>
                 </div>
             </div>
             <h2 class="heading">Curriculum Vitae</h2>
             <hr class="hr-line">
-            <ol class="ordered-list">                  
+            <ol class="ordered-list">
                 <li class="list-item">
                     <div class="circle"></div>
-                    <time class="time">Since September 2025</time>
-                    <h3 class="h3">Founding Engineer at Superglue</h3>
+                    <time class="time">Starting June 2026</time>
+                    <h3 class="h3">Member of Technical Staff at Sierra</h3>
                     <ul class="ul">
-                        <li>Building a <a href="https://github.com/superglue-ai/superglue" target="_blank">great product</a>!</li>
+                        <li>Building conversational AI agents.</li>
+                        <li>Joining as Sierra's first German hire to help build out the Munich office and partner with GTM across DACH.</li>
+                    </ul>
+                </li>
+                <li class="list-item">
+                    <div class="circle"></div>
+                    <time class="time">September 2025 - June 2026</time>
+                    <h3 class="h3">Founding Engineer at superglue (YC W25)</h3>
+                    <ul class="ul">
+                        <li>Building an AI-powered integration platform that lets enterprises connect business systems in minutes instead of months.</li>
+                        <li>Fourth hire; helped shape the <a href="https://superglue.ai/" target="_blank">product</a> from the early days.</li>
+                        <li>Own the cloud architecture and scaling of the platform, supporting thousands of users and millions of requests. Lead architectural decisions, performance evaluations, and benchmarking of our GenAI backend to push state-of-the-art capabilities.</li>
+                        <li>Active across sales calls, product demos, and client POCs — bridging AI engineering, product, solution architecture, and on-prem deployments. Led the rollout at our largest customer and helped close the deal.</li>
+                        <li>Beyond engineering: lead hiring and interviewing, and mentor interns and other engineers.</li>
                     </ul>
                 </li>
                 <li class="list-item">
@@ -75,31 +88,31 @@
                     </ul>
                 </li>
             </ol>
-            
+
         </div>
     </div>
 </template>
 
 <style scoped>
 .about-container {
-    display: flex; 
-    padding: 2rem; 
+    display: flex;
+    padding: 2rem;
     margin: 0 auto;
-    flex-direction: column; 
-    justify-content: space-between; 
-    max-width: 1200px; 
+    flex-direction: column;
+    justify-content: space-between;
+    max-width: 1200px;
 }
 
 .image-text-container {
-    display: flex; 
-    margin-bottom: 3rem; 
-    flex-direction: column; 
+    display: flex;
+    margin-bottom: 3rem;
+    flex-direction: column;
     align-items: center;
     gap: 2rem;
     padding: 2rem 0;
 
-    @media (min-width: 768px) { 
-        flex-direction: row; 
+    @media (min-width: 768px) {
+        flex-direction: row;
         align-items: flex-start;
         gap: 3rem;
     }
@@ -110,7 +123,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    
+
     img {
         width: 160px;
         height: 160px;
@@ -121,19 +134,19 @@
         box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
         transition: transform 0.3s ease;
     }
-    
+
     img:hover {
         transform: scale(1.3);
     }
 
-    @media (min-width: 768px) { 
+    @media (min-width: 768px) {
         img {
             width: 150px;
             height: 150px;
         }
     }
-    
-    @media (min-width: 1024px) { 
+
+    @media (min-width: 1024px) {
         img {
             width: 160px;
             height: 160px;
@@ -144,16 +157,16 @@
 .text {
     flex: 1;
     font-size: 1.125rem;
-    line-height: 1.8; 
+    line-height: 1.8;
     text-align: left;
     color: #374151;
-    
+
     p {
         margin: 0;
         padding: 0;
     }
 
-    @media (min-width: 768px) { 
+    @media (min-width: 768px) {
         text-align: justify;
         padding-left: 1rem;
     }
@@ -170,15 +183,15 @@
     padding: 0px;
 }
 .list-item {
-    margin-bottom: 2rem; 
+    margin-bottom: 2rem;
     margin-inline-start: 1rem;
 }
 .circle {
-    position: absolute; 
-    margin-top: 0.375rem; 
-    border-radius: 9999px; 
+    position: absolute;
+    margin-top: 0.375rem;
+    border-radius: 9999px;
     border-width: 1px;
-    width: 0.75rem; 
+    width: 0.75rem;
     height: 0.75rem;
     background-color: rgb(167 243 208);
     border-color: rgb(5 150 105);
@@ -187,25 +200,25 @@
 }
 
 .time {
-    margin-bottom: 0.25rem; 
+    margin-bottom: 0.25rem;
     font-size: 0.875rem;
-    line-height: 1.25rem; 
-    font-weight: 400; 
-    line-height: 1; 
-    color: #70747b; 
+    line-height: 1.25rem;
+    font-weight: 400;
+    line-height: 1;
+    color: #70747b;
 }
 
 .h3 {
     font-size: 1.125rem;
-    line-height: 1.75rem; 
-    font-weight: 600; 
-    color: #111827; 
+    line-height: 1.75rem;
+    font-weight: 600;
+    color: #111827;
 }
 
 .ul {
     padding-left: 1rem;
-    padding-right: 1rem; 
-    list-style-type: disc; 
+    padding-right: 1rem;
+    list-style-type: disc;
 }
 
 .vp-doc h3 {
