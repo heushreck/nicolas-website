@@ -276,7 +276,7 @@ import { drawSprite, spriteSize, spriteDataURL, ANIMS, SPRITES } from '/tennis/s
 /* ================================================================
    CONFIG
    Paste the web-app config from Firebase console → Project settings →
-   Your apps → Web app. Leave as null to run in local demo mode
+   Your apps → Web app. Leave as null to run in local mode
    (data stays in this browser only).
    ================================================================ */
 const FIREBASE_CONFIG = null;
@@ -286,7 +286,14 @@ const FIREBASE_SDK = 'https://www.gstatic.com/firebasejs/11.0.2';
 // is derived from the password itself, so reading the source doesn't reveal it.
 const CHECK_HASH = '0bcd28232d4f0bbf0550ce85d1043de5e70806b49db0dd958b147fe05e187c1e';
 const AUTH_KEY = 'nf-tennis-auth-v1';
-const LOCAL_KEY = 'nf-tennis-local-matches-v1';
+// v2 drops the fake demo matches earlier builds stored under v1.
+const LOCAL_KEY = 'nf-tennis-local-matches-v2';
+
+// Matches played before the scoreboard existed; local mode starts from these.
+const INITIAL_MATCHES = [
+  { id: 'm-2026-10-05', date: '2026-10-05', sets: [{ n: 6, f: 1 }], ts: 1 },
+  { id: 'm-2026-10-09', date: '2026-10-09', sets: [{ n: 6, f: 3 }], ts: 2 },
+];
 
 const $ = (s, el = document) => el.querySelector(s);
 const NAMES = { n: 'Nicolas', f: 'Felix' };
@@ -342,10 +349,9 @@ const RANGE_LABEL = { month: 'this month', quarter: 'last 3 months', year: 'this
 
 /* ---------------- data stores ---------------- */
 function localStore() {
-  const read = () => storeGet(LOCAL_KEY) || [];
+  const read = () => storeGet(LOCAL_KEY) ?? INITIAL_MATCHES;
   let cb = () => {};
   const write = (ms) => { storeSet(LOCAL_KEY, ms); cb(ms); };
-  if (new URLSearchParams(location.search).has('demo') && !read().length) storeSet(LOCAL_KEY, demoData());
   return {
     mode: 'local',
     subscribe(fn) { cb = fn; fn(read()); },
@@ -375,18 +381,6 @@ async function firestoreStore(boardKey) {
     remove: id => fs.deleteDoc(fs.doc(col, id)),
   };
 }
-function demoData() {
-  const out = []; const d = new Date(); d.setDate(d.getDate() - 7 * 30);
-  const scores = [[6,4],[3,6],[6,3],[6,2],[4,6],[7,5],[2,6],[6,4],[7,6],[5,7],[6,1],[6,4],[4,6],[3,6],[6,0],[6,3],[4,3],[6,4],[2,6],[7,6],[6,2],[3,6],[6,4],[6,4],[1,6],[6,3],[5,7],[6,4],[6,2],[4,6]];
-  scores.forEach((s, i) => {
-    const sets = [{ n: s[0], f: s[1] }];
-    if (i % 7 === 3) sets.push({ n: s[1] + 1, f: 6 });
-    out.push({ id: 'demo' + i, date: isoDay(d), sets, ts: i });
-    d.setDate(d.getDate() + 7);
-  });
-  return out;
-}
-
 /* ================================================================
    LOCK SCREEN
    ================================================================ */
@@ -428,7 +422,7 @@ async function enter(auth, animate) {
     catch (err) { console.error(err); store = localStore(); banner('Could not reach Firebase — showing local data only.'); }
   } else {
     store = localStore();
-    banner('Local demo mode: no Firebase config yet, so matches are saved in this browser only.');
+    banner('Local mode: no Firebase config yet, so matches are saved in this browser only.');
   }
   if (store.mode === 'local') $('#syncState').textContent = 'locally only';
   store.subscribe(ms => { matches = sortMatches(ms); render(); }, s => { $('#syncState').textContent = s; });
