@@ -279,7 +279,14 @@ import { drawSprite, spriteSize, spriteDataURL, ANIMS, SPRITES } from '/tennis/s
    Your apps → Web app. Leave as null to run in local mode
    (data stays in this browser only).
    ================================================================ */
-const FIREBASE_CONFIG = null;
+const FIREBASE_CONFIG = {
+  apiKey: 'AIzaSyDJW_EYpuPACWzCVDJJzxwpXRLBCleh_Zg',
+  authDomain: 'nicolas-website-4a62d.firebaseapp.com',
+  projectId: 'nicolas-website-4a62d',
+  storageBucket: 'nicolas-website-4a62d.firebasestorage.app',
+  messagingSenderId: '837961761557',
+  appId: '1:837961761557:web:d9ba016e7eff0d51999f1c',
+};
 const FIREBASE_SDK = 'https://www.gstatic.com/firebasejs/11.0.2';
 
 // Only a hash of the password lives in this file. The Firestore location
@@ -288,12 +295,6 @@ const CHECK_HASH = '0bcd28232d4f0bbf0550ce85d1043de5e70806b49db0dd958b147fe05e18
 const AUTH_KEY = 'nf-tennis-auth-v1';
 // v2 drops the fake demo matches earlier builds stored under v1.
 const LOCAL_KEY = 'nf-tennis-local-matches-v2';
-
-// Matches played before the scoreboard existed; local mode starts from these.
-const INITIAL_MATCHES = [
-  { id: 'm-2026-10-05', date: '2026-10-05', sets: [{ n: 6, f: 1 }], ts: 1 },
-  { id: 'm-2026-10-09', date: '2026-10-09', sets: [{ n: 6, f: 3 }], ts: 2 },
-];
 
 const $ = (s, el = document) => el.querySelector(s);
 const NAMES = { n: 'Nicolas', f: 'Felix' };
@@ -349,7 +350,7 @@ const RANGE_LABEL = { month: 'this month', quarter: 'last 3 months', year: 'this
 
 /* ---------------- data stores ---------------- */
 function localStore() {
-  const read = () => storeGet(LOCAL_KEY) ?? INITIAL_MATCHES;
+  const read = () => storeGet(LOCAL_KEY) || [];
   let cb = () => {};
   const write = (ms) => { storeSet(LOCAL_KEY, ms); cb(ms); };
   return {
