@@ -155,7 +155,7 @@
     @keyframes fadeIn{from{opacity:0}}
     .partyCard{position:relative;width:min(420px,100%);background:var(--paper);border:3px solid var(--ink);box-shadow:6px 6px 0 var(--ink);text-align:center;padding:18px 16px 18px;animation:pop .4s cubic-bezier(.2,1.6,.4,1)}
     @keyframes pop{from{transform:scale(.6);opacity:0}}
-    #partyCanvas{display:block;width:100%;height:300px}
+    #partyCanvas{display:block;width:100%;height:420px}
     .partyCard h3{margin:4px 0 6px;font:16px/1.5 var(--pixel)}
     .partyCard p{margin:0 0 14px;color:var(--muted)}
 
@@ -271,7 +271,11 @@
 </div>
 
 <script type="module">
-import { drawSprite, spriteSize, spriteDataURL, ANIMS, SPRITES } from '/tennis/sprites.js';
+import * as BASE_SPRITES from '/tennis/sprites.js';
+import { register, has, dataURL } from '/tennis/pixel.js';
+import { startRally } from '/tennis/rally.js';
+import { loadParty, playParty } from '/tennis/party.js';
+register(BASE_SPRITES);
 
 /* ================================================================
    CONFIG
@@ -313,11 +317,10 @@ const fmtDate = (s, opts = { day: 'numeric', month: 'short', year: 'numeric' }) 
 const storeGet = (k) => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } };
 const storeSet = (k, v) => { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch {} };
 const pick = arr => arr[Math.floor(Math.random() * arr.length)];
-const has = name => !!SPRITES[name];
 function setSpriteImgs(root = document) {
   root.querySelectorAll('img[data-sprite]').forEach(img => {
     const name = img.dataset.sprite;
-    if (has(name)) img.src = spriteDataURL(name, +(img.dataset.scale || 4));
+    if (has(name)) img.src = dataURL(name, +(img.dataset.scale || 4));
     else if (img.dataset.fallback) img.replaceWith(Object.assign(document.createElement('b'), { textContent: img.dataset.fallback, style: 'font:24px var(--pixel)' }));
     else img.remove();
   });
@@ -389,7 +392,7 @@ let store, matches = [], range = 'all', metric = 'sets', histLimit = 8;
 
 async function boot() {
   setSpriteImgs();
-  if (has('ball')) $('#lockBall').src = spriteDataURL('ball', 5);
+  if (has('ball')) $('#lockBall').src = dataURL('ball', 5);
   const auth = storeGet(AUTH_KEY);
   if (auth?.key) return enter(auth, false);
   $('#pw').focus();
@@ -415,7 +418,8 @@ async function enter(auth, animate) {
   if (animate) { lock.classList.add('fade'); setTimeout(() => lock.remove(), 500); } else lock.remove();
   $('#app').classList.remove('hidden');
   $('#pwShow').textContent = auth.pw;
-  startRally();
+  startRally($('#rally'));
+  loadParty(); // victory/defeat art + header extras (umpire, ball kid), fetched in the background
   bindUi();
 
   if (FIREBASE_CONFIG) {
@@ -468,7 +472,7 @@ function renderChart(ms) {
     svg.style.height = 'auto';
     $('#chartBox').querySelector('.empty')?.remove();
     const e = document.createElement('div'); e.className = 'empty';
-    e.innerHTML = `${has('net') ? `<img class="px" src="${spriteDataURL('net', 3)}" alt="">` : ''}No matches ${range === 'all' ? 'yet' : RANGE_LABEL[range]}. Hit <b>+</b> to log one.`;
+    e.innerHTML = `${has('net') ? `<img class="px" src="${dataURL('net', 3)}" alt="">` : ''}No matches ${range === 'all' ? 'yet' : RANGE_LABEL[range]}. Hit <b>+</b> to log one.`;
     $('#chartBox').append(e);
     return;
   }
@@ -621,7 +625,7 @@ function drawSets() {
   const list = $('#setList'); list.innerHTML = '';
   draftSets.forEach((s, idx) => {
     const box = document.createElement('div'); box.className = 'setBox';
-    const row = who => `<div class="pick ${who}"><span class="nm ${who}">${has(P[who] + '_ready') ? `<img class="px" src="${spriteDataURL(P[who] + '_ready', 2)}" alt="">` : ''}${NAMES[who].toUpperCase()}</span>${
+    const row = who => `<div class="pick ${who}"><span class="nm ${who}">${has(P[who] + '_ready') ? `<img class="px" src="${dataURL(P[who] + '_ready', 2)}" alt="">` : ''}${NAMES[who].toUpperCase()}</span>${
       [0,1,2,3,4,5,6,7].map(v => `<button type="button" data-who="${who}" data-v="${v}" class="${s[who] === v ? 'on' : ''}">${v}</button>`).join('')}</div>`;
     box.innerHTML = `<div class="setTop"><b>SET ${idx + 1}</b>${draftSets.length > 1 ? '<button type="button" class="rm">REMOVE</button>' : ''}</div>${row('n')}${row('f')}<div class="verdict"></div>`;
     box.querySelectorAll('.pick button').forEach(btn => btn.addEventListener('click', () => {
@@ -688,153 +692,21 @@ function bindUi() {
 const segOn = (sel, b) => $(sel).querySelectorAll('button').forEach(x => x.classList.toggle('on', x === b));
 
 /* ================================================================
-   HEADER RALLY ANIMATION
-   ================================================================ */
-function fitCanvas(cv) {
-  const dpr = Math.min(window.devicePixelRatio || 1, 3), r = { width: cv.offsetWidth, height: cv.offsetHeight };
-  cv.width = Math.round(r.width * dpr); cv.height = Math.round(r.height * dpr);
-  const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.imageSmoothingEnabled = false;
-  return { ctx, w: r.width, h: r.height };
-}
-function animFrame(anim, t0, now, hold = true) {
-  const a = ANIMS[anim]; const i = Math.floor((now - t0) / a.ms);
-  return { name: a.frames[hold ? Math.min(i, a.frames.length - 1) : i % a.frames.length], done: i >= a.frames.length };
-}
-
-function startRally() {
-  const cv = $('#rally');
-  let g = fitCanvas(cv);
-  addEventListener('resize', () => { g = fitCanvas(cv); });
-  const FLIGHT = 1150;
-  const player = { n: { anim: null, t0: 0 }, f: { anim: null, t0: 0 } };
-  let shot = { from: 'n', t0: performance.now() + 600, kind: 'rally' }, flashes = [], shots = 0;
-  player.n.anim = 'nico_serve'; player.n.t0 = shot.t0 - contactOffset('nico_serve');
-
-  function contactOffset(anim) {
-    const a = ANIMS[anim]; if (!a) return 0;
-    let idx = a.frames.findIndex(f => /_swing2$|_serve2$/.test(f));
-    if (idx < 0) idx = 1;
-    return idx * a.ms + a.ms / 2;
-  }
-  function layout() {
-    const { w, h } = g;
-    const scale = w < 420 ? 2 : w < 760 ? 3 : 4;
-    const { w: sw, h: sh } = spriteSize('nico_ready');
-    const ground = h - 18;
-    return { scale, sw: sw * scale, sh: sh * scale, ground, nx: 4, fx: w - 4 - sw * scale };
-  }
-  function contactPoint(who, L) {
-    return who === 'n' ? { x: L.nx + L.sw * .92, y: L.ground - L.sh * .55 } : { x: L.fx + L.sw * .08, y: L.ground - L.sh * .55 };
-  }
-  function ballPos(L, now) {
-    const u = Math.min(1, (now - shot.t0) / FLIGHT);
-    const A = contactPoint(shot.from, L), C = contactPoint(shot.from === 'n' ? 'f' : 'n', L);
-    const Bx = A.x + (C.x - A.x) * .72, By = L.ground - 3;
-    const peak = Math.min(110, g.h * .65);
-    if (u < .72) { const v = u / .72; return { x: A.x + (Bx - A.x) * v, y: A.y + (By - A.y) * v - peak * 4 * v * (1 - v) * .55, u }; }
-    const v = (u - .72) / .28; return { x: Bx + (C.x - Bx) * v, y: By + (C.y - By) * v - peak * .35 * 4 * v * (1 - v), u };
-  }
-
-  function frame(now) {
-    const { ctx, w, h } = g, L = layout();
-    ctx.clearRect(0, 0, w, h);
-    // ground: thin court strip with baseline + net
-    ctx.fillStyle = '#e6dcc4'; ctx.fillRect(0, L.ground, w, 4);
-    ctx.fillStyle = '#d9d1bd'; for (let x = 0; x < w; x += 12) ctx.fillRect(x, L.ground + 9, 6, 3);
-    if (has('net')) { const { w: nw, h: nh } = spriteSize('net'); const s = L.scale - 1 || 1; drawSprite(ctx, 'net', Math.round(w / 2 - nw * s / 2), Math.round(L.ground - nh * s + 2), s); }
-
-    // shot bookkeeping
-    if (now >= shot.t0) {
-      const recv = shot.from === 'n' ? 'f' : 'n';
-      const arrive = shot.t0 + FLIGHT;
-      const rallyAnim = `${P[recv]}_rally`;
-      if (!player[recv].anim && now >= arrive - contactOffset(rallyAnim)) { player[recv].anim = rallyAnim; player[recv].t0 = now; }
-      if (now >= arrive) {
-        shots++;
-        const smash = shots % 6 === 5;
-        if (smash || Math.random() < .25) flashes.push({ who: recv, t: now, kind: smash ? 'smash' : 'sparkle' });
-        shot = { from: recv, t0: arrive };
-      }
-    }
-    // players
-    for (const who of ['n', 'f']) {
-      const p = player[who];
-      let name;
-      if (p.anim) { const fr = animFrame(p.anim, p.t0, now); name = fr.name; if (fr.done) p.anim = null; }
-      if (!name) name = animFrame(`${P[who]}_idle`, 0, now, false).name;
-      const { w: sw, h: sh } = spriteSize(name);
-      const x = who === 'n' ? L.nx : L.fx;
-      // shadow
-      ctx.fillStyle = 'rgba(27,27,42,.13)'; ctx.fillRect(x + L.sw * .2, L.ground - 2, L.sw * .6, 4);
-      drawSprite(ctx, name, Math.round(x), Math.round(L.ground - sh * L.scale), L.scale, who === 'f');
-    }
-    // ball + shadow
-    if (now >= shot.t0) {
-      const b = ballPos(L, now);
-      const bs = has('ball') ? spriteSize('ball') : { w: 6, h: 6 }, s = Math.max(2, L.scale - 1);
-      ctx.globalAlpha = .18; ctx.fillStyle = '#1b1b2a';
-      const shW = Math.max(4, 12 - (L.ground - b.y) / 10) * s / 2;
-      ctx.fillRect(Math.round(b.x - shW / 2), L.ground - 1, Math.round(shW), 3); ctx.globalAlpha = 1;
-      if (has('ball')) drawSprite(ctx, 'ball', Math.round(b.x - bs.w * s / 2), Math.round(b.y - bs.h * s / 2), s);
-      else { ctx.fillStyle = '#d9f24b'; ctx.fillRect(b.x - 5, b.y - 5, 10, 10); }
-    }
-    // impact flashes
-    flashes = flashes.filter(fl => now - fl.t < 260);
-    for (const fl of flashes) {
-      if (!has(fl.kind)) continue;
-      const c = contactPoint(fl.who, L), { w: fw, h: fh } = spriteSize(fl.kind), s = Math.max(2, L.scale - 1);
-      drawSprite(ctx, fl.kind, Math.round(c.x - fw * s / 2), Math.round(c.y - fh * s / 2), s, fl.who === 'f');
-    }
-    requestAnimationFrame(frame);
-  }
-  requestAnimationFrame(frame);
-}
-
-/* ================================================================
    CELEBRATION
    ================================================================ */
-let partyRaf = null;
-function celebrate(m) {
-  const party = $('#party'); party.classList.remove('hidden');
+let party = null;
+async function celebrate(m) {
   const W = m.winner, Lz = W ? (W === 'n' ? 'f' : 'n') : null;
   // scores read from the winner's side, as they're said in tennis
   const score = m.sets.map(s => m.winner === 'f' ? `${s.f}–${s.n}` : `${s.n}–${s.f}`).join(', ');
   $('#partyTitle').innerHTML = W ? `<span class="${W}">${NAMES[W].toUpperCase()}</span> WINS!` : `IT'S A DRAW!`;
   $('#partySub').textContent = W ? pick([`${score}. Bragging rights secured.`, `${score}. ${NAMES[Lz]} demands a rematch.`, `${score}. What a match!`, `${score}. Game, set, match.`]) : `${score}. Nobody's buying the drinks.`;
-  const winAnim = W ? `${P[W]}_win${1 + Math.floor(Math.random() * 3)}` : null;
-  const loseAnim = W ? `${P[Lz]}_lose${1 + Math.floor(Math.random() * 3)}` : null;
-  const cv = $('#partyCanvas'); const g = fitCanvas(cv); const t0 = performance.now();
-  const confetti = Array.from({ length: 70 }, () => ({ x: Math.random() * g.w, y: -Math.random() * g.h, v: 40 + Math.random() * 70, c: pick(['#d9f24b', '#e2483d', '#2e9b57', '#f0be45', '#4f74a8']), s: 3 + Math.floor(Math.random() * 3), d: Math.random() * 6 }));
-  cancelAnimationFrame(partyRaf);
-  const draw = now => {
-    const { ctx, w, h } = g; ctx.clearRect(0, 0, w, h);
-    const t = (now - t0) / 1000;
-    if (W) {
-      const { w: sw, h: sh } = spriteSize(`${P[W]}_ready`), ws = Math.max(2, Math.min(5, Math.floor((h - 64 - 36) / sh)));
-      // winner: front & centre, on a little podium; loser: smaller, down in the corner
-      const podW = sw * ws * .9, podX = w * .42 - podW / 2, podY = h - 64;
-      ctx.fillStyle = '#f0be45'; ctx.fillRect(podX, podY, podW, 64); ctx.fillStyle = '#1b1b2a'; ctx.fillRect(podX, podY, podW, 4);
-      ctx.font = '18px "Press Start 2P"'; ctx.textAlign = 'center'; ctx.fillText('1', podX + podW / 2, podY + 42);
-      const wn = animFrame(winAnim, 0, now, false).name;
-      drawSprite(ctx, wn, Math.round(w * .42 - sw * ws / 2), Math.round(podY - sh * ws), ws, W === 'f');
-      if (has('crown') && t > .4) { const c = spriteSize('crown'); drawSprite(ctx, 'crown', Math.round(w * .42 - c.w * 2), Math.round(podY - sh * ws - c.h * 4 - 4 + Math.sin(t * 6) * 2), 4); }
-      const ls = 3, ln = animFrame(loseAnim, 0, now, false).name, l = spriteSize(ln);
-      drawSprite(ctx, ln, Math.round(w * .82 - l.w * ls / 2), Math.round(h - l.h * ls), ls, Lz === 'n');
-    } else {
-      for (const who of ['n', 'f']) {
-        const nm = animFrame(`${P[who]}_idle`, 0, now, false).name, s = spriteSize(nm), sc = 4;
-        drawSprite(ctx, nm, Math.round((who === 'n' ? w * .3 : w * .7) - s.w * sc / 2), Math.round(h - s.h * sc), sc, who === 'f');
-      }
-    }
-    for (const p of confetti) {
-      p.y += p.v / 60; p.x += Math.sin(t * 3 + p.d) * .6; if (p.y > h) { p.y = -10; p.x = Math.random() * w; }
-      ctx.fillStyle = p.c; ctx.fillRect(Math.round(p.x), Math.round(p.y), p.s, p.s);
-    }
-    partyRaf = requestAnimationFrame(draw);
-  };
-  partyRaf = requestAnimationFrame(draw);
+  await loadParty();
+  $('#party').classList.remove('hidden');
+  party?.stop();
+  party = playParty($('#partyCanvas'), W);
 }
-function closeParty() { cancelAnimationFrame(partyRaf); $('#party').classList.add('hidden'); }
+function closeParty() { party?.stop(); party = null; $('#party').classList.add('hidden'); }
 
 boot();
 </script>
