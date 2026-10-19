@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#fbf4f2">
+  <title>Japan Trip 2027</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Shippori+Mincho:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#fbf4f2; --paper:#fffdfc; --ink:#2f282c; --muted:#7f7378; --line:#efe1e1;
+      --sakura:#f3c6cf; --sakura-soft:#fbe9ec; --sakura-deep:#c9677c;
+      --wood:#8b5a3c; --wood-dark:#4b2d1c;
+      --serif:"Shippori Mincho", "Hiragino Mincho ProN", "Yu Mincho", Georgia, serif;
+      --sans:Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+      color-scheme:light;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 var(--sans);-webkit-font-smoothing:antialiased}
+    body{background:radial-gradient(1200px 520px at 50% -120px,#fde6ea 0%,rgba(253,230,234,0) 70%),var(--bg);min-height:100vh}
+    button,input{font:inherit;color:inherit}
+    button{cursor:pointer}
+    a{color:inherit}
+    .hidden{display:none !important}
+    .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+    #petals{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:30}
+
+    /* ---------- lock ---------- */
+    #lock{position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:16px;transition:opacity .6s}
+    #lock.fade{opacity:0}
+    .lockCard{width:min(380px,100%);text-align:center}
+    .lockCard .torii{width:220px;margin:0 auto 6px;display:block}
+    .lockCard p{margin:0 0 18px;color:var(--muted)}
+    .field{display:flex;gap:8px;padding:6px;background:var(--paper);border:1px solid var(--line);border-radius:999px;box-shadow:0 8px 30px rgba(201,103,124,.12)}
+    .field input{flex:1;min-width:0;border:0;background:none;padding:8px 14px;outline:none}
+    .field button{border:0;border-radius:999px;padding:8px 18px;background:var(--ink);color:#fff;font-weight:500}
+    .field button:hover{background:#4a3f45}
+    .field.bad{animation:shake .4s}
+    @keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+    .lockCard .lockMsg{min-height:1.6em;margin:12px 0 0;font-size:14px}
+    .lockMsg.bad{color:var(--sakura-deep)}
+
+    /* ---------- header ---------- */
+    .wrap{width:min(1040px,100%);margin:0 auto;padding:0 20px}
+    .hero{text-align:center;padding:34px 0 8px}
+    .hero .torii{width:min(560px,100%);display:block;margin:0 auto}
+    .when{margin:6px 0 0;font:600 13px/1.4 var(--sans);letter-spacing:.18em;text-transform:uppercase;color:var(--sakura-deep)}
+    .tagline{margin:6px auto 0;max-width:520px;color:var(--muted)}
+
+    /* ---------- tabs ---------- */
+    .tabs{position:sticky;top:0;z-index:10;margin:26px 0 0;padding:10px 0;background:rgba(251,244,242,.86);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+    .tabs .wrap{display:flex;gap:6px;justify-content:center;overflow-x:auto;scrollbar-width:none}
+    .tabs .wrap::-webkit-scrollbar{display:none}
+    .tab{flex:none;display:flex;flex-direction:column;align-items:center;border:1px solid transparent;background:none;border-radius:14px;padding:6px 16px;color:var(--muted);transition:background .2s,color .2s}
+    .tab .jp{font:500 12px/1.3 var(--serif);letter-spacing:.08em;opacity:.8}
+    .tab .en{font-weight:500}
+    .tab:hover{color:var(--ink);background:var(--sakura-soft)}
+    .tab[aria-selected="true"]{color:var(--ink);background:var(--paper);border-color:var(--line);box-shadow:0 4px 14px rgba(201,103,124,.12)}
+    .tab .soon{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--sakura-deep);opacity:.9}
+
+    /* ---------- panels ---------- */
+    main{padding:30px 0 40px}
+    .intro{max-width:680px;margin:0 auto 22px;text-align:center;color:var(--muted)}
+    .jump{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin:0 0 30px}
+    .jump a{text-decoration:none;font-size:13px;padding:5px 12px;border-radius:999px;background:var(--paper);border:1px solid var(--line);color:var(--muted)}
+    .jump a:hover{color:var(--ink);border-color:var(--sakura)}
+    section.block{margin:0 0 46px;scroll-margin-top:90px}
+    .blockHead{display:flex;align-items:baseline;gap:14px;margin:0 0 4px}
+    .blockHead .jp{font:600 30px/1 var(--serif);color:var(--sakura)}
+    .blockHead h2{margin:0;font:600 24px/1.2 var(--serif)}
+    .blockHead .count{margin-left:auto;font-size:13px;color:var(--muted);white-space:nowrap}
+    .blockNote{margin:0 0 18px;color:var(--muted)}
+    .group{margin:0 0 22px}
+    .group h3{margin:0 0 10px;font:600 12px/1.4 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+    .groupNote{margin:-4px 0 12px;font-size:14px;color:var(--muted)}
+    .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px}
+    .item{position:relative;transition:transform .2s}
+    .item:hover{transform:translateY(-2px)}
+    .card{display:flex;gap:14px;height:100%;padding:16px 16px 14px;background:var(--paper);border:1px solid var(--line);border-radius:16px;text-decoration:none;transition:box-shadow .2s,border-color .2s,background .2s}
+    .item:hover .card{border-color:var(--sakura);box-shadow:0 10px 26px rgba(201,103,124,.14)}
+    .item.done .card{background:#fff8f9;border-color:var(--sakura)}
+    .card .body{display:flex;flex-direction:column;gap:6px;flex:1;min-width:0}
+    .card .poster{flex:none;align-self:flex-start;width:78px;aspect-ratio:2/3;object-fit:cover;border-radius:8px;background:var(--sakura-soft);box-shadow:0 3px 10px rgba(47,40,44,.14)}
+    .card .poster.ph{display:grid;place-items:center;box-shadow:none}
+    .card .poster.ph svg{width:26px;height:26px;stroke:var(--sakura-deep);opacity:.55}
+    .card .top{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+    .card .kind{display:inline-flex;align-items:center;gap:6px}
+    .card .kind svg{width:14px;height:14px;stroke:var(--sakura-deep)}
+    .lang{font:600 10px/1 var(--sans);letter-spacing:.08em;padding:4px 6px;border-radius:6px;background:var(--sakura-soft);color:var(--sakura-deep)}
+    .lang.de{background:#ece9f6;color:#6a5aa0}
+    .card .title{font:600 16px/1.35 var(--serif)}
+    .card .by{font-size:13px;color:var(--muted)}
+    .card .titleDe{font-size:12px;color:var(--muted);font-style:italic}
+    .card .blurb{font-size:14px;margin-top:auto;padding-top:4px}
+    .card .go{font-size:13px;color:var(--sakura-deep);font-weight:500}
+    .tick{position:absolute;right:12px;bottom:11px;display:inline-flex;align-items:center;gap:6px;padding:3px 10px 3px 4px;border:1px solid var(--line);border-radius:999px;background:var(--paper);font-size:12px;color:var(--muted);transition:background .2s,border-color .2s,color .2s}
+    .tick:hover{border-color:var(--sakura);color:var(--ink)}
+    .tick:disabled{opacity:.45;cursor:default}
+    .tick .box{display:grid;place-items:center;width:18px;height:18px;border:1.5px solid var(--sakura);border-radius:50%}
+    .tick .box svg{width:12px;height:12px;stroke:#fff;opacity:0}
+    .tick[aria-pressed="true"]{background:var(--sakura-soft);border-color:var(--sakura);color:var(--sakura-deep)}
+    .tick[aria-pressed="true"] .box{background:var(--sakura-deep);border-color:var(--sakura-deep)}
+    .tick[aria-pressed="true"] .box svg{opacity:1}
+
+    .two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+    .list{margin:0;padding:6px 18px;background:var(--paper);border:1px solid var(--line);border-radius:16px;list-style:none}
+    .list li{padding:12px 0;border-bottom:1px solid var(--line)}
+    .list li:last-child{border-bottom:0}
+    .list b{font-weight:600}
+    .phrase{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:2px 12px;align-items:baseline}
+    .phrase .ja{font:600 17px/1.4 var(--serif)}
+    .phrase .ro{font-size:13px;color:var(--sakura-deep)}
+    .phrase .mean{grid-column:1/-1;font-size:14px;color:var(--muted)}
+
+    .soonCard{max-width:520px;margin:20px auto 0;text-align:center;padding:40px 26px;background:var(--paper);border:1px solid var(--line);border-radius:22px}
+    .soonCard .jp{font:600 54px/1 var(--serif);color:var(--sakura)}
+    .soonCard h2{margin:16px 0 6px;font:600 22px/1.3 var(--serif)}
+    .soonCard p{margin:0;color:var(--muted)}
+    .soonCard .pill{display:inline-block;margin-top:18px;font-size:12px;letter-spacing:.12em;text-transform:uppercase;padding:6px 12px;border-radius:999px;background:var(--sakura-soft);color:var(--sakura-deep)}
+
+    footer{padding:10px 0 46px;text-align:center}
+    .sync{margin:0 0 6px;font-size:12px;color:var(--muted)}
+    footer button{border:0;background:none;color:var(--muted);font-size:13px;text-decoration:underline;text-underline-offset:3px}
+    footer button:hover{color:var(--ink)}
+
+    @media (max-width:640px){
+      .wrap{padding:0 16px}
+      .hero{padding-top:22px}
+      .tabs .wrap{justify-content:flex-start}
+      .tab{padding:6px 12px}
+      .two{grid-template-columns:1fr}
+      .blockHead .jp{font-size:24px}
+      .blockHead h2{font-size:21px}
+      .card .poster{width:70px}
+    }
+  </style>
+</head>
+<body>
+
+<!-- The torii is defined once and used on the lock screen and in the header. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="gBeam" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a87650"/><stop offset="1" stop-color="#7a4b30"/></linearGradient>
+    <linearGradient id="gCap" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#6e432a"/><stop offset="1" stop-color="#46281a"/></linearGradient>
+    <linearGradient id="gPost" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#734630"/><stop offset=".45" stop-color="#a87650"/><stop offset="1" stop-color="#6b3f29"/></linearGradient>
+    <symbol id="torii" viewBox="0 0 600 270">
+      <ellipse cx="300" cy="258" rx="230" ry="7" fill="#e9cfd3" opacity=".7"/>
+      <!-- pillars, leaning in slightly -->
+      <path d="M146 58 L168 58 L162 252 L134 252 Z" fill="url(#gPost)"/>
+      <path d="M432 58 L454 58 L466 252 L438 252 Z" fill="url(#gPost)"/>
+      <path d="M151 80 L149 236 M458 80 L460 236" stroke="#5a3522" stroke-opacity=".25" stroke-width="1.5"/>
+      <rect x="128" y="236" width="40" height="18" rx="2" fill="#3d2416"/>
+      <rect x="432" y="236" width="40" height="18" rx="2" fill="#3d2416"/>
+      <!-- centre strut -->
+      <rect x="292" y="64" width="16" height="54" fill="url(#gBeam)"/>
+      <!-- nuki, the lower tie beam -->
+      <rect x="94" y="116" width="412" height="15" rx="2" fill="url(#gBeam)"/>
+      <path d="M100 120 H500" stroke="#c99a72" stroke-opacity=".5" stroke-width="1"/>
+      <!-- shimaki and the kasagi on top, with upturned ends -->
+      <path d="M30 46 Q300 68 570 46 L566 58 Q300 80 34 58 Z" fill="url(#gBeam)"/>
+      <path d="M4 24 Q300 52 596 24 L590 44 Q300 70 10 44 Z" fill="url(#gCap)"/>
+      <path d="M14 29 Q300 56 586 29" fill="none" stroke="#9a6a48" stroke-opacity=".55" stroke-width="1.2"/>
+      <!-- the plaque -->
+      <rect x="188" y="72" width="224" height="40" rx="3" fill="#3d2416"/>
+      <rect x="193" y="77" width="214" height="30" rx="2" fill="none" stroke="#c8a36a" stroke-opacity=".7"/>
+      <text x="300" y="98" text-anchor="middle" textLength="178" lengthAdjust="spacing" font-family="Shippori Mincho, Georgia, serif" font-weight="600" font-size="16" fill="#f3dfb8">JAPAN TRIP 2027</text>
+    </symbol>
+  </defs>
+</svg>
+
+<canvas id="petals" aria-hidden="true"></canvas>
+
+<div id="lock">
+  <form class="lockCard" id="lockForm" autocomplete="off">
+    <svg class="torii" viewBox="0 0 600 270" aria-hidden="true"><use href="#torii"/></svg>
+    <h1 class="sr">Japan Trip 2027</h1>
+    <p>Just for us. Enter the password to come in.</p>
+    <div class="field" id="field">
+      <input id="pw" type="password" placeholder="Password" aria-label="Password" autocomplete="off" required>
+      <button type="submit">Enter</button>
+    </div>
+    <p class="lockMsg" id="lockMsg" role="status"></p>
+  </form>
+</div>
+
+<div id="app" class="hidden">
+  <header class="hero wrap">
+    <svg class="torii" viewBox="0 0 600 270" role="img" aria-label="A wooden torii gate reading Japan Trip 2027"><use href="#torii"/></svg>
+    <h1 class="sr">Japan Trip 2027</h1>
+    <p class="when">日本 · May 2027</p>
+    <p class="tagline">Everything for the trip in one place. The plan fills in as we go.</p>
+  </header>
+  <nav class="tabs" aria-label="Sections"><div class="wrap" role="tablist" id="tabs"></div></nav>
+  <main class="wrap" id="panel" role="tabpanel"></main>
+  <footer><p class="sync" id="sync" role="status"></p><button type="button" id="relock">Lock this page</button></footer>
+</div>
+
+<script type="module">
+import { TABS, PREPARE } from '/japan/content.js';
+
+const FIREBASE_CONFIG = {
+  apiKey: 'AIzaSyDJW_EYpuPACWzCVDJJzxwpXRLBCleh_Zg',
+  authDomain: 'nicolas-website-4a62d.firebaseapp.com',
+  projectId: 'nicolas-website-4a62d',
+  storageBucket: 'nicolas-website-4a62d.firebasestorage.app',
+  messagingSenderId: '837961761557',
+  appId: '1:837961761557:web:d9ba016e7eff0d51999f1c',
+};
+const FIREBASE_SDK = 'https://www.gstatic.com/firebasejs/11.0.2';
+
+// Only a hash of the password lives here, and the Firestore location of the ticks is derived
+// from the password itself. The repo is public, so nothing private belongs in this folder:
+// the gate keeps the page out of casual view, nothing more.
+const CHECK_HASH = '07e84a138c670ef10a7de5dda352507b69819cac7737c85419a6cd41872f288e';
+const AUTH_KEY = 'nf-japan-auth-v2';
+const LOCAL_DONE_KEY = 'nf-japan-done-v1';
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+const storeGet = k => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } };
+const storeSet = (k, v) => { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+async function sha256(text) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+/* ---------------- lock ---------------- */
+function boot() {
+  startPetals();
+  const saved = storeGet(AUTH_KEY);
+  if (saved?.check === CHECK_HASH && saved.key) return enter(saved, false);
+  $('#pw').focus();
+  $('#lockForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const pw = $('#pw').value.trim().toLowerCase(), msg = $('#lockMsg'), field = $('#field');
+    if (await sha256('nf-japan-check:' + pw) !== CHECK_HASH) {
+      field.classList.remove('bad'); void field.offsetWidth; field.classList.add('bad');
+      msg.className = 'lockMsg bad'; msg.textContent = 'Not quite. Try again.';
+      return;
+    }
+    const auth = { check: CHECK_HASH, key: await sha256('nf-japan-board:' + pw) };
+    storeSet(AUTH_KEY, auth);
+    msg.className = 'lockMsg'; msg.textContent = 'ようこそ · Welcome';
+    setTimeout(() => enter(auth, true), 600);
+  });
+}
+function enter(auth, animate) {
+  const lock = $('#lock');
+  if (animate) { lock.classList.add('fade'); setTimeout(() => lock.remove(), 600); } else lock.remove();
+  $('#app').classList.remove('hidden');
+  renderTabs();
+  show(TABS.some(t => t.id === location.hash.slice(1)) ? location.hash.slice(1) : TABS[0].id);
+  addEventListener('hashchange', () => { const id = location.hash.slice(1); if (TABS.some(t => t.id === id)) show(id); });
+  $('#relock').addEventListener('click', () => { storeSet(AUTH_KEY, null); location.hash = ''; location.reload(); });
+  $('#panel').addEventListener('click', e => {
+    const tick = e.target.closest('.tick');
+    if (tick && store) {
+      const id = tick.closest('.item').dataset.id;
+      store.set(id, !done.has(id)).catch(err => setSync(`Couldn’t save that tick (${err.code || err.message}).`));
+      return;
+    }
+    // in-page jumps scroll without touching the tab hash
+    const a = e.target.closest('[data-jump]');
+    if (!a) return;
+    e.preventDefault();
+    document.getElementById(a.getAttribute('href').slice(1)).scrollIntoView({ behavior: 'smooth' });
+  });
+  connect(auth.key);
+}
+
+/* ---------------- tabs ---------------- */
+function renderTabs() {
+  $('#tabs').innerHTML = TABS.map(t => `
+    <button class="tab" role="tab" id="tab-${t.id}" data-id="${t.id}" aria-selected="false" aria-controls="panel">
+      <span class="jp" lang="ja">${esc(t.jp)}</span><span class="en">${esc(t.label)}</span>${t.soon ? '<span class="soon">soon</span>' : ''}
+    </button>`).join('');
+  $('#tabs').addEventListener('click', e => { const b = e.target.closest('.tab'); if (b) location.hash = b.dataset.id; });
+}
+function show(id) {
+  const tab = TABS.find(t => t.id === id);
+  document.querySelectorAll('.tab').forEach(b => b.setAttribute('aria-selected', String(b.dataset.id === id)));
+  $('#panel').setAttribute('aria-labelledby', `tab-${id}`);
+  $('#panel').innerHTML = tab.soon ? soonPanel(tab) : preparePanel();
+  paintTicks();
+  document.getElementById(`tab-${id}`).scrollIntoView({ block: 'nearest', inline: 'center' });
+}
+const soonPanel = t => `
+  <div class="soonCard">
+    <div class="jp" lang="ja">${esc(t.jp)}</div>
+    <h2>${esc(t.label)}</h2>
+    <p>${esc(t.soon)}</p>
+    <span class="pill">Information will come soon</span>
+  </div>`;
+
+/* ---------------- prepare ---------------- */
+const ICONS = {
+  podcast: '<path d="M12 3a3 3 0 0 0-3 3v5a3 3 0 0 0 6 0V6a3 3 0 0 0-3-3Z"/><path d="M19 11a7 7 0 0 1-14 0M12 18v3"/>',
+  video: '<rect x="3" y="6" width="13" height="12" rx="2"/><path d="m16 10 5-3v10l-5-3"/>',
+  film: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4"/>',
+  series: '<rect x="3" y="5" width="18" height="12" rx="2"/><path d="M8 21h8M12 17v4"/>',
+  book: '<path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2Z"/><path d="M4 19V5"/>',
+};
+const KIND_LABEL = { podcast: 'Podcast', video: 'Video', film: 'Film', series: 'Series', book: 'Book' };
+const icon = k => `<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[k]}</svg>`;
+
+const DONE_LABEL = { podcast: 'Listened', video: 'Watched', film: 'Watched', series: 'Watched', book: 'Read' };
+const POSTER_KINDS = new Set(['film', 'series', 'book']);
+const CHECK = '<svg viewBox="0 0 24 24" fill="none" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m5 12 5 5 9-10"/></svg>';
+const slug = s => s.normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 80);
+const itemId = it => it.id || slug(`${it.kind}-${it.title}`);
+
+const poster = it => it.poster
+  ? `<img class="poster" src="${esc(it.poster)}" alt="" loading="lazy" decoding="async">`
+  : POSTER_KINDS.has(it.kind) ? `<div class="poster ph">${icon(it.kind)}</div>` : '';
+
+const card = it => `
+  <div class="item" data-id="${esc(itemId(it))}">
+    <a class="card" href="${esc(it.url)}" target="_blank" rel="noopener">
+      ${poster(it)}
+      <div class="body">
+        <div class="top"><span class="kind">${icon(it.kind)}${KIND_LABEL[it.kind]}${it.length ? ` · ${esc(it.length)}` : ''}</span>${it.lang ? `<span class="lang ${it.lang}">${it.lang.toUpperCase()}</span>` : ''}</div>
+        <div class="title">${esc(it.title)}</div>
+        <div class="by">${esc([it.by, it.year].filter(Boolean).join(' · '))}</div>
+        ${it.titleDe ? `<div class="titleDe">DE: ${esc(it.titleDe)}</div>` : ''}
+        <div class="blurb">${esc(it.blurb)}</div>
+        <div class="go">Open ↗</div>
+      </div>
+    </a>
+    <button class="tick" type="button" aria-pressed="false" aria-label="${esc(`${DONE_LABEL[it.kind]}: ${it.title}`)}" disabled><span class="box">${CHECK}</span>${DONE_LABEL[it.kind]}</button>
+  </div>`;
+
+function preparePanel() {
+  const P = PREPARE;
+  const blocks = P.sections.map(s => `
+    <section class="block" id="${s.id}">
+      <div class="blockHead"><span class="jp" lang="ja">${esc(s.jp)}</span><h2>${esc(s.title)}</h2><span class="count" data-count="${s.id}"></span></div>
+      <p class="blockNote">${esc(s.note)}</p>
+      ${s.groups.map(g => `<div class="group">${g.title ? `<h3>${esc(g.title)}</h3>` : ''}${g.note ? `<p class="groupNote">${esc(g.note)}</p>` : ''}<div class="grid">${g.items.map(card).join('')}</div></div>`).join('')}
+    </section>`).join('');
+  const manners = `
+    <section class="block" id="manners">
+      <div class="blockHead"><span class="jp" lang="ja">作法</span><h2>Manners and useful words</h2></div>
+      <p class="blockNote">The small things that make a big difference once we're there.</p>
+      <div class="two">
+        <ul class="list">${P.etiquette.map(e => `<li><b>${esc(e.title)}.</b> ${esc(e.text)}</li>`).join('')}</ul>
+        <ul class="list">${P.phrases.map(p => `<li class="phrase"><span class="ja" lang="ja">${esc(p.ja)}</span><span class="ro">${esc(p.romaji)}</span><span class="mean">${esc(p.meaning)}</span></li>`).join('')}</ul>
+      </div>
+    </section>`;
+  const jump = [...P.sections, { id: 'manners', title: 'Manners & words' }].map(s => `<a href="#${s.id}" data-jump>${esc(s.title)}</a>`).join('');
+  return `<p class="intro">${esc(P.intro)}</p><nav class="jump" aria-label="On this page">${jump}</nav>${blocks}${manners}`;
+}
+
+/* ---------------- ticks, shared through Firestore ---------------- */
+let store = null, done = new Set();
+const setSync = text => { $('#sync').textContent = text; };
+
+function localStore() {
+  let cb = () => {};
+  const read = () => new Set(storeGet(LOCAL_DONE_KEY) || []);
+  return {
+    subscribe(fn, onState) { cb = fn; fn(read()); onState('Couldn’t reach Firebase, so ticks are saved on this device only.'); },
+    async set(id, on) { const s = read(); on ? s.add(id) : s.delete(id); storeSet(LOCAL_DONE_KEY, [...s]); cb(s); },
+  };
+}
+async function firestoreStore(boardKey) {
+  const { initializeApp } = await import(`${FIREBASE_SDK}/firebase-app.js`);
+  const fs = await import(`${FIREBASE_SDK}/firebase-firestore.js`);
+  const app = initializeApp(FIREBASE_CONFIG);
+  let db;
+  try { db = fs.initializeFirestore(app, { localCache: fs.persistentLocalCache({ tabManager: fs.persistentMultipleTabManager() }) }); }
+  catch { db = fs.getFirestore(app); }
+  const col = fs.collection(db, 'japan', boardKey, 'done');
+  return {
+    subscribe(fn, onState, onFail) {
+      fs.onSnapshot(col, { includeMetadataChanges: true }, snap => {
+        fn(new Set(snap.docs.map(d => d.id)));
+        onState(snap.metadata.hasPendingWrites ? 'Saving…' : snap.metadata.fromCache ? 'Offline: showing the ticks saved on this device.' : 'Ticks sync live between our phones.');
+      }, err => { onState(`Ticks couldn’t sync (${err.code}).`); onFail(); });
+    },
+    set: (id, on) => on ? fs.setDoc(fs.doc(col, id), { at: Date.now() }) : fs.deleteDoc(fs.doc(col, id)),
+  };
+}
+async function connect(boardKey) {
+  setSync('Connecting…');
+  try { store = await firestoreStore(boardKey); }
+  catch (err) { console.error(err); store = localStore(); }
+  store.subscribe(s => { done = s; paintTicks(); }, setSync, () => { store = null; paintTicks(); });
+}
+function paintTicks() {
+  document.querySelectorAll('.item').forEach(el => {
+    const on = done.has(el.dataset.id), tick = el.querySelector('.tick');
+    el.classList.toggle('done', on);
+    tick.setAttribute('aria-pressed', String(on));
+    tick.disabled = !store;
+  });
+  document.querySelectorAll('[data-count]').forEach(el => {
+    const ids = [...document.querySelectorAll(`#${el.dataset.count} .item`)].map(i => i.dataset.id);
+    el.textContent = `${ids.filter(id => done.has(id)).length} of ${ids.length} done`;
+  });
+}
+
+/* ---------------- falling sakura petals ---------------- */
+function startPetals() {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const cv = $('#petals'), ctx = cv.getContext('2d');
+  const COLORS = ['#f7c8d1', '#f3b6c4', '#fbdbe2', '#f0a9ba'];
+  let W, H, petals = [];
+  const spawn = (y = Math.random() * H) => ({
+    x: Math.random() * W, y, r: 5 + Math.random() * 5, vy: 18 + Math.random() * 26, vx: 8 + Math.random() * 14,
+    rot: Math.random() * 6.28, vr: (Math.random() - 0.5) * 1.6, flip: Math.random() * 6.28, vf: 1 + Math.random() * 2,
+    sway: Math.random() * 6.28, c: COLORS[Math.floor(Math.random() * COLORS.length)],
+  });
+  const fit = () => {
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    W = innerWidth; H = innerHeight; cv.width = W * dpr; cv.height = H * dpr; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const n = Math.round(Math.min(18, Math.max(7, (W * H) / 60000)));
+    while (petals.length < n) petals.push(spawn());
+    petals.length = n;
+  };
+  fit(); addEventListener('resize', fit);
+  // a sakura petal: rounded, with the little notch at its tip
+  const petal = r => {
+    ctx.beginPath(); ctx.moveTo(0, r);
+    ctx.bezierCurveTo(r * 0.95, r * 0.35, r * 0.7, -r * 0.8, r * 0.2, -r * 0.92);
+    ctx.lineTo(0, -r * 0.62); ctx.lineTo(-r * 0.2, -r * 0.92);
+    ctx.bezierCurveTo(-r * 0.7, -r * 0.8, -r * 0.95, r * 0.35, 0, r);
+    ctx.fill();
+  };
+  let prev = performance.now();
+  const tick = now => {
+    const dt = Math.min(0.05, (now - prev) / 1000); prev = now;
+    ctx.clearRect(0, 0, W, H);
+    for (const p of petals) {
+      p.sway += dt; p.rot += p.vr * dt; p.flip += p.vf * dt;
+      p.y += p.vy * dt; p.x += (p.vx + Math.sin(p.sway * 1.3) * 18) * dt;
+      if (p.y > H + 20 || p.x > W + 20) Object.assign(p, spawn(-20), { x: Math.random() * (W + 200) - 200 });
+      ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot); ctx.scale(Math.cos(p.flip), 1);
+      ctx.globalAlpha = 0.85; ctx.fillStyle = p.c; petal(p.r);
+      ctx.restore();
+    }
+    requestAnimationFrame(tick);
+  };
+  requestAnimationFrame(tick);
+}
+
+boot();
+</script>
+</body>
+</html>
