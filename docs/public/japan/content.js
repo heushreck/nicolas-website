@@ -1,11 +1,16 @@
 // content.js: everything the Japan page shows. Edit this file to fill in the trip.
 //
 // Tabs: give a tab `soon: '…'` while it has no content yet; drop `soon` once it has a real panel.
-// Groups: { title?, note?, items: [...] }
-// Resource items: { kind: 'podcast'|'video'|'film'|'series'|'book', title, titleDe?, by, year, length?, lang?: 'de', blurb, url, poster?, id? }
-//   titleDe is the German release title; lang: 'de' marks German-language audio.
-//   poster is a portrait image URL (Wikipedia's infobox image works); films, series and books without one get a placeholder.
-//   Ticks are stored per item, keyed by kind + title, so renaming an item clears its tick unless you give it a fixed `id`.
+// Prepare is a grid of categories; each category opens into rows that scroll sideways.
+//   Category: { id, jp, title, art, tint, unit, note, rows: [{ title, note?, items }] }
+//   Podcast:  { kind: 'podcast', title, by, year, length?, lang?: 'de', spotify?, cover?, url }
+//             spotify is the episode id from open.spotify.com/episode/<id>; cover is its artwork.
+//             Without spotify the card links to url instead.
+//   Video:    { kind: 'video', title, by, year, length?, youtube }  (youtube is the video id)
+//   Film:     { kind: 'film' | 'series', title, titleDe?, by, year, blurb, url, poster? }
+//             titleDe is the German release title; poster is a portrait image URL.
+// Ticks are stored per item, keyed by kind + title, so renaming an item clears its tick
+// unless you give it a fixed `id`.
 //
 // The repo is public, so don't put anything private here (addresses, booking codes, ticket PDFs).
 
@@ -18,91 +23,115 @@ export const TABS = [
 ];
 
 export const PREPARE = {
-  intro: 'Before we go: the history, the companies, the films and the manners that will make Japan make more sense once we land.',
-  sections: [
+  intro: 'Before we go: the history, the companies, the films and the manners that will make Japan make more sense once we land. Pick a corner and tick things off as we go.',
+  categories: [
     {
-      id: 'listen', jp: '聴く', title: 'Listen', note: 'Podcasts for the commute, the gym or the long flight.', groups: [
+      id: 'listen', jp: '聴く', title: 'Podcasts', art: 'listen', tint: '#fbe9ec', unit: 'episodes',
+      note: 'For the commute, the gym or the long flight.',
+      rows: [
         {
           title: 'The Rest Is History · Dawn of the Samurai',
-          note: 'The four-part series from April 2026. Listen in order.',
+          note: 'The four-part series. Listen in order.',
           items: [
-            { kind: 'podcast', title: 'Part 1 · The Shadow of the Sword', by: 'The Rest Is History, ep. 658', year: 2026, length: '63 min', blurb: 'Who the samurai really were, and how their myth runs from the Heian court all the way to Meiji.', url: 'https://therestishistory.com/episodes/the-shadow-of-the-sword-part-1' },
-            { kind: 'podcast', title: 'Part 2 · Bloodbath at the Bridge', by: 'The Rest Is History, ep. 659', year: 2026, length: '67 min', blurb: 'Taira against Minamoto: how the warrior clans muscled into imperial politics in 1100s Kyoto.', url: 'https://therestishistory.com/episodes/bloodbath-at-the-bridge-part-2' },
-            { kind: 'podcast', title: 'Part 3 · Japan’s Greatest Warrior', by: 'The Rest Is History, ep. 660', year: 2026, length: '61 min', blurb: 'Yoshitsune and Benkei, the tragic heroes you’ll keep meeting at shrines and in kabuki.', url: 'https://therestishistory.com/episodes/japan-s-greatest-warrior-part-3' },
-            { kind: 'podcast', title: 'Part 4 · The Shōgun Triumphant', by: 'The Rest Is History, ep. 661', year: 2026, length: '65 min', blurb: 'The end of the Genpei War and the Kamakura shogunate: the start of seven centuries of warrior rule.', url: 'https://therestishistory.com/episodes/the-sh-gun-triumphant-part-4' },
+            { kind: 'podcast', title: 'Part 1 · The Shadow of the Sword', by: 'The Rest Is History', year: 2026, length: '63 min', url: 'https://therestishistory.com/episodes/the-shadow-of-the-sword-part-1',
+              spotify: '5FbmWKSPHRh7uEa4tSgYeM', cover: 'https://i.scdn.co/image/ab6772ab000015bedccbf8bd4a997cbb97a5d465' },
+            { kind: 'podcast', title: 'Part 2 · Bloodbath at the Bridge', by: 'The Rest Is History', year: 2026, length: '67 min', url: 'https://therestishistory.com/episodes/bloodbath-at-the-bridge-part-2',
+              spotify: '4qcSEcDyUr0RXoD7kJ51lt', cover: 'https://i.scdn.co/image/ab6772ab000015becbee804ee69a23af846a9798' },
+            { kind: 'podcast', title: 'Part 3 · Japan’s Greatest Warrior', by: 'The Rest Is History', year: 2026, length: '61 min', url: 'https://therestishistory.com/episodes/japan-s-greatest-warrior-part-3',
+              spotify: '6YhIPfcOuijY1l0Ix6tf5t', cover: 'https://i.scdn.co/image/ab6772ab000015befc0c42421d8ea6b3250f630c' },
+            { kind: 'podcast', title: 'Part 4 · The Shōgun Triumphant', by: 'The Rest Is History', year: 2026, length: '65 min', url: 'https://therestishistory.com/episodes/the-sh-gun-triumphant-part-4',
+              spotify: '4geeOEJlXyqJs0GaB2Xjx4', cover: 'https://i.scdn.co/image/ab6772ab000015be3181a25f448bd89bf2047e0e' },
           ],
         },
         {
           title: 'The Rest Is History · more Japan',
           items: [
-            { kind: 'podcast', title: 'Japan: Samurai and Shoguns', by: 'The Rest Is History, ep. 277', year: 2022, length: '62 min', blurb: 'The best single-episode overview: Japanese history told through six people, from medieval lords to manga.', url: 'https://therestishistory.com/episodes/samurai-and-shoguns' },
-            { kind: 'podcast', title: 'Lady Murasaki and the Shining Prince', by: 'The Rest Is History, ep. 560', year: 2025, length: '54 min', blurb: 'The Tale of Genji and Heian Kyoto’s court culture, where Japanese aesthetics begin.', url: 'https://therestishistory.com/episodes/lady-murasaki-and-the-shining-prince-part-1' },
-            { kind: 'podcast', title: 'Secrets of the Imperial Court', by: 'The Rest Is History, ep. 561', year: 2025, length: '67 min', blurb: 'The Pillow Book and daily life at court. A great primer before Kyoto’s palaces and temples.', url: 'https://therestishistory.com/episodes/secrets-of-the-imperial-court-part-2' },
+            { kind: 'podcast', title: 'Japan: Samurai and Shoguns', by: 'The Rest Is History', year: 2022, length: '62 min', url: 'https://therestishistory.com/episodes/samurai-and-shoguns',
+              spotify: '6lXNuHjCcti2YSPF2AF19Q', cover: 'https://i.scdn.co/image/ab67656300005f1fa6b1c980e35b9e510ecdeb44' },
+            { kind: 'podcast', title: 'Lady Murasaki and the Shining Prince', by: 'The Rest Is History', year: 2025, length: '54 min', url: 'https://therestishistory.com/episodes/lady-murasaki-and-the-shining-prince-part-1',
+              spotify: '5Ional8yBiATI8633ohWNx', cover: 'https://i.scdn.co/image/ab6772ab000015be64eb6f7398f87446d6a7053c' },
+            { kind: 'podcast', title: 'Secrets of the Imperial Court', by: 'The Rest Is History', year: 2025, length: '67 min', url: 'https://therestishistory.com/episodes/secrets-of-the-imperial-court-part-2',
+              spotify: '38WEqi3Yg4AeIfUzqBaDQ6', cover: 'https://i.scdn.co/image/ab6772ab000015be7bb89cdd8dbaa04e4c26c07d' },
           ],
         },
         {
           title: 'Acquired · Japanese companies',
           note: 'Long business histories. Start with Sony.',
           items: [
-            { kind: 'podcast', title: 'Sony', by: 'Acquired, S10 E3', year: 2022, length: '3 h 4 min', blurb: 'From a postwar Tokyo startup to the Walkman, PlayStation and a global entertainment empire.', url: 'https://www.acquired.fm/episodes/sony' },
-            { kind: 'podcast', title: 'Nintendo’s Origins', by: 'Acquired, S12 E3', year: 2023, length: '3 h 28 min', blurb: 'A Kyoto playing-card maker from 1889 becomes the Famicom company: craft, family and reinvention.', url: 'https://www.acquired.fm/episodes/nintendo' },
-            { kind: 'podcast', title: 'Nintendo: The Console Wars', by: 'Acquired, S12 E4', year: 2023, length: '3 h 20 min', blurb: 'Nintendo against Sega and Sony. Pairs nicely with the Sony episode.', url: 'https://www.acquired.fm/episodes/nintendo-the-console-wars' },
-            { kind: 'podcast', title: 'ARM & SoftBank', by: 'Acquired, S4 E2', year: 2019, length: '1 h 30 min', blurb: 'Masayoshi Son, SoftBank and the ARM takeover: Japan’s boldest modern tech investor.', url: 'https://www.acquired.fm/episodes/arm-softbank' },
+            { kind: 'podcast', title: 'Sony', by: 'Acquired', year: 2022, length: '3 h 4 min', url: 'https://www.acquired.fm/episodes/sony',
+              spotify: '191UKETU2H8XGSYqJJsTZO', cover: 'https://i.scdn.co/image/ab67656300005f1ff9bd7049cea88c23693d1d1d' },
+            { kind: 'podcast', title: 'Nintendo’s Origins', by: 'Acquired', year: 2023, length: '3 h 28 min', url: 'https://www.acquired.fm/episodes/nintendo',
+              spotify: '5Pe6juMsSbnI5VAxWgys8y', cover: 'https://i.scdn.co/image/ab67656300005f1ff9bd7049cea88c23693d1d1d' },
+            { kind: 'podcast', title: 'Nintendo: The Console Wars', by: 'Acquired', year: 2023, length: '3 h 20 min', url: 'https://www.acquired.fm/episodes/nintendo-the-console-wars',
+              spotify: '44DKfqgkXGGhHtZPdXtKlJ', cover: 'https://i.scdn.co/image/ab67656300005f1ff9bd7049cea88c23693d1d1d' },
+            { kind: 'podcast', title: 'ARM & SoftBank', by: 'Acquired', year: 2019, length: '1 h 30 min', url: 'https://www.acquired.fm/episodes/arm-softbank',
+              spotify: '0rI11KF2OVKLzuljc179xt', cover: 'https://i.scdn.co/image/ab67656300005f1ff9bd7049cea88c23693d1d1d' },
           ],
         },
         {
           title: 'Hardcore History · Supernova in the East',
-          note: 'Dan Carlin on Japan’s road into and through the Pacific War. Six free episodes, about 27 hours. Heavy, but unforgettable.',
+          note: 'Japan’s road into and through the Pacific War. About 27 hours, heavy but unforgettable.',
           items: [
-            { kind: 'podcast', title: 'Supernova in the East I', by: 'Dan Carlin, show 62', year: 2018, length: '4 h 28 min', blurb: 'Start here: how a society shaped by centuries of isolation became an expansionist empire.', url: 'https://www.dancarlin.com/product/hardcore-history-62-supernova-in-the-east-i/' },
-            { kind: 'podcast', title: 'Supernova in the East II', by: 'Dan Carlin, show 63', year: 2019, length: '4 h 2 min', blurb: 'The war in China, the world’s muted response, and the road to Pearl Harbor.', url: 'https://www.dancarlin.com/product/hardcore-history-63-supernova-in-the-east-ii/' },
-            { kind: 'podcast', title: 'Supernova in the East III', by: 'Dan Carlin, show 64', year: 2019, length: '4 h 54 min', blurb: 'Japan’s lightning expansion across Asia and the Pacific, and the war’s merciless turn.', url: 'https://www.dancarlin.com/product/hardcore-history-64-supernova-in-the-east-iii/' },
-            { kind: 'podcast', title: 'Supernova in the East IV', by: 'Dan Carlin, show 65', year: 2020, length: '3 h 59 min', blurb: 'Coral Sea, Midway and Guadalcanal: the naval battles that flipped the Pacific war.', url: 'https://www.dancarlin.com/product/hardcore-history-65-supernova-in-the-east-iv/' },
-            { kind: 'podcast', title: 'Supernova in the East V', by: 'Dan Carlin, show 66', year: 2020, length: '3 h 33 min', blurb: 'As defeat looms, desperate tactics replace material strength.', url: 'https://www.dancarlin.com/product/hardcore-history-66-supernova-in-the-east-v/' },
-            { kind: 'podcast', title: 'Supernova in the East VI', by: 'Dan Carlin, show 67', year: 2021, length: '5 h 46 min', blurb: 'Firebombing, kamikaze and the atomic bombs. Worth hearing before Hiroshima.', url: 'https://www.dancarlin.com/product/hardcore-history-67-supernova-in-the-east-vi/' },
+            { kind: 'podcast', title: 'Supernova in the East I', by: 'Dan Carlin', year: 2018, length: '4 h 28 min', url: 'https://www.dancarlin.com/product/hardcore-history-62-supernova-in-the-east-i/',
+              spotify: '2lqNevhLx08QPmvCLjhS4g', cover: 'https://i.scdn.co/image/ab67656300005f1f68bff9eb1131efaa2db182ec' },
+            { kind: 'podcast', title: 'Supernova in the East II', by: 'Dan Carlin', year: 2019, length: '4 h 2 min', url: 'https://www.dancarlin.com/product/hardcore-history-63-supernova-in-the-east-ii/',
+              spotify: '1lkQ10FIzzATYqr2TCtXow', cover: 'https://i.scdn.co/image/ab67656300005f1fd0b48ec41e2b7618d57c625d' },
+            { kind: 'podcast', title: 'Supernova in the East III', by: 'Dan Carlin', year: 2019, length: '4 h 54 min', url: 'https://www.dancarlin.com/product/hardcore-history-64-supernova-in-the-east-iii/',
+              spotify: '0EfH5ab5tffoTI8GIUyWSa', cover: 'https://i.scdn.co/image/ab67656300005f1f78a88da9670948bacc3a3ced' },
+            { kind: 'podcast', title: 'Supernova in the East IV', by: 'Dan Carlin', year: 2020, length: '3 h 59 min', url: 'https://www.dancarlin.com/product/hardcore-history-65-supernova-in-the-east-iv/',
+              spotify: '26vJ74LfG4fpeYJOsp3nKT', cover: 'https://i.scdn.co/image/ab67656300005f1f7426c0ec5ff3ec7cd46fd413' },
+            { kind: 'podcast', title: 'Supernova in the East V', by: 'Dan Carlin', year: 2020, length: '3 h 33 min', url: 'https://www.dancarlin.com/product/hardcore-history-66-supernova-in-the-east-v/',
+              spotify: '0JyPFxeMC3sZCT1qssDGqB', cover: 'https://i.scdn.co/image/ab67656300005f1f1bf627349fa8a6f2eeb20e78' },
+            { kind: 'podcast', title: 'Supernova in the East VI', by: 'Dan Carlin', year: 2021, length: '5 h 46 min', url: 'https://www.dancarlin.com/product/hardcore-history-67-supernova-in-the-east-vi/',
+              spotify: '19XDKv5ZtfQJpRv3R61liH', cover: 'https://i.scdn.co/image/ab67656300005f1fc67d102a774858f8356d448e' },
           ],
         },
         {
           title: 'Auf Deutsch',
-          note: 'History, food and companies, in German.',
+          note: 'History, art, food and companies, in German.',
           items: [
-            { kind: 'podcast', lang: 'de', title: 'Japan: Der Genpei-Krieg und die Samurai 1180', by: 'Eine Stunde History', year: 2025, length: '43 min', blurb: 'The German companion to Dawn of the Samurai: the same war, in one hour.', url: 'https://www.deutschlandfunknova.de/beitrag/japan-der-genpei-krieg-und-die-samurai-1180' },
-            { kind: 'podcast', lang: 'de', title: 'Japan: Die Meiji-Restauration', by: 'Eine Stunde History', year: 2023, length: '43 min', blurb: '1868: how Japan swapped the shogun for an emperor and industrialised at breakneck speed.', url: 'https://www.deutschlandfunknova.de/beitrag/kaiserreich-japan-die-meiji-restauration-1868' },
-            { kind: 'podcast', lang: 'de', title: 'Die 47 Ronin', by: 'Geschichten aus der Geschichte, GAG255', year: 2020, length: '59 min', blurb: 'Japan’s great loyalty legend. Their graves at Sengaku-ji in Tokyo are still a pilgrimage site.', url: 'https://www.geschichte.fm/podcast/zs255/' },
-            { kind: 'podcast', lang: 'de', title: 'Die Republik Ezo und das Ende des Shogunats', by: 'Geschichten aus der Geschichte, GAG323', year: 2021, length: '50 min', blurb: 'The shogunate’s last stand in Hokkaido and the end of the samurai era.', url: 'https://www.geschichte.fm/archiv/gag323/' },
-            { kind: 'podcast', lang: 'de', title: 'Hokusai und die Große Welle', by: 'Geschichten aus der Geschichte, GAG488', year: 2025, blurb: 'The story behind the most famous print in the world.', url: 'https://www.geschichte.fm/archiv/gag488/' },
-            { kind: 'podcast', lang: 'de', title: 'Eine kleine Geschichte des Sushi', by: 'Geschichten aus der Geschichte, GAG541', year: 2026, length: '72 min', blurb: 'How fermented fish turned into the sushi we know. Food history for the flight.', url: 'https://www.geschichte.fm/archiv/gag541/' },
-            { kind: 'podcast', lang: 'de', title: 'Edo, 1691', by: 'Was bisher geschah', year: 2026, length: '27 min', blurb: 'A short time-travel tour of shogun-era Tokyo, guided by a 17th-century German visitor.', url: 'https://shows.acast.com/was-bisher-geschah/episodes/6a1c023149418f56c4c3936e' },
-            { kind: 'podcast', lang: 'de', title: 'Nintendo vs. Sony', by: 'Kampf der Unternehmen', year: 2020, length: '6 parts · 2.5 h', blurb: 'How a Nintendo snub created the PlayStation. The German counterpart to Acquired.', url: 'https://podcasts.apple.com/de/podcast/nintendo-vs-sony-in-den-r%C3%BCcken-gefallen/id1485275017?i=1000499992000' },
-            { kind: 'podcast', lang: 'de', title: 'Toyota vs. Honda', by: 'Kampf der Unternehmen', year: 2023, length: '4 parts · 2.8 h', blurb: 'Postwar Japan rebuilt, told through two carmakers.', url: 'https://podcasts.apple.com/de/podcast/toyota-vs-honda-aus-den-tr%C3%BCmmern-auferstanden/id1485275017?i=1000629150191' },
+            { kind: 'podcast', lang: 'de', title: 'Die 47 Ronin', by: 'Geschichten aus der Geschichte', year: 2020, length: '59 min', url: 'https://www.geschichte.fm/podcast/zs255/',
+              spotify: '4VHECyzkXpF72EHMxIlhOm', cover: 'https://i.scdn.co/image/ab67656300005f1f03bcd98520bd401f682eae45' },
+            { kind: 'podcast', lang: 'de', title: 'Die Republik Ezo und das Ende des Shogunats', by: 'Geschichten aus der Geschichte', year: 2021, length: '50 min', url: 'https://www.geschichte.fm/archiv/gag323/',
+              spotify: '55INRbxYgsGoEpk5en4WzW', cover: 'https://i.scdn.co/image/ab67656300005f1f271845631b8d4c99e358918f' },
+            { kind: 'podcast', lang: 'de', title: 'Hokusai und die Große Welle', by: 'Geschichten aus der Geschichte', year: 2025, url: 'https://www.geschichte.fm/archiv/gag488/',
+              spotify: '2qbnOfXhNDkgLD5LnIPppu', cover: 'https://i.scdn.co/image/ab67656300005f1ff391b0b2df2cda94ed0ca9a4' },
+            { kind: 'podcast', lang: 'de', title: 'Eine kleine Geschichte des Sushi', by: 'Geschichten aus der Geschichte', year: 2026, length: '72 min', url: 'https://www.geschichte.fm/archiv/gag541/',
+              spotify: '3GDk0VZZ28gunOZz2Y9L6y', cover: 'https://i.scdn.co/image/ab67656300005f1f8a528c4b49ca3fdc10bf10fa' },
+            { kind: 'podcast', lang: 'de', title: 'Nintendo vs. Sony', by: 'Kampf der Unternehmen', year: 2020, length: '6 parts', url: 'https://podcasts.apple.com/de/podcast/nintendo-vs-sony-in-den-r%C3%BCcken-gefallen/id1485275017?i=1000499992000',
+              spotify: '3q85pDjBDfddITcwTUZ3rZ', cover: 'https://i.scdn.co/image/ab67656300005f1f9a1a3e7df3839732962d8f28' },
           ],
         },
       ],
     },
     {
-      id: 'watch', jp: '見る', title: 'Watch on YouTube', note: 'Short explainers on how Japan became Japan, plus tips for first-timers.', groups: [
+      id: 'watch', jp: '見る', title: 'YouTube', art: 'watch', tint: '#e6eef6', unit: 'videos',
+      note: 'Short explainers on how Japan became Japan, plus tips for first-timers. They play right here.',
+      rows: [
         {
           title: 'History',
           items: [
-            { kind: 'video', title: 'history of japan', by: 'Bill Wurtz', year: 2016, length: '9 min', blurb: 'All of Japanese history at breakneck speed. Ridiculous, and the names stick.', url: 'https://www.youtube.com/watch?v=Mh5LY4Mz15o' },
-            { kind: 'video', title: 'History of the Shogunates and the End of the Shogun', by: 'Kings and Generals', year: 2024, length: '19 min', blurb: 'The Kamakura, Ashikaga and Tokugawa shogunates in one clear animated overview.', url: 'https://www.youtube.com/watch?v=aoczzwyfjkA' },
-            { kind: 'video', title: 'Warring States Japan: Sengoku Jidai', by: 'Extra History', year: 2014, length: '6 parts · 9 min each', blurb: 'Nobunaga, Hideyoshi and Ieyasu, the three unifiers behind the castles we’ll visit.', url: 'https://www.youtube.com/watch?v=hDsdkoln59A' },
-            { kind: 'video', title: 'End of the Samurai', by: 'Extra History', year: 2025, length: '49 min', blurb: 'Perry’s black ships, the Boshin War and the Meiji reforms, as one film.', url: 'https://www.youtube.com/watch?v=ZWHYS-E7nNg' },
+            { kind: 'video', title: 'history of japan', by: 'Bill Wurtz', year: 2016, length: '9 min', youtube: 'Mh5LY4Mz15o' },
+            { kind: 'video', title: 'History of the Shogunates and the End of the Shogun', by: 'Kings and Generals', year: 2024, length: '19 min', youtube: 'aoczzwyfjkA' },
+            { kind: 'video', title: 'Warring States Japan: Sengoku Jidai', by: 'Extra History', year: 2014, length: 'Part 1 of 6', youtube: 'hDsdkoln59A' },
+            { kind: 'video', title: 'End of the Samurai', by: 'Extra History', year: 2025, length: '49 min', youtube: 'ZWHYS-E7nNg' },
           ],
         },
         {
           title: 'Before we go',
           items: [
-            { kind: 'video', title: 'How to Plan Your First Trip to Japan (2026)', by: 'Japan Guide', year: 2026, length: '13 min', blurb: 'Up-to-date logistics: rail passes, IC cards, money and how to split the days.', url: 'https://www.youtube.com/watch?v=2yAr36a7Lmw' },
-            { kind: 'video', title: '12 Unspoken Rules Not to Break in Japan', by: 'Abroad in Japan', year: 2024, length: '26 min', blurb: 'Chris Broad’s funny, practical guide to the etiquette visitors most often get wrong.', url: 'https://www.youtube.com/watch?v=i_kYN7f8qUg' },
-            { kind: 'video', title: 'How to Eat Japan: 10 Food Tips', by: 'Paolo fromTOKYO', year: 2018, length: '10 min', blurb: 'Ordering and restaurant manners from a long-time Tokyo local. A few details may be dated.', url: 'https://www.youtube.com/watch?v=lbnpo-hZHsQ' },
-            { kind: 'video', title: 'What a Typical Tokyo Neighbourhood Is Like', by: 'Life Where I’m From', year: 2021, length: '15 min', blurb: 'A calm walk through ordinary residential Tokyo, away from the tourist spots.', url: 'https://www.youtube.com/watch?v=TheOkz8oF_I' },
+            { kind: 'video', title: 'How to Plan Your First Trip to Japan (2026)', by: 'Japan Guide', year: 2026, length: '13 min', youtube: '2yAr36a7Lmw' },
+            { kind: 'video', title: '12 Unspoken Rules Not to Break in Japan', by: 'Abroad in Japan', year: 2024, length: '26 min', youtube: 'i_kYN7f8qUg' },
+            { kind: 'video', title: 'How to Eat Japan: 10 Food Tips', by: 'Paolo fromTOKYO', year: 2018, length: '10 min', youtube: 'lbnpo-hZHsQ' },
+            { kind: 'video', title: 'What a Typical Tokyo Neighbourhood Is Like', by: 'Life Where I’m From', year: 2021, length: '15 min', youtube: 'TheOkz8oF_I' },
           ],
         },
       ],
     },
     {
-      id: 'films', jp: '映画', title: 'Films', note: 'A film night list, from Ghibli to the classics.', groups: [
+      id: 'films', jp: '映画', title: 'Films & series', art: 'films', tint: '#f8efd6', unit: 'titles',
+      note: 'A film night list, from Ghibli to the classics.',
+      rows: [
         {
           title: 'Studio Ghibli',
           items: [
@@ -112,12 +141,23 @@ export const PREPARE = {
               poster: 'https://upload.wikimedia.org/wikipedia/en/0/02/My_Neighbor_Totoro_-_Tonari_no_Totoro_%28Movie_Poster%29.jpg' },
             { kind: 'film', title: 'Princess Mononoke', titleDe: 'Prinzessin Mononoke', by: 'Hayao Miyazaki', year: 1997, blurb: 'An epic clash between iron-making humans and the old forest gods.', url: 'https://en.wikipedia.org/wiki/Princess_Mononoke',
               poster: 'https://upload.wikimedia.org/wikipedia/en/8/8c/Princess_Mononoke_Japanese_poster.png' },
-            { kind: 'film', title: 'Kiki’s Delivery Service', titleDe: 'Kikis kleiner Lieferservice', by: 'Hayao Miyazaki', year: 1989, blurb: 'A young witch moves to the city and starts a business. Ghibli at its gentlest.', url: 'https://en.wikipedia.org/wiki/Kiki%27s_Delivery_Service',
-              poster: 'https://upload.wikimedia.org/wikipedia/en/0/07/Kiki%27s_Delivery_Service_%28Movie%29.jpg' },
-            { kind: 'film', title: 'Grave of the Fireflies', titleDe: 'Die letzten Glühwürmchen', by: 'Isao Takahata', year: 1988, blurb: 'Two children in firebombed Kobe. Devastating, and central to how Japan remembers the war.', url: 'https://en.wikipedia.org/wiki/Grave_of_the_Fireflies',
-              poster: 'https://upload.wikimedia.org/wikipedia/en/a/a5/Grave_of_the_Fireflies_Japanese_poster.jpg' },
-            { kind: 'film', title: 'The Boy and the Heron', titleDe: 'Der Junge und der Reiher', by: 'Hayao Miyazaki', year: 2023, blurb: 'Miyazaki’s Oscar-winning late film about grief and growing up in wartime.', url: 'https://en.wikipedia.org/wiki/The_Boy_and_the_Heron',
-              poster: 'https://upload.wikimedia.org/wikipedia/en/4/41/How_Do_You_Live_poster.jpg' },
+          ],
+        },
+        {
+          title: 'Modern Japan',
+          items: [
+            { kind: 'film', title: 'Lost in Translation', by: 'Sofia Coppola', year: 2003, blurb: 'Two jet-lagged strangers adrift in Tokyo. Exactly how the first night will feel.', url: 'https://en.wikipedia.org/wiki/Lost_in_Translation',
+              poster: 'https://upload.wikimedia.org/wikipedia/en/4/4c/Lost_in_Translation_poster.jpg' },
+            { kind: 'film', title: 'Perfect Days', by: 'Wim Wenders', year: 2023, blurb: 'A Tokyo toilet cleaner’s quiet routine: a meditation on small pleasures.', url: 'https://en.wikipedia.org/wiki/Perfect_Days',
+              poster: 'https://upload.wikimedia.org/wikipedia/en/c/c9/Perfect_Days_poster.jpg' },
+            { kind: 'film', title: 'Your Name', titleDe: 'Your Name. – Gestern, heute und für immer', by: 'Makoto Shinkai', year: 2016, blurb: 'A Tokyo boy and a country girl swap bodies. Its real locations still draw fans.', url: 'https://en.wikipedia.org/wiki/Your_Name',
+              poster: 'https://upload.wikimedia.org/wikipedia/en/0/0b/Your_Name_poster.png' },
+            { kind: 'film', title: 'Shoplifters', titleDe: 'Shoplifters – Familienbande', by: 'Hirokazu Kore-eda', year: 2018, blurb: 'A makeshift family on Tokyo’s margins. Palme d’Or winner.', url: 'https://en.wikipedia.org/wiki/Shoplifters_(film)',
+              poster: 'https://upload.wikimedia.org/wikipedia/en/c/c9/Shoplifters_%28film%29.jpg' },
+            { kind: 'film', title: 'Departures', titleDe: 'Nokan – Die Kunst des Ausklangs', by: 'Yōjirō Takita', year: 2008, blurb: 'A cellist becomes an undertaker. Oscar winner about ritual and how Japan honours its dead.', url: 'https://en.wikipedia.org/wiki/Departures_(2008_film)',
+              poster: 'https://upload.wikimedia.org/wikipedia/en/e/e1/Okuribito_%282008%29.jpg' },
+            { kind: 'film', title: 'Jiro Dreams of Sushi', titleDe: 'Jiro und das beste Sushi der Welt', by: 'David Gelb', year: 2011, blurb: 'Documentary about a sushi master’s lifelong pursuit of perfection.', url: 'https://en.wikipedia.org/wiki/Jiro_Dreams_of_Sushi',
+              poster: 'https://upload.wikimedia.org/wikipedia/en/4/47/Jiro_sushi_poster.jpg' },
           ],
         },
         {
@@ -129,67 +169,24 @@ export const PREPARE = {
               poster: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/8/86/Tokyo_monogatari_poster.jpg/330px-Tokyo_monogatari_poster.jpg' },
             { kind: 'film', title: 'Tampopo', by: 'Jūzō Itami', year: 1985, blurb: 'A “ramen western” about Japan’s food obsession. Watch it hungry.', url: 'https://en.wikipedia.org/wiki/Tampopo',
               poster: 'https://upload.wikimedia.org/wikipedia/en/0/00/Tampopo_-_Poster.jpg' },
-            { kind: 'film', title: 'Shall We Dance?', by: 'Masayuki Suo', year: 1996, blurb: 'A buttoned-up salaryman secretly takes ballroom lessons. Warm and funny about conformity.', url: 'https://en.wikipedia.org/wiki/Shall_We_Dance%3F_(1996_film)',
-              poster: 'https://upload.wikimedia.org/wikipedia/en/9/9f/Shall_We_Dansu.jpg' },
           ],
         },
         {
-          title: 'Modern Japan',
+          title: 'Series',
           items: [
-            { kind: 'film', title: 'Lost in Translation', by: 'Sofia Coppola', year: 2003, blurb: 'Two jet-lagged strangers adrift in Tokyo. Exactly how the first night will feel.', url: 'https://en.wikipedia.org/wiki/Lost_in_Translation',
-              poster: 'https://upload.wikimedia.org/wikipedia/en/4/4c/Lost_in_Translation_poster.jpg' },
-            { kind: 'film', title: 'Perfect Days', by: 'Wim Wenders', year: 2023, blurb: 'A Tokyo toilet cleaner’s quiet routine. A meditation on small pleasures, and Tokyo’s designer public toilets.', url: 'https://en.wikipedia.org/wiki/Perfect_Days',
-              poster: 'https://upload.wikimedia.org/wikipedia/en/c/c9/Perfect_Days_poster.jpg' },
-            { kind: 'film', title: 'Departures', titleDe: 'Nokan – Die Kunst des Ausklangs', by: 'Yōjirō Takita', year: 2008, blurb: 'A cellist becomes an undertaker. Oscar winner about ritual and how Japan honours its dead.', url: 'https://en.wikipedia.org/wiki/Departures_(2008_film)',
-              poster: 'https://upload.wikimedia.org/wikipedia/en/e/e1/Okuribito_%282008%29.jpg' },
-            { kind: 'film', title: 'Shoplifters', titleDe: 'Shoplifters – Familienbande', by: 'Hirokazu Kore-eda', year: 2018, blurb: 'A makeshift family on Tokyo’s margins. Palme d’Or winner.', url: 'https://en.wikipedia.org/wiki/Shoplifters_(film)',
-              poster: 'https://upload.wikimedia.org/wikipedia/en/c/c9/Shoplifters_%28film%29.jpg' },
-            { kind: 'film', title: 'Still Walking', by: 'Hirokazu Kore-eda', year: 2008, blurb: 'One family’s memorial day: food, obligation and everything left unsaid.', url: 'https://en.wikipedia.org/wiki/Still_Walking',
-              poster: 'https://upload.wikimedia.org/wikipedia/en/b/be/Still_Walking_%28film%29_POSTER.png' },
-            { kind: 'film', title: 'Drive My Car', by: 'Ryūsuke Hamaguchi', year: 2021, blurb: 'A slow, Oscar-winning Murakami adaptation about grief, mostly set in Hiroshima.', url: 'https://en.wikipedia.org/wiki/Drive_My_Car_(film)',
-              poster: 'https://upload.wikimedia.org/wikipedia/en/3/3d/Drive_My_Car_movie_poster.jpeg' },
-            { kind: 'film', title: 'Your Name', titleDe: 'Your Name. – Gestern, heute und für immer', by: 'Makoto Shinkai', year: 2016, blurb: 'A Tokyo boy and a country girl swap bodies. Its real locations still draw fans.', url: 'https://en.wikipedia.org/wiki/Your_Name',
-              poster: 'https://upload.wikimedia.org/wikipedia/en/0/0b/Your_Name_poster.png' },
-            { kind: 'film', title: 'Godzilla Minus One', by: 'Takashi Yamazaki', year: 2023, blurb: 'Postwar trauma and rebuilding, told through Japan’s most famous monster.', url: 'https://en.wikipedia.org/wiki/Godzilla_Minus_One',
-              poster: 'https://upload.wikimedia.org/wikipedia/en/e/e0/Godzilla_Minus_One_Poster.jpeg' },
-            { kind: 'film', title: 'Jiro Dreams of Sushi', titleDe: 'Jiro und das beste Sushi der Welt', by: 'David Gelb', year: 2011, blurb: 'Documentary about a sushi master’s lifelong pursuit of perfection: the shokunin spirit.', url: 'https://en.wikipedia.org/wiki/Jiro_Dreams_of_Sushi',
-              poster: 'https://upload.wikimedia.org/wikipedia/en/4/47/Jiro_sushi_poster.jpg' },
+            { kind: 'series', title: 'Shōgun', by: 'FX / Disney+', year: 2024, blurb: 'Power politics in 1600, mostly in Japanese. Record-breaking Emmy winner.', url: 'https://en.wikipedia.org/wiki/Sh%C5%8Dgun_(2024_TV_series)',
+              poster: 'https://upload.wikimedia.org/wikipedia/en/b/b6/Sh%C5%8Dgun_%282024_miniseries%29_poster.jpg' },
+            { kind: 'series', title: 'Midnight Diner: Tokyo Stories', by: 'Netflix', year: '2016–2019', blurb: 'A tiny late-night diner in Shinjuku; each episode is built around one humble dish.', url: 'https://en.wikipedia.org/wiki/Midnight_Diner_(Japanese_TV_series)',
+              poster: 'https://upload.wikimedia.org/wikipedia/en/8/8e/Midnight_Diner_%28Japanese_TV_series%29.jpg' },
+            { kind: 'series', title: 'The Makanai: Cooking for the Maiko House', by: 'Netflix', year: 2023, blurb: 'Kyoto’s maiko apprentices and the cook who feeds them. Gentle and gorgeous food.', url: 'https://en.wikipedia.org/wiki/The_Makanai:_Cooking_for_the_Maiko_House',
+              poster: 'https://upload.wikimedia.org/wikipedia/en/1/11/Kiyo_In_Kyoto.jpg' },
           ],
         },
       ],
     },
     {
-      id: 'series', jp: 'ドラマ', title: 'Series', note: 'For when one film isn’t enough.', groups: [{
-        items: [
-          { kind: 'series', title: 'Shōgun', by: 'FX / Disney+', year: 2024, blurb: 'Power politics in 1600, mostly in Japanese. Record-breaking Emmy winner; season 2 is on the way.', url: 'https://en.wikipedia.org/wiki/Sh%C5%8Dgun_(2024_TV_series)',
-            poster: 'https://upload.wikimedia.org/wikipedia/en/b/b6/Sh%C5%8Dgun_%282024_miniseries%29_poster.jpg' },
-          { kind: 'series', title: 'Midnight Diner: Tokyo Stories', by: 'Netflix', year: '2016–2019', blurb: 'A tiny late-night diner in Shinjuku; each episode is built around one humble dish.', url: 'https://en.wikipedia.org/wiki/Midnight_Diner_(Japanese_TV_series)',
-            poster: 'https://upload.wikimedia.org/wikipedia/en/8/8e/Midnight_Diner_%28Japanese_TV_series%29.jpg' },
-          { kind: 'series', title: 'The Makanai: Cooking for the Maiko House', by: 'Hirokazu Kore-eda, Netflix', year: 2023, blurb: 'Kyoto’s maiko apprentices and the cook who feeds them. Gentle and gorgeous food.', url: 'https://en.wikipedia.org/wiki/The_Makanai:_Cooking_for_the_Maiko_House',
-            poster: 'https://upload.wikimedia.org/wikipedia/en/1/11/Kiyo_In_Kyoto.jpg' },
-          { kind: 'series', title: 'Tokyo Vice', by: 'HBO Max', year: '2022–2024', blurb: 'An American reporter, the yakuza and the police in 1990s Tokyo. Stylish crime drama.', url: 'https://en.wikipedia.org/wiki/Tokyo_Vice_(TV_series)' },
-          { kind: 'series', title: 'Old Enough!', by: 'Nippon TV, Netflix', year: 2022, blurb: 'Toddlers run their first errands alone. Shows how much Japan trusts kids and neighbours.', url: 'https://en.wikipedia.org/wiki/Old_Enough!' },
-          { kind: 'series', title: 'Terrace House: Boys & Girls in the City', by: 'Fuji TV, Netflix', year: 2015, blurb: 'Low-key reality TV that quietly reveals the unwritten rules of politeness.', url: 'https://en.wikipedia.org/wiki/Terrace_House:_Boys_%26_Girls_in_the_City' },
-        ],
-      }],
-    },
-    {
-      id: 'read', jp: '読む', title: 'Read', note: 'A few books for the plane.', groups: [{
-        items: [
-          { kind: 'book', title: 'Convenience Store Woman', by: 'Sayaka Murata', year: 2016, blurb: 'A short, funny, slightly unsettling novel about fitting in, set in a Tokyo konbini.', url: 'https://en.wikipedia.org/wiki/Convenience_Store_Woman',
-            poster: 'https://upload.wikimedia.org/wikipedia/en/f/f2/Konbini_ningen_%28Murata_novel%29.png' },
-          { kind: 'book', title: 'In Praise of Shadows', by: 'Jun’ichirō Tanizaki', year: 1933, blurb: 'A slim essay on Japanese aesthetics: lacquer, paper screens, dim light. Changes how you see a temple.', url: 'https://en.wikipedia.org/wiki/In_Praise_of_Shadows',
-            poster: 'https://upload.wikimedia.org/wikipedia/en/d/d4/In_praise_of_shadows.jpg' },
-          { kind: 'book', title: 'The Book of Tea', by: 'Okakura Kakuzō', year: 1906, blurb: 'The tea ceremony as a way into Zen, simplicity and the Japanese idea of beauty.', url: 'https://en.wikipedia.org/wiki/The_Book_of_Tea',
-            poster: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5a/Title_page_of_The_Book_of_Tea.jpg/330px-Title_page_of_The_Book_of_Tea.jpg' },
-          { kind: 'book', title: 'Norwegian Wood', by: 'Haruki Murakami', year: 1987, blurb: 'Murakami’s most straightforward novel: love and loss in late-1960s Tokyo.', url: 'https://en.wikipedia.org/wiki/Norwegian_Wood_(novel)',
-            poster: 'https://upload.wikimedia.org/wikipedia/en/e/e0/Norwegian_Wood_%28novel%29_%28Book_Cover%29.jpeg' },
-          { kind: 'book', title: 'Shōgun', by: 'James Clavell', year: 1975, blurb: 'The doorstopper behind the series: an English pilot shipwrecked in 1600 Japan.', url: 'https://en.wikipedia.org/wiki/Sh%C5%8Dgun_(novel)',
-            poster: 'https://upload.wikimedia.org/wikipedia/en/9/9b/Shogun.jpg' },
-          { kind: 'book', title: 'Hiroshima', by: 'John Hersey', year: 1946, blurb: 'Six survivors’ accounts of the bomb. Short, and essential before visiting the Peace Memorial.', url: 'https://en.wikipedia.org/wiki/Hiroshima_(book)',
-            poster: 'https://upload.wikimedia.org/wikipedia/en/e/e6/HiroshimaBook.jpg' },
-        ],
-      }],
+      id: 'manners', jp: '作法', title: 'Manners & words', art: 'manners', tint: '#e5eedc',
+      note: 'The small things that make a big difference once we’re there.',
     },
   ],
   etiquette: [
