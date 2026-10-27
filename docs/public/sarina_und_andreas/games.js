@@ -28,8 +28,8 @@ export const GAMES = [
     ],
   },
   {
-    id: 'song', n: 3, title: 'Wie heißt der Song?', icon: 'icon-music.svg', tint: '#f6eddf', ready: false,
-    tagline: 'Fünfzig Lieder, die ihr kennen solltet. Oder?',
+    id: 'song', n: 3, title: 'Wie heißt der Song?', icon: 'icon-music.svg', tint: '#f6eddf', ready: true,
+    tagline: 'Lieder, die ihr kennen solltet. Oder?',
     steps: [
       'Ein Song spielt an, der Titel bleibt geheim.',
       'Wählt den richtigen Titel aus vier Möglichkeiten.',

@@ -1,0 +1,6 @@
+# The songs for "Wie heißt der Song?" on the Spielewiese, one per line: Artist - Title
+# After editing, run `python3 scripts/spielewiese/songs.py` to update games/song-list.js.
+# If it picks the wrong recording, add Apple's song ID after a bar: Artist - Title | 1441001567
+Sunrise Avenue - Hollywood Hills
+Sunrise Avenue - I Help You Hate Me
+SDP feat. Weekend - Tanz aus der Reihe!
