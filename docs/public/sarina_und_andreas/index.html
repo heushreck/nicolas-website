@@ -81,6 +81,8 @@
     .back:hover{background:#fff;box-shadow:0 4px 14px rgba(47,93,74,.18)}
     .back svg{transition:transform .2s}
     .back:hover svg{transform:translateX(-2px)}
+    .help{justify-self:end;width:36px;height:36px;padding:0;border:0;border-radius:50%;background:rgba(255,255,255,.85);box-shadow:0 2px 10px rgba(47,93,74,.12);font:700 17px/1 var(--sans);color:var(--forest);cursor:pointer;transition:background .2s,box-shadow .2s}
+    .help:hover{background:#fff;box-shadow:0 4px 14px rgba(47,93,74,.18)}
     .barTitle{text-align:center}
     .barTitle h1{display:flex;align-items:center;justify-content:center;gap:10px;margin:0;font:700 26px/1.2 var(--serif)}
     .barTitle p{margin:2px 0 0;font-size:14px;color:var(--muted)}
@@ -147,6 +149,7 @@
   <nav class="topbar">
     <a class="back" href="#"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3 5 8l5 5"/></svg><span>Alle Spiele</span></a>
     <div class="barTitle" id="barTitle"></div>
+    <button type="button" class="help" id="help" aria-label="So geht’s" title="So geht’s" hidden>?</button>
   </nav>
   <main class="wrap" id="view"></main>
   <footer>von Nicolas für Sarina und Andreas</footer>
@@ -154,6 +157,7 @@
 
 <script type="module">
 import { GAMES } from '/sarina_und_andreas/games.js';
+import { openTutorial, seenTutorial } from '/sarina_und_andreas/tutorial.js';
 
 // Only a hash of the password lives here. The repo is public, so the gate keeps the page out of
 // casual view and nothing more.
@@ -197,8 +201,10 @@ function enter(animate) {
 /* ---------------- routing ---------------- */
 // '#' is the game picker, '#play/<id>' opens a game.
 let stopGame = null;
+let closeTutorial = null;
 function route() {
   stopGame?.(); stopGame = null;
+  closeTutorial?.(); closeTutorial = null;
   const [view, id] = location.hash.slice(1).split('/');
   const game = view === 'play' && GAMES.find(g => g.id === id);
   document.body.classList.toggle('playing', Boolean(game));
@@ -222,6 +228,7 @@ function home() {
 async function playScreen(g) {
   $('#barTitle').innerHTML = `<h1>${blaze(g.n)}${esc(g.title)}</h1><p>${esc(g.tagline)}</p>`;
   $('#view').innerHTML = '<section class="stage" id="stage"></section>';
+  $('#help').hidden = true;
   const stage = $('#stage');
   if (!g.ready) {
     stage.innerHTML = `
@@ -229,13 +236,19 @@ async function playScreen(g) {
         <span class="sign">Weg im Bau</span>
         <h3>Dieses Spiel ist noch in Arbeit</h3>
         <p>So wird es funktionieren:</p>
-        <ol class="steps">${g.steps.map(s => `<li>${esc(s)}</li>`).join('')}</ol>
+        <ol class="steps">${g.steps.map(s => `<li>${esc(s.text)}</li>`).join('')}</ol>
       </div>`;
     return;
   }
-  // a game module draws into the stage and may return a function that cleans up when the player leaves
-  const { start } = await import(`/sarina_und_andreas/games/${g.id}.js`);
-  if (location.hash === `#play/${g.id}`) stopGame = await start(stage, { game: g }) || null;
+  // A game module draws into the stage and may return a function that cleans up when the player
+  // leaves. It may also export INTRO_ART, shown at the top of its "So geht’s" pop-up.
+  const { start, INTRO_ART } = await import(`/sarina_und_andreas/games/${g.id}.js`);
+  if (location.hash !== `#play/${g.id}`) return;
+  const tutorial = () => { closeTutorial = openTutorial(g, INTRO_ART); };
+  $('#help').onclick = tutorial;
+  $('#help').hidden = false;
+  if (!seenTutorial(g.id)) tutorial();
+  stopGame = await start(stage, { game: g }) || null;
 }
 
 boot();
