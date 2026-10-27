@@ -2,7 +2,8 @@
 //
 // Game: { id, n, title, tagline, icon, tint, steps, ready }
 //   icon is a file in art/; tint is the soft colour behind it.
-//   steps are the "how it works" lines shown while a game is still being built.
+//   steps are the "how it works" lines, shown while a game is still being built and by games that
+//   explain themselves before the first round.
 //   ready: false shows the "still being built" screen. Once a game exists as games/<id>.js
 //   (exporting `start(stage, ctx)`), flip it to true and the page loads that module instead.
 // The page is served both with and without a trailing slash, so links use absolute paths and game
@@ -19,12 +20,12 @@ export const GAMES = [
     ],
   },
   {
-    id: 'weg', n: 2, title: 'Zeichnet den Weg', icon: 'icon-route.svg', tint: '#e8f2e2', ready: false,
-    tagline: 'Von euch zu Freunden, ganz aus dem Kopf.',
+    id: 'weg', n: 2, title: 'Zeichnet den Weg', icon: 'icon-route.svg', tint: '#e8f2e2', ready: true,
+    tagline: 'Wege, die ihr im Schlaf kennt. Auch ohne Straßen?',
     steps: [
-      'Ihr bekommt eine Karte ohne Straßen, nur mit eurem Zuhause und dem Ziel.',
-      'Zeichnet mit dem Finger den Weg, den ihr fahren würdet.',
-      'Dann erscheint die echte Route, und wir zeigen, wie viel Prozent davon passt.',
+      'Die Karte zeigt, wo es losgeht und wo ihr hinwollt. Straßen gibt es keine.',
+      'Zeichnet mit dem Finger den Weg, den ihr nehmen würdet, vom Haus bis zur Fahne.',
+      'Dann erscheint die echte Route, und ihr seht, wie viel Prozent eures Wegs passt.',
     ],
   },
   {
