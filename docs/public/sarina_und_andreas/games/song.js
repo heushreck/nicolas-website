@@ -1,20 +1,20 @@
-// song.js: "Wie heißt der Song?". A song plays, the players pick its title from four, and the sooner
-// they're right the more points they get. The songs are listed in song-list.js; the clips and covers
-// are Apple Music's 30-second previews, looked up when the game starts.
+// song.js: "Wie heißt der Song?". The first seconds of a song play and the players pick its title from
+// four. Knowing it after 3 seconds scores most; each longer listen they ask for is worth less. The
+// songs are listed in song-list.js; the clips and covers are Apple Music's 30-second previews, looked
+// up when the game starts.
 import { SONGS } from './song-list.js';
 
 const LOOKUP = 'https://itunes.apple.com/lookup';
 const ROUND = 10; // songs per game
 const OPTIONS = 4;
-const MAX_POINTS = 100; // for a right answer straight away, falling to MIN_POINTS when the clip ends
-const MIN_POINTS = 10;
-const STREAK_BONUS = 10; // per right answer in a row before this one, up to STREAK_CAP of them
-const STREAK_CAP = 5;
-const CLIP_SECONDS = 30; // the length of Apple's previews, until the clip itself says
-const BEST_KEY = 'sa-song-best-v1';
+// how much of the clip the players may hear, and what a right answer is worth after hearing that much
+const STEPS = [{ seconds: 3, points: 3 }, { seconds: 10, points: 2 }, { seconds: 30, points: 1 }];
+const FULL = STEPS.at(-1).seconds;
+const BEST_KEY = 'sa-song-best-v2';
 
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const same = (a, b) => a.toLowerCase() === b.toLowerCase();
+const pointsText = n => `${n} ${n === 1 ? 'Punkt' : 'Punkte'}`;
 
 function shuffle(list) {
   for (let i = list.length - 1; i > 0; i--) {
@@ -53,17 +53,20 @@ export async function start(stage) {
   if (!stage.isConnected) return; // the players left while the songs were loading
   const songs = SONGS.filter(s => found.has(s.id)).map(s => ({ ...s, ...found.get(s.id) }));
 
+  const arc = `cx="50" cy="50" r="48" pathLength="1"`;
   stage.innerHTML = `
     <div class="sg">
       <div class="sgBar"><span class="sgNum"></span><span class="sgScore"></span></div>
       <div class="sgPlay">
         <div class="sgDeck">
           <button type="button" class="sgDisc">
-            <svg class="sgRing" viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="48"/><circle class="t" cx="50" cy="50" r="48" pathLength="1"/></svg>
+            <svg class="sgRing" viewBox="0 0 100 100" aria-hidden="true"><circle ${arc}/><circle class="open" ${arc}/><circle class="t" ${arc}/>${
+              STEPS.slice(0, -1).map(s => `<circle class="tick" ${arc} style="stroke-dashoffset:${0.004 - s.seconds / FULL}"/>`).join('')}</svg>
             <span class="sgVinyl"><span class="sgLabel"><img alt=""><b>?</b></span></span>
             <span class="sgIcon" aria-hidden="true"></span>
           </button>
           <p class="sgNow" role="status"></p>
+          <button type="button" class="sgMore"></button>
         </div>
         <div class="sgSide">
           <div class="sgOpts"></div>
@@ -74,11 +77,10 @@ export async function start(stage) {
       <div class="sgEnd" hidden></div>
     </div>`;
   const $ = sel => stage.querySelector(sel);
-  const [play, end, disc, ring, cover, now, opts, say, go] =
-    ['.sgPlay', '.sgEnd', '.sgDisc', '.sgRing .t', '.sgLabel img', '.sgNow', '.sgOpts', '.sgSay', '.sgGo'].map($);
+  const [play, end, disc, open, ring, cover, now, more, opts, say, go] =
+    ['.sgPlay', '.sgEnd', '.sgDisc', '.sgRing .open', '.sgRing .t', '.sgLabel img', '.sgNow', '.sgMore', '.sgOpts', '.sgSay', '.sgGo'].map($);
 
-  let round, at, audio, answered, heardAll, score, streak, bestStreak, results;
-  const clipLength = () => audio.duration || CLIP_SECONDS;
+  let round, at, audio, step, answered, score, streak, bestStreak, results, stopTimer;
 
   // Wrong answers are two other songs by the same artist, so recognising the voice isn't enough,
   // filled up with other titles from the list.
@@ -96,20 +98,57 @@ export async function start(stage) {
     $('.sgScore').innerHTML = `<b>${score}</b> Punkte${streak > 1 ? ` · Serie <b>${streak}</b>` : ''}`;
   }
 
+  // the ring shows how far the clip has played, over the part the players may hear
+  function drawRing() {
+    ring.style.strokeDashoffset = 1 - Math.min((audio?.currentTime || 0) / FULL, 1);
+    open.style.strokeDashoffset = answered ? 0 : 1 - STEPS[step].seconds / FULL;
+  }
+
+  // Pauses the clip at the end of what the players may hear. The audio element reports its time
+  // only a few times a second, so a timer aims at the exact moment and is re-aimed on each report.
+  function holdAtLimit() {
+    clearTimeout(stopTimer);
+    if (!audio || audio.paused || answered) return;
+    const left = STEPS[step].seconds - audio.currentTime;
+    if (left <= 0.02) audio.pause();
+    else stopTimer = setTimeout(holdAtLimit, left * 1000);
+  }
+
+  function animateRing() {
+    drawRing();
+    if (audio && !audio.paused) requestAnimationFrame(animateRing);
+  }
+
+  function showStep() {
+    const { seconds, points } = STEPS[step];
+    const longer = STEPS[step + 1];
+    now.innerHTML = `<b>${seconds} Sekunden</b>Wisst ihr’s jetzt, gibt’s ${pointsText(points)}`;
+    more.classList.toggle('off', !longer);
+    if (longer) more.textContent = `Mehr hören: ${longer.seconds} Sekunden für ${pointsText(longer.points)}`;
+    drawRing();
+  }
+
   function newGame() {
     round = shuffle([...songs]).slice(0, ROUND);
     at = -1;
+    step = 0;
+    answered = false;
     score = streak = bestStreak = 0;
     results = [];
     play.hidden = false;
     end.hidden = true;
     counters();
     setDisc('ready');
+    drawRing();
     cover.removeAttribute('src');
     now.textContent = 'Tippt auf die Platte, dann läuft der erste Song.';
+    more.hidden = true;
     opts.innerHTML = '';
     say.className = 'sgSay';
-    say.textContent = 'Je schneller ihr den richtigen Titel antippt, desto mehr Punkte. Mehrere richtige Antworten in Folge geben einen Bonus.';
+    const [first, ...longer] = STEPS;
+    say.textContent = `Ihr hört erst ${first.seconds} Sekunden. Wisst ihr den Titel, gibt das ${pointsText(first.points)}. `
+      + `Sonst könnt ihr mehr hören: ${longer.map(s => `${s.seconds} Sekunden für ${pointsText(s.points)}`).join(', dann ')}. `
+      + 'Tippt auf die Platte, um die Stelle nochmal zu hören.';
     go.hidden = false;
     go.textContent = 'Los geht’s';
   }
@@ -125,31 +164,45 @@ export async function start(stage) {
     at++;
     if (at === round.length) return showEnd();
     const song = round[at];
-    answered = heardAll = false;
+    step = 0;
+    answered = false;
     counters();
     cover.removeAttribute('src');
-    now.textContent = 'Wie heißt der Song?';
+    more.hidden = false;
+    showStep();
     opts.innerHTML = choices(song).map((t, i) => `<button type="button" data-title="${esc(t)}" disabled><kbd>${i + 1}</kbd>${esc(t)}</button>`).join('');
     say.textContent = '';
     go.hidden = true;
-    audio = new Audio(song.preview);
-    audio.addEventListener('playing', () => {
+    // the events of a song that was already stopped can still arrive, so each listener checks
+    const clip = audio = new Audio(song.preview);
+    clip.addEventListener('playing', () => {
+      if (clip !== audio) return;
       setDisc('playing');
       for (const b of opts.children) b.disabled = answered;
+      holdAtLimit();
+      requestAnimationFrame(animateRing);
     });
-    audio.addEventListener('pause', () => { if (!audio.ended) setDisc('paused'); });
-    audio.addEventListener('ended', () => { heardAll = true; setDisc('over'); });
-    audio.addEventListener('timeupdate', () => { ring.style.strokeDashoffset = 1 - audio.currentTime / clipLength(); });
-    audio.addEventListener('error', () => {
-      if (answered) return;
+    clip.addEventListener('timeupdate', () => { if (clip === audio) { drawRing(); holdAtLimit(); } });
+    clip.addEventListener('pause', () => { if (clip === audio && !clip.ended) { setDisc('paused'); drawRing(); } });
+    clip.addEventListener('ended', () => { if (clip === audio) setDisc('over'); });
+    clip.addEventListener('error', () => {
+      if (clip !== audio || answered) return;
       setDisc('over');
       now.textContent = 'Dieser Song lädt gerade nicht.';
+      more.hidden = true;
       for (const b of opts.children) b.disabled = false;
     });
-    ring.style.strokeDashoffset = 1;
     setDisc('loading');
-    audio.play().catch(() => setDisc('paused'));
+    clip.play().catch(() => setDisc('paused'));
     if (round[at + 1]) new Audio(round[at + 1].preview).preload = 'auto';
+  }
+
+  function listenLonger() {
+    if (answered || !audio || !STEPS[step + 1]) return;
+    step++;
+    showStep();
+    if (audio.paused) audio.play().catch(() => {}); // carries on from where it stopped
+    else holdAtLimit();
   }
 
   function answer(title) {
@@ -157,19 +210,16 @@ export async function start(stage) {
     answered = true;
     const song = round[at];
     const right = same(title, song.title);
-    const heard = heardAll ? clipLength() : audio.currentTime;
-    let points = 0;
-    let bonus = 0;
+    const { seconds, points: worth } = STEPS[step];
+    const points = right ? worth : 0;
     if (right) {
-      points = Math.max(MIN_POINTS, Math.round(MAX_POINTS * (1 - heard / clipLength())));
-      bonus = Math.min(streak, STREAK_CAP) * STREAK_BONUS;
       streak++;
       bestStreak = Math.max(bestStreak, streak);
     }
     const lost = !right && streak > 1;
     if (!right) streak = 0;
-    score += points + bonus;
-    results.push({ song, right, points: points + bonus });
+    score += points;
+    results.push({ song, right, points, seconds });
 
     for (const b of opts.children) {
       b.disabled = true;
@@ -178,13 +228,16 @@ export async function start(stage) {
     }
     if (song.cover) cover.src = song.cover;
     now.innerHTML = `<b>${esc(song.title)}</b>${esc(song.artist)}`;
+    more.hidden = true;
     say.className = `sgSay ${right ? 'right' : 'wrong'}`;
     say.innerHTML = right
-      ? `<b>Richtig!</b> +${points} Punkte${bonus ? `, dazu +${bonus} für eure Serie` : ''}`
+      ? `<b>Richtig!</b> +${pointsText(points)} nach ${seconds} Sekunden`
       : `<b>Leider nicht.</b>${lost ? ' Eure Serie ist vorbei.' : ''}`;
     go.hidden = false;
     go.textContent = at + 1 < round.length ? 'Nächster Song' : 'Zum Ergebnis';
     counters();
+    drawRing();
+    if (audio.paused && !audio.ended) audio.play().catch(() => {}); // now the rest of the clip plays
   }
 
   function showEnd() {
@@ -196,18 +249,19 @@ export async function start(stage) {
     const right = results.filter(r => r.right).length;
     end.innerHTML = `
       <p class="k">Ergebnis</p>
-      <p class="big">${score} Punkte</p>
+      <p class="big">${score} von ${results.length * STEPS[0].points} Punkten</p>
       <p class="sub">${right} von ${results.length} richtig · längste Serie ${bestStreak} · ${score > best ? 'neuer Rekord!' : `Rekord ${best}`}</p>
-      <ol>${results.map(({ song, right, points }) => `
+      <ol>${results.map(({ song, right, points, seconds }) => `
         <li class="${right ? 'right' : 'wrong'}"><a href="${esc(song.link)}" target="_blank" rel="noopener">
           <img src="${esc(song.cover)}" alt="" loading="lazy">
           <div><b title="${esc(song.title)}">${esc(song.title)}</b><span>${esc(song.artist)}</span></div>
-          <em>${right ? `+${points}` : '✗'}</em></a></li>`).join('')}</ol>
+          <em>${right ? `+${points}<small>${seconds} Sek.</small>` : '✗'}</em></a></li>`).join('')}</ol>
       <button type="button" class="sgGo" data-again>Nochmal spielen</button>
       <p class="credit">Hörproben von Apple Music. Tippt auf einen Song, um ihn ganz zu hören.</p>`;
   }
 
   function stopAudio() {
+    clearTimeout(stopTimer);
     if (!audio) return;
     audio.pause();
     audio.removeAttribute('src');
@@ -218,13 +272,15 @@ export async function start(stage) {
   disc.addEventListener('click', () => {
     if (disc.dataset.state === 'ready') return next();
     if (!audio) return;
-    if (audio.paused) {
-      if (audio.ended) audio.currentTime = 0;
-      audio.play().catch(() => {});
-    } else if (answered) {
-      audio.pause();
+    if (!audio.paused) {
+      if (answered) audio.pause();
+      return;
     }
+    // before the answer a tap replays the part they may hear; afterwards it carries on with the song
+    if (!answered || audio.ended) audio.currentTime = 0;
+    audio.play().catch(() => {});
   });
+  more.addEventListener('click', listenLonger);
   go.addEventListener('click', next);
   opts.addEventListener('click', e => { const b = e.target.closest('button'); if (b && !b.disabled) answer(b.dataset.title); });
   end.addEventListener('click', e => { if (e.target.closest('[data-again]')) newGame(); });
@@ -257,11 +313,13 @@ function injectStyle() {
     .sgScore b{color:var(--ink)}
 
     .sgPlay{flex:1;min-height:0;display:flex;flex-direction:column;gap:14px}
-    .sgDeck{flex:1 1 0;min-height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;container-type:size}
-    .sgDisc{position:relative;flex:none;width:min(300px,100cqw,calc(100cqh - 64px));aspect-ratio:1;padding:0;border:0;border-radius:50%;background:none;-webkit-tap-highlight-color:transparent}
+    .sgDeck{--below:112px;flex:1 1 0;min-height:110px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;container-type:size}
+    .sgDisc{position:relative;flex:none;width:max(56px,min(300px,100cqw,calc(100cqh - var(--below))));aspect-ratio:1;padding:0;border:0;border-radius:50%;background:none;-webkit-tap-highlight-color:transparent}
     .sgRing{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
     .sgRing circle{fill:none;stroke:var(--line);stroke-width:2.5}
-    .sgRing .t{stroke:var(--forest);stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset .3s linear}
+    .sgRing .open{stroke:#cfe3c4;stroke-dasharray:1;stroke-dashoffset:1;transition:stroke-dashoffset .4s}
+    .sgRing .t{stroke:var(--forest);stroke-dasharray:1;stroke-dashoffset:1}
+    .sgRing .tick{stroke:var(--paper);stroke-width:5;stroke-dasharray:.008 1}
     .sgVinyl{position:absolute;inset:7%;display:grid;place-items:center;border-radius:50%;background:radial-gradient(circle,transparent 30%,rgba(255,255,255,.07) 31%,transparent 32%,transparent 44%,rgba(255,255,255,.06) 45%,transparent 46%,transparent 58%,rgba(255,255,255,.06) 59%,transparent 60%),repeating-radial-gradient(circle,#1f2d38 0 2px,#283845 2px 4px);box-shadow:0 10px 30px rgba(31,45,56,.25);animation:sgSpin 3.2s linear infinite;animation-play-state:paused}
     .sgDisc[data-state="playing"] .sgVinyl{animation-play-state:running}
     @keyframes sgSpin{to{transform:rotate(360deg)}}
@@ -276,15 +334,23 @@ function injectStyle() {
     .sgDisc[data-state="loading"] .sgIcon,.sgDisc[data-state="playing"] .sgIcon{display:none}
     .sgNow{min-height:2.8em;margin:0;text-align:center;line-height:1.4;color:var(--muted)}
     .sgNow b{display:block;font:700 19px/1.3 var(--serif);color:var(--ink)}
+    .sgMore{padding:7px 16px;border:1.5px solid var(--line);border-radius:999px;background:#fff;font-size:14px;font-weight:600;color:var(--forest)}
+    .sgMore:hover{border-color:#cfdcd6;background:#f6f8f7}
+    .sgMore.off{visibility:hidden}
+    .sgDeck:has(.sgMore[hidden]){--below:64px}
 
     .sgSide{flex:none;display:flex;flex-direction:column;gap:12px}
     .sgOpts{display:grid;gap:8px}
     .sgOpts:empty{display:none}
-    .sgOpts button{display:flex;align-items:center;gap:10px;min-height:48px;padding:10px 14px;border:1.5px solid var(--line);border-radius:14px;background:#fff;text-align:left;font-weight:500;line-height:1.3;transition:border-color .15s,background .15s}
+    .sgOpts button{display:flex;align-items:center;gap:10px;min-height:44px;padding:9px 14px;border:1.5px solid var(--line);border-radius:14px;background:#fff;text-align:left;font-weight:500;line-height:1.3;transition:border-color .15s,background .15s}
     .sgOpts button:not(:disabled):hover{border-color:#cfdcd6;background:#f6f8f7}
     .sgOpts button:disabled{cursor:default}
     .sgOpts kbd{flex:none;display:grid;place-items:center;width:24px;height:24px;border-radius:6px;background:var(--sky);font:600 12px/1 var(--sans);color:var(--muted)}
-    .sgOpts .right{border-color:#a9cfb0;background:#eaf5ec}
+    .sgOpts button:disabled:not(.right):not(.wrong){color:var(--muted)}
+    .sgOpts .right{border-color:#8fc39a;background:#e3f2e6}
+    .sgOpts .right::after,.sgOpts .wrong::after{margin-left:auto;font-weight:700}
+    .sgOpts .right::after{content:"✓";color:var(--forest)}
+    .sgOpts .wrong::after{content:"✗";color:var(--red)}
     .sgOpts .right kbd{background:var(--forest);color:#fff}
     .sgOpts .wrong{border-color:rgba(217,83,79,.5);background:#fbeceb}
     .sgOpts .wrong kbd{background:var(--red);color:#fff}
@@ -311,7 +377,8 @@ function injectStyle() {
     .sgEnd a div{flex:1;min-width:0}
     .sgEnd b,.sgEnd span{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
     .sgEnd span{font-size:13px;color:var(--muted)}
-    .sgEnd em{flex:none;padding-right:6px;font-style:normal;font-weight:600;color:var(--forest)}
+    .sgEnd em{flex:none;padding-right:6px;font-style:normal;font-weight:600;line-height:1.2;text-align:center;color:var(--forest)}
+    .sgEnd em small{display:block;font-size:11px;font-weight:500;color:var(--muted)}
     .sgEnd .wrong em{color:var(--red)}
     .sgEnd .credit{margin:12px 0 0;font-size:12px;color:var(--muted)}
 

@@ -31,9 +31,9 @@ export const GAMES = [
     id: 'song', n: 3, title: 'Wie heißt der Song?', icon: 'icon-music.svg', tint: '#f6eddf', ready: true,
     tagline: 'Lieder, die ihr kennen solltet. Oder?',
     steps: [
-      'Ein Song spielt an, der Titel bleibt geheim.',
-      'Wählt den richtigen Titel aus vier Möglichkeiten.',
-      'Je schneller ihr richtig liegt, desto mehr Punkte. Haltet eure Serie am Leben!',
+      'Ein Song spielt drei Sekunden lang an, der Titel bleibt geheim.',
+      'Wählt den richtigen Titel aus vier Möglichkeiten, oder hört erst mehr: zehn Sekunden, dann dreißig.',
+      'Je weniger ihr hören musstet, desto mehr Punkte. Haltet eure Serie am Leben!',
     ],
   },
   {
