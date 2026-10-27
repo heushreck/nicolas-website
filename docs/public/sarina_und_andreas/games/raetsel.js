@@ -27,7 +27,7 @@ function buildGrid() {
     return ar - br || ac - bc;
   });
   starts.forEach((k, i) => { squares.get(k).num = i + 1; });
-  for (const w of words) w.num = squares.get(w.keys[0]).num;
+  for (const w of words) { w.num = squares.get(w.keys[0]).num; w.id = `${w.dir}${w.num}`; }
   PUZZLE.solution.forEach(([r, c], i) => { squares.get(keyOf(r, c)).sol = i + 1; });
   const order = ['A', 'D'].flatMap(d => words.filter(w => w.dir === d).sort((a, b) => a.num - b.num));
   return { squares, order };
@@ -36,17 +36,20 @@ function buildGrid() {
 export function start(stage) {
   injectStyle();
   const { squares, order } = buildGrid();
-  const wordById = new Map(order.map(w => [`${w.dir}${w.num}`, w]));
+  const wordById = new Map(order.map(w => [w.id, w]));
   const saved = (() => { try { return JSON.parse(localStorage.getItem(SAVE_KEY)) || {}; } catch { return {}; } })();
   const letters = saved.letters || {};
-  const hinted = new Set(saved.hinted || []);
-  const wrong = new Set();
+  const given = new Set(saved.given);       // squares filled in by "Buchstabe zeigen"
+  const verified = new Set(saved.verified); // squares of words confirmed by "Wort prüfen"
+  const tips = new Set(saved.tips);         // words whose second, easier hint is showing
+  const locked = k => given.has(k) || verified.has(k);
   let solved = isSolved();
   let dir = 'A';
   let active = order[0].keys[0];
   let celebration = null;
+  let toastTimer = 0;
 
-  const save = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify({ letters, hinted: [...hinted] })); } catch {} };
+  const save = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify({ letters, given: [...given], verified: [...verified], tips: [...tips] })); } catch {} };
   const word = () => squares.get(active).words[dir];
   function isSolved() { return [...squares].every(([k, sq]) => letters[k] === sq.answer); }
 
@@ -55,25 +58,26 @@ export function start(stage) {
       <div class="cwDock">
         <div class="cwClue">
           <button type="button" class="cwStep" data-step="-1" aria-label="Vorheriger Hinweis">‹</button>
-          <p aria-live="polite"><b></b><span></span></p>
+          <p aria-live="polite"><b></b><span></span><i></i></p>
           <button type="button" class="cwStep" data-step="1" aria-label="Nächster Hinweis">›</button>
         </div>
+        <div class="cwActs">
+          <button type="button" data-act="tip">Tipp</button>
+          <button type="button" data-act="check">Wort prüfen</button>
+          <button type="button" data-act="reveal">Buchstabe zeigen</button>
+        </div>
+        <p class="cwToast" role="status"></p>
         <div class="cwKeys">${KEY_ROWS.map((row, i) => `<div>${[...row].map(ch => `<button type="button" data-key="${ch}">${ch}</button>`).join('')}${i === 2 ? '<button type="button" data-key="Backspace" class="wide" aria-label="Löschen">⌫</button>' : ''}</div>`).join('')}</div>
       </div>
       <div class="cwMain">
         <div>
           <div class="cwGrid" style="--cols:${PUZZLE.cols}">${gridHtml()}</div>
           <div class="cwSol"><span>Lösungswort</span><div>${PUZZLE.solution.map((_, i) => `<b data-sol="${i + 1}"></b>`).join('')}</div></div>
-          <div class="cwTools">
-            <button type="button" data-act="check">Prüfen</button>
-            <button type="button" data-act="hint">Buchstabe zeigen</button>
-            <button type="button" data-act="reset">Neu anfangen</button>
-          </div>
-          <p class="cwMsg" role="status"></p>
+          <div class="cwTools"><button type="button" data-act="reset">Neu anfangen</button></div>
         </div>
         <div class="cwLists">${['A', 'D'].map(d => `
           <section><h4>${d === 'A' ? 'Waagerecht' : 'Senkrecht'}</h4><ol>${order.filter(w => w.dir === d).map(w => `
-            <li data-word="${w.dir}${w.num}"><b>${w.num}</b><span>${esc(w.clue)}</span></li>`).join('')}</ol></section>`).join('')}
+            <li data-word="${w.id}"><b>${w.num}</b><span>${esc(w.clue)}<small></small></span></li>`).join('')}</ol></section>`).join('')}
         </div>
       </div>
       <p class="cwNote">Umlaute schreibt ihr aus: Ü wird UE, ß wird SS.</p>
@@ -91,8 +95,9 @@ export function start(stage) {
   }
 
   const els = new Map([...stage.querySelectorAll('.cwSq')].map(el => [el.dataset.k, el]));
-  const msg = stage.querySelector('.cwMsg');
-  const say = text => { msg.textContent = text; };
+  const [dockLabel, dockClue, dockTip] = stage.querySelector('.cwClue p').children;
+  const tipButton = stage.querySelector('[data-act="tip"]');
+  const toastEl = stage.querySelector('.cwToast');
 
   function paint() {
     const w = word();
@@ -100,17 +105,28 @@ export function start(stage) {
       el.querySelector('.l').textContent = letters[k] || '';
       el.classList.toggle('active', k === active);
       el.classList.toggle('inWord', w.keys.includes(k));
-      el.classList.toggle('wrong', wrong.has(k));
-      el.classList.toggle('given', hinted.has(k));
+      el.classList.toggle('ok', verified.has(k));
+      el.classList.toggle('given', given.has(k));
     }
-    stage.querySelector('.cwClue b').textContent = `${w.num} ${DIR_NAME[w.dir]}`;
-    stage.querySelector('.cwClue span').textContent = w.clue;
+    dockLabel.textContent = `${w.num} ${DIR_NAME[w.dir]}`;
+    dockClue.textContent = w.clue;
+    dockTip.textContent = tips.has(w.id) ? `Tipp: ${w.hint}` : '';
+    tipButton.disabled = tips.has(w.id);
     for (const li of stage.querySelectorAll('.cwLists li')) {
       const lw = wordById.get(li.dataset.word);
       li.classList.toggle('current', lw === w);
       li.classList.toggle('filled', lw.keys.every(k => letters[k]));
+      li.querySelector('small').textContent = tips.has(lw.id) ? `Tipp: ${lw.hint}` : '';
     }
     PUZZLE.solution.forEach(([r, c], i) => { stage.querySelector(`[data-sol="${i + 1}"]`).textContent = letters[keyOf(r, c)] || ''; });
+  }
+
+  // tone 'good' shows the message in green; it stays up longer the more there is to read
+  function toast(text, tone = '') {
+    toastEl.textContent = text;
+    toastEl.className = `cwToast show ${tone}`;
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.classList.remove('show'), 1500 + text.length * 45);
   }
 
   function select(k, toggle = true) {
@@ -129,10 +145,9 @@ export function start(stage) {
     selectWord(order[(i + step + order.length) % order.length]);
   }
 
+  // checked and revealed letters are known to be right, so typing passes over them
   function type(ch) {
-    letters[active] = ch;
-    wrong.delete(active);
-    hinted.delete(active);
+    if (!locked(active)) letters[active] = ch;
     const w = word(), i = w.keys.indexOf(active);
     if (i < w.keys.length - 1) select(w.keys[i + 1], false);
     else stepWord(1);
@@ -140,10 +155,8 @@ export function start(stage) {
   }
   function erase() {
     const w = word(), i = w.keys.indexOf(active);
-    if (!letters[active] && i > 0) active = w.keys[i - 1];
-    delete letters[active];
-    wrong.delete(active);
-    hinted.delete(active);
+    if ((!letters[active] || locked(active)) && i > 0) active = w.keys[i - 1];
+    if (!locked(active)) delete letters[active];
     select(active, false);
     afterChange();
   }
@@ -161,26 +174,42 @@ export function start(stage) {
   function afterChange() {
     save();
     paint();
-    if (solved || [...squares.keys()].some(k => !letters[k])) return say('');
-    if (isSolved()) { solved = true; say('Gelöst!'); celebrate(); }
-    else say('Alle Kästchen sind voll, aber irgendwo hakt es noch. „Prüfen“ zeigt euch, wo.');
+    if (solved || [...squares.keys()].some(k => !letters[k])) return;
+    if (isSolved()) { solved = true; celebrate(); }
+    else toast('Alles ausgefüllt, aber irgendwo hakt es noch. „Wort prüfen“ hilft beim Suchen.');
+  }
+
+  function shake(w) {
+    for (const k of w.keys) {
+      const el = els.get(k);
+      el.classList.remove('nope');
+      void el.offsetWidth; // restarts the animation
+      el.classList.add('nope');
+    }
   }
 
   function act(name) {
-    if (name === 'check') {
-      for (const [k, sq] of squares) if (letters[k] && letters[k] !== sq.answer) wrong.add(k);
-      say(wrong.size ? `${wrong.size} ${wrong.size === 1 ? 'Buchstabe ist' : 'Buchstaben sind'} noch falsch, rot markiert.` : 'Alles richtig, was bisher drinsteht!');
+    const w = word();
+    if (name === 'tip') {
+      tips.add(w.id);
+      save();
       paint();
-    } else if (name === 'hint') {
-      if (letters[active] === squares.get(active).answer) return say('Der Buchstabe stimmt schon. Wählt ein anderes Kästchen.');
+    } else if (name === 'check') {
+      // only says right or wrong, never which letter is off
+      if (w.keys.some(k => !letters[k])) return toast('Füllt erst das ganze Wort aus.');
+      if (w.keys.some(k => letters[k] !== squares.get(k).answer)) { shake(w); return toast('Noch nicht ganz richtig.'); }
+      w.keys.forEach(k => verified.add(k));
+      save();
+      paint();
+      toast('Stimmt!', 'good');
+    } else if (name === 'reveal') {
+      if (locked(active)) return toast('Dieser Buchstabe steht schon fest.');
       letters[active] = squares.get(active).answer;
-      wrong.delete(active);
-      hinted.add(active);
+      given.add(active);
       afterChange();
-    } else if (name === 'reset' && confirm('Wirklich alle Buchstaben löschen?')) {
+    } else if (name === 'reset' && confirm('Wirklich alle Buchstaben und Tipps löschen?')) {
       for (const k of Object.keys(letters)) delete letters[k];
-      hinted.clear(); wrong.clear(); solved = false;
-      say('');
+      given.clear(); verified.clear(); tips.clear(); solved = false;
       selectWord(order[0]);
       save();
     }
@@ -223,7 +252,11 @@ export function start(stage) {
   document.addEventListener('keydown', onKey);
 
   function celebrate() {
-    const hints = hinted.size;
+    const count = (n, one, many) => (n === 1 ? one : `${n} ${many}`);
+    const help = [
+      tips.size && count(tips.size, 'einem Tipp', 'Tipps'),
+      given.size && count(given.size, 'einem aufgedeckten Buchstaben', 'aufgedeckten Buchstaben'),
+    ].filter(Boolean).join(' und ');
     celebration = document.createElement('div');
     celebration.className = 'cwWin';
     celebration.innerHTML = `
@@ -231,7 +264,7 @@ export function start(stage) {
       <div class="card" role="dialog" aria-label="Rätsel gelöst">
         <p class="k">Lösungswort</p>
         <p class="w">${esc(PUZZLE.solution.map(([r, c]) => squares.get(keyOf(r, c)).answer).join(''))}</p>
-        <p>Geschafft, ihr zwei, ${hints ? `mit ${hints === 1 ? 'einem Tipp' : `${hints} Tipps`}` : 'ganz ohne Tipps'}! Herzlichen Glückwunsch.</p>
+        <p>Geschafft, ihr zwei, ${help ? `mit ${help}` : 'ganz ohne Hilfe'}! Herzlichen Glückwunsch.</p>
         <button type="button">Zurück zum Rätsel</button>
       </div>`;
     document.body.append(celebration);
@@ -244,6 +277,7 @@ export function start(stage) {
   paint();
   return () => {
     document.removeEventListener('keydown', onKey);
+    clearTimeout(toastTimer);
     closeCelebration();
   };
 }
@@ -275,25 +309,38 @@ function injectStyle() {
   style.id = 'cw-style';
   style.textContent = `
     .stage:has(.cw){overflow:clip}
-    .cw{padding:16px 18px 20px}
+    .cw{--blue:#3a6fb0;padding:16px 18px 20px}
     .cwDock{position:sticky;top:0;z-index:5;margin:-16px -18px 16px;padding:10px 12px;background:rgba(255,255,255,.94);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
     .cwClue{display:flex;align-items:center;gap:8px}
     .cwClue p{flex:1;min-height:2.9em;margin:0;display:flex;flex-direction:column;justify-content:center;line-height:1.35}
     .cwClue b{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--forest)}
+    .cwClue i{font-style:normal;font-size:14px;color:var(--blue)}
+    .cwClue i:empty{display:none}
     .cwStep{flex:none;width:36px;height:36px;border:1px solid var(--line);border-radius:50%;background:#fff;font-size:20px;line-height:1;color:var(--muted)}
     .cwStep:hover{color:var(--ink);border-color:#cfdcd6}
+    .cwActs{display:flex;justify-content:center;gap:6px;margin-top:8px}
+    .cwActs button{padding:5px 12px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:13px;color:var(--ink)}
+    .cwActs button:hover:not(:disabled){border-color:#cfdcd6;background:#f6f8f7}
+    .cwActs button:disabled{opacity:.45;cursor:default}
+    .cwToast{position:absolute;left:50%;top:calc(100% + 8px);width:max-content;max-width:calc(100% - 24px);margin:0;padding:7px 14px;border-radius:12px;background:var(--ink);color:#fff;font-size:14px;text-align:center;transform:translateX(-50%);opacity:0;pointer-events:none;transition:opacity .2s}
+    .cwToast.show{opacity:1}
+    .cwToast.good{background:var(--forest)}
     .cwKeys{display:none}
 
     .cwMain{display:grid;gap:22px}
     @media (min-width:760px){.cwMain{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);align-items:start}}
     .cwGrid{container-type:inline-size;display:grid;grid-template-columns:repeat(var(--cols),1fr);gap:2px;width:min(100%,calc(var(--cols) * 34px));margin:0 auto}
     .cwSq{position:relative;aspect-ratio:1;display:grid;place-items:center;background:#fff;border:1.5px solid #c5d0cc;border-radius:4px;cursor:pointer;-webkit-tap-highlight-color:transparent;scroll-margin:90px 0 24px}
+    .cwSq.ok{background:#eaf5ec;border-color:#a9cfb0}
     .cwSq.inWord{background:#fdf1cf;border-color:#e7c66b}
     .cwSq.active{background:#f2c14e;border-color:#c99a2a}
     .cwSq .l{font:700 calc(100cqw / var(--cols) * .52)/1 var(--sans);color:var(--ink)}
-    .cwSq.wrong .l{color:var(--red)}
-    .cwSq.wrong::after{content:"";position:absolute;inset:0;background:linear-gradient(to top right,transparent 47%,rgba(217,83,79,.55) 48% 52%,transparent 53%)}
-    .cwSq.given .l{color:#3a6fb0}
+    .cwSq.ok .l{color:#2e7d4f}
+    .cwSq.given .l{color:var(--blue)}
+    .cwSq.given::after{content:"";position:absolute;top:0;right:0;border:4px solid transparent;border-top-color:var(--blue);border-right-color:var(--blue);border-top-right-radius:2px}
+    .cwSq.nope{animation:cwNope .45s}
+    @keyframes cwNope{20%,60%{transform:translateX(-3px);border-color:var(--red)}40%,80%{transform:translateX(3px);border-color:var(--red)}}
+    @media (prefers-reduced-motion:reduce){.cwSq.nope{animation-name:cwNopeStill}@keyframes cwNopeStill{20%,80%{border-color:var(--red)}}}
     .cwSq .n{position:absolute;top:1px;left:2px;font:600 calc(100cqw / var(--cols) * .22)/1 var(--sans);color:var(--muted)}
     .cwSq .o{position:absolute;inset:12%;border:1.5px solid rgba(217,83,79,.55);border-radius:50%;pointer-events:none}
     .cwSq .s{position:absolute;right:2px;bottom:1px;font:700 calc(100cqw / var(--cols) * .2)/1 var(--sans);color:var(--red)}
@@ -302,10 +349,9 @@ function injectStyle() {
     .cwSol span{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
     .cwSol div{display:flex;gap:4px}
     .cwSol b{display:grid;place-items:center;width:30px;height:34px;border:1.5px solid rgba(217,83,79,.55);border-radius:6px;background:#fff;font:700 17px/1 var(--sans)}
-    .cwTools{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin:14px 0 0}
+    .cwTools{display:flex;justify-content:center;margin:14px 0 0}
     .cwTools button{padding:7px 14px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:14px}
     .cwTools button:hover{border-color:#cfdcd6;background:#f6f8f7}
-    .cwMsg{min-height:1.5em;margin:10px 0 0;text-align:center;font-size:14px;color:var(--forest)}
 
     .cwLists{display:grid;gap:18px}
     .cwLists h4{margin:0 0 4px;font:600 12px/1.4 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
@@ -315,6 +361,8 @@ function injectStyle() {
     .cwLists li:hover{background:#f6f8f7}
     .cwLists li.current{background:#fdf1cf}
     .cwLists li.filled span{color:var(--muted)}
+    .cwLists li small{display:block;margin-top:2px;font-size:13px;color:var(--blue)}
+    .cwLists li small:empty{display:none}
     .cwNote{margin:18px 0 0;text-align:center;font-size:13px;color:var(--muted)}
 
     .cwWin{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:16px;background:rgba(31,45,56,.35)}
@@ -331,9 +379,10 @@ function injectStyle() {
     }
     /* phones and tablets get an on-screen keyboard docked to the bottom, like the NYT apps */
     @media (pointer:coarse){
-      .cw{padding-bottom:250px}
-      .cwSq{scroll-margin:16px 0 260px}
+      .cw{padding-bottom:300px}
+      .cwSq{scroll-margin:16px 0 310px}
       .cwDock{position:fixed;top:auto;left:0;right:0;bottom:0;margin:0;padding:8px 6px calc(8px + env(safe-area-inset-bottom));border-top:1px solid var(--line);border-bottom:0;box-shadow:0 -6px 20px rgba(31,45,56,.08)}
+      .cwToast{top:auto;bottom:calc(100% + 8px)}
       .cwKeys{display:grid;gap:6px;margin-top:8px}
       .cwKeys div{display:flex;justify-content:center;gap:4px}
       .cwKeys button{flex:1;max-width:40px;height:44px;padding:0;border:0;border-radius:6px;background:#eef1f0;font:600 16px/1 var(--sans);color:var(--ink)}
