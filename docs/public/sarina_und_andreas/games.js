@@ -5,6 +5,8 @@
 //   steps are the "how it works" lines shown before a game starts.
 //   ready: false shows the "still being built" screen. Once a game exists as games/<id>.js
 //   (exporting `start(stage, ctx)`), flip it to true and the page loads that module instead.
+// The page is served both with and without a trailing slash, so links use absolute paths and game
+// modules load their own files relative to import.meta.url.
 
 export const GAMES = [
   {
