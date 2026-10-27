@@ -1,13 +1,10 @@
 // wo-photos.js: the photos for "Wo war das?". To add one, put the image into games/wo/ and add an entry.
 //
-// Photo: { file, place, lat, lng, note?, radiusKm? }
+// Photo: { file, place, lat, lng, note? }
 //   file is the image in games/wo/ (jpg or webp; about 1200px on the long side is plenty).
 //   place is what the reveal shows, and lat/lng is where the photo was taken (right-clicking a spot
 //   in Google Maps copies both). note is an optional second line, such as the month.
-//   radiusKm overrides RIGHT_WITHIN_KM for one photo, e.g. a wider circle for a trip far away.
 // Saved progress is kept per file, so photos can be added or removed at any time.
-
-export const RIGHT_WITHIN_KM = 20;
 
 export const PHOTOS = [
   // Schwäbische Alb
@@ -40,8 +37,8 @@ export const PHOTOS = [
   // weiter weg
   { file: 'aggstein.webp', place: 'Burgruine Aggstein, Wachau', lat: 48.3139, lng: 15.4216, note: 'April 2026' },
   { file: 'luenersee.webp', place: 'Lünersee, Rätikon', lat: 47.0537, lng: 9.7549, note: 'August 2023' },
-  { file: 'kjeragbolten.webp', place: 'Kjeragbolten, Norwegen', lat: 59.0337, lng: 6.5933, note: 'Juli 2024', radiusKm: 50 },
-  { file: 'preikestolen.webp', place: 'Preikestolen, Norwegen', lat: 58.9862, lng: 6.187, note: 'Juli 2024', radiusKm: 50 },
-  { file: 'trolltunga.webp', place: 'Trolltunga, Norwegen', lat: 60.133, lng: 6.754, note: 'Juli 2024', radiusKm: 50 },
-  { file: 'geiranger.webp', place: 'Geirangerfjord, Norwegen', lat: 62.1006, lng: 7.2059, note: 'Juli 2024', radiusKm: 50 },
+  { file: 'kjeragbolten.webp', place: 'Kjeragbolten, Norwegen', lat: 59.0337, lng: 6.5933, note: 'Juli 2024' },
+  { file: 'preikestolen.webp', place: 'Preikestolen, Norwegen', lat: 58.9862, lng: 6.187, note: 'Juli 2024' },
+  { file: 'trolltunga.webp', place: 'Trolltunga, Norwegen', lat: 60.133, lng: 6.754, note: 'Juli 2024' },
+  { file: 'geiranger.webp', place: 'Geirangerfjord, Norwegen', lat: 62.1006, lng: 7.2059, note: 'Juli 2024' },
 ];

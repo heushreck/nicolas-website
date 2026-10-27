@@ -1,6 +1,7 @@
-// wo.js: "Wo war das?". A photo appears, the players tap the map where it was taken, and the distance
-// decides whether it counts as right. The photos are listed in wo-photos.js and stored in wo/.
-import { PHOTOS, RIGHT_WITHIN_KM } from './wo-photos.js';
+// wo.js: "Wo war das?". A photo appears, the players tap the map where it was taken, and the
+// kilometres between their pin and the real spot add up: the fewer in total, the better. The photos
+// are listed in wo-photos.js and stored in wo/.
+import { PHOTOS } from './wo-photos.js';
 import { loadLeaflet } from './leaflet.js';
 
 // the German OpenStreetMap style labels places in German (Lissabon, Rom) and needs no API key
@@ -12,9 +13,32 @@ const GUESS_STYLE = { radius: 8, color: '#fff', weight: 3, fillColor: '#d9534f',
 const SPOT_STYLE = { radius: 8, color: '#fff', weight: 3, fillColor: '#2f5d4a', fillOpacity: 1 };
 const LINE_STYLE = { color: '#1f2d38', weight: 2, dashArray: '6 6', opacity: 0.7 };
 
+// What the reveal says, by how far off the pin was: each band holds the sayings for distances under
+// its kilometres, and one of them is picked at random.
+const SAYINGS = [
+  [0.5, ['Volltreffer! Habt ihr das Foto etwa gerade gemacht?', 'Genau da! Da steht ihr ja quasi im Bild.']],
+  [3, ['Da hättet ihr euch ja fast selbst zugewinkt.', 'Ein paar Schritte, und ihr seid da.']],
+  [10, ['Da kann man ja fast rüberspucken!', 'So nah dran! Das ist praktisch um die Ecke.']],
+  [30, ['Mit dem Fahrrad wärt ihr schon da.', 'Ganz knapp daneben. Die Richtung stimmt!']],
+  [75, ['Ein Sonntagsausflug daneben, mit Vesper.', 'Richtige Gegend, nur das falsche Tal.']],
+  [150, ['Mit Sarinas rotem Ibiza wärt ihr in einer Stunde da.', 'Die Ecke stimmt so ungefähr.']],
+  [400, ['Zwei Stunden Autobahn, eine davon im Stau.', 'Da braucht’s schon eine Brotzeit für unterwegs.']],
+  [1000, ['Immerhin der richtige Kontinent!', 'Da lohnt sich unterwegs eine Übernachtung.']],
+  [Infinity, ['Nur ein Flugzeugflug entfernt.', 'Koffer packen, das wird eine Reise!']],
+];
+const DECIMAL = new Intl.NumberFormat('de-DE', { maximumFractionDigits: 1 });
+const WHOLE = new Intl.NumberFormat('de-DE', { maximumFractionDigits: 0 });
+
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
-const km = new Intl.NumberFormat('de-DE', { maximumFractionDigits: 0 });
-const distanceText = d => (d < 1 ? 'Weniger als 1 km daneben' : `${km.format(d)} km daneben`);
+// metres (to the nearest ten) up close, one decimal under 10 km, whole kilometres beyond
+const distanceText = d => {
+  const metres = Math.round(d * 100) * 10;
+  return metres < 1000 ? `${metres} m` : `${(d < 10 ? DECIMAL : WHOLE).format(d)} km`;
+};
+const saying = d => {
+  const [, lines] = SAYINGS.find(([under]) => d < under);
+  return lines[Math.floor(Math.random() * lines.length)];
+};
 const src = p => new URL(`./wo/${p.file}`, import.meta.url).href;
 
 function shuffle(list) {
@@ -49,12 +73,18 @@ export async function start(stage) {
   let order = (saved.order || []).filter(f => byFile.has(f));
   order.push(...shuffle([...byFile.keys()].filter(f => !order.includes(f))));
   const save = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify({ order, guesses })); } catch {} };
-  const isRight = f => guesses[f].km <= (byFile.get(f).radiusKm ?? RIGHT_WITHIN_KM);
   save();
 
   stage.innerHTML = `
     <div class="wo">
-      <div class="woBar"><span class="woNum"></span><span class="woScore"></span></div>
+      <div class="woBar">
+        <span class="woNum"></span>
+        <div class="woStats">
+          <span><small>Gesamt</small><b data-stat="total"></b></span>
+          <span><small>Ø pro Foto</small><b data-stat="average"></b></span>
+          <span><small>Bester Tipp</small><b data-stat="best"></b></span>
+        </div>
+      </div>
       <div class="woPlay">
         <figure class="woPhoto" title="Zum Vergrößern antippen"><img alt=""></figure>
         <div class="woSide">
@@ -78,10 +108,21 @@ export async function start(stage) {
   let guess = null;
   let revealed = false;
 
-  function counters(round) {
+  // the kilometres so far: all of them, per photo, and the closest guess
+  function tally() {
     const done = order.filter(f => guesses[f]);
+    const total = done.reduce((sum, f) => sum + guesses[f].km, 0);
+    const best = done.reduce((a, f) => (a && guesses[a].km <= guesses[f].km ? a : f), null);
+    return { done, total, average: done.length ? total / done.length : 0, best };
+  }
+
+  function counters(round) {
+    const { done, total, average, best } = tally();
     $('.woNum').textContent = round ? `Foto ${round} von ${order.length}` : `${order.length} Fotos`;
-    $('.woScore').innerHTML = `<b>${done.filter(isRight).length}</b> richtig · <b>${order.length - done.length}</b> übrig`;
+    $('[data-stat="total"]').textContent = done.length ? distanceText(total) : '–';
+    $('[data-stat="average"]').textContent = done.length ? distanceText(average) : '–';
+    $('[data-stat="best"]').textContent = best ? distanceText(guesses[best].km) : '–';
+    $('[data-stat="best"]').title = best ? byFile.get(best).place : '';
   }
 
   function next() {
@@ -97,7 +138,6 @@ export async function start(stage) {
     img.src = src(byFile.get(file));
     img.alt = `Foto ${round}`;
     result.textContent = '';
-    result.className = 'woResult';
     go.disabled = true;
     go.textContent = 'Tippt auf die Karte';
     map.setView(START_VIEW.center, START_VIEW.zoom, { animate: false });
@@ -118,31 +158,31 @@ export async function start(stage) {
     const p = byFile.get(file);
     const spot = L.latLng(p.lat, p.lng);
     const distance = guess.distanceTo(spot) / 1000;
-    guesses[file] = { lat: guess.lat, lng: guess.lng, km: Math.round(distance * 10) / 10 };
+    guesses[file] = { lat: guess.lat, lng: guess.lng, km: Math.round(distance * 1000) / 1000 };
     save();
     revealed = true;
     counters(order.filter(f => guesses[f]).length);
     L.polyline([guess, spot], LINE_STYLE).addTo(marks);
     L.circleMarker(spot, SPOT_STYLE).bindTooltip(esc(p.place), { permanent: true, direction: 'top', offset: [0, -10], className: 'woTip' }).addTo(marks);
     map.fitBounds(L.latLngBounds([guess, spot]), { padding: [60, 60], maxZoom: 9 });
-    const right = isRight(file);
-    result.className = `woResult ${right ? 'right' : 'wrong'}`;
-    result.innerHTML = `<b>${right ? (distance < 5 ? 'Volltreffer!' : 'Richtig!') : 'Leider daneben.'}</b> ${distanceText(distance)}
+    result.innerHTML = `<b>${esc(saying(distance))}</b> ${distanceText(distance)} daneben.
       <p>${esc(p.place)}${p.note ? ` · ${esc(p.note)}` : ''}</p>`;
     go.textContent = order.some(f => !guesses[f]) ? 'Nächstes Foto' : 'Zum Ergebnis';
   }
 
   function showEnd() {
     counters();
+    const { total, average, best } = tally();
     play.hidden = true;
     end.hidden = false;
     end.innerHTML = `
-      <p class="k">Ergebnis</p>
-      <p class="big">${order.filter(isRight).length} von ${order.length} richtig</p>
+      <p class="k">Zusammen daneben</p>
+      <p class="big">${distanceText(total)}</p>
+      <p class="sub">Im Schnitt ${distanceText(average)} pro Foto: ${esc(saying(average))}</p>
       <ol>${order.map(f => {
         const p = byFile.get(f);
-        return `<li class="${isRight(f) ? 'right' : 'wrong'}"><img src="${src(p)}" alt="" loading="lazy">
-          <div><b title="${esc(p.place)}">${esc(p.place)}</b><span>${distanceText(guesses[f].km)}</span></div></li>`;
+        return `<li${f === best ? ' class="best"' : ''}><img src="${src(p)}" alt="" loading="lazy">
+          <div><b title="${esc(p.place)}">${esc(p.place)}</b><span>${distanceText(guesses[f].km)} daneben</span></div></li>`;
       }).join('')}</ol>
       <button type="button" class="woGo" data-again>Nochmal spielen</button>`;
   }
@@ -177,9 +217,11 @@ function injectStyle() {
     .wo{height:100%;display:flex;flex-direction:column;padding:14px 18px 18px}
     .wo [hidden]{display:none}
     .woNote{margin:0;padding:70px 20px;text-align:center;color:var(--muted)}
-    .woBar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;font-size:14px;color:var(--muted)}
-    .woScore{padding:4px 12px;border-radius:999px;background:var(--sky)}
-    .woScore b{color:var(--ink)}
+    .woBar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;font-size:14px;color:var(--muted)}
+    .woStats{display:flex;gap:6px}
+    .woStats span{display:flex;flex-direction:column;align-items:center;min-width:64px;padding:3px 10px;border-radius:10px;background:var(--sky);line-height:1.25}
+    .woStats small{font-size:11px}
+    .woStats b{color:var(--ink);white-space:nowrap}
 
     .woPlay{flex:1;min-height:0;display:flex;flex-direction:column;gap:12px}
     .woPhoto{position:relative;flex:1 1 0;min-height:120px;margin:0;background:#1f2d38;border-radius:14px;overflow:hidden;cursor:zoom-in}
@@ -195,25 +237,28 @@ function injectStyle() {
 
     .woResult{padding:10px 14px;border-radius:12px;background:#f6f8f7;font-size:14px;color:var(--muted)}
     .woResult:empty{display:none}
-    .woResult b{margin-right:4px;font-size:16px}
-    .woResult.right b{color:var(--forest)}
-    .woResult.wrong b{color:var(--red)}
+    .woResult b{display:block;font-size:16px;color:var(--forest)}
     .woResult p{margin:2px 0 0;color:var(--ink)}
     .woGo{padding:11px 18px;border:0;border-radius:999px;background:var(--forest);font-size:15px;font-weight:600;color:#fff}
     .woGo:disabled{background:#c9d3cf;cursor:default}
 
     .woEnd{flex:1;min-height:0;overflow:auto;text-align:center}
     .woEnd .k{margin:0;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
-    .woEnd .big{margin:2px 0 14px;font:700 30px/1.2 var(--serif)}
+    .woEnd .big{margin:2px 0 4px;font:700 30px/1.2 var(--serif)}
+    .woEnd .sub{margin:0 0 14px;color:var(--muted)}
     .woEnd ol{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px;margin:0 0 16px;padding:0;list-style:none;text-align:left}
     .woEnd li{display:flex;align-items:center;gap:10px;padding:6px;border:1px solid var(--line);border-radius:12px;font-size:14px;line-height:1.35}
     .woEnd li img{flex:none;width:44px;height:44px;object-fit:cover;border-radius:8px}
     .woEnd li div{min-width:0}
     .woEnd li b{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
     .woEnd li span{font-size:13px;color:var(--muted)}
-    .woEnd li.right span::before{content:"✓ ";color:var(--forest)}
-    .woEnd li.wrong span::before{content:"✗ ";color:var(--red)}
+    .woEnd li.best{border-color:#a9cfb0;background:#eaf5ec}
+    .woEnd li.best span::after{content:" · bester Tipp";color:var(--forest)}
 
-    @media (max-width:600px){.wo{padding:12px}}`;
+    @media (max-width:600px){
+      .wo{padding:12px}
+      .woStats{gap:4px}
+      .woStats span{min-width:0;padding:3px 7px}
+    }`;
   document.head.append(style);
 }
