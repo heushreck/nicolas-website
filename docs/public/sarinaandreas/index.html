@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex">
+  <meta name="theme-color" content="#eef4f7">
+  <title>Sarina and Andreas DIY Arcade</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --sky:#eef4f7; --bg:#f6f8f7; --paper:#fff; --ink:#1f2d38; --muted:#66757f; --line:#e1e8e5;
+      --forest:#2f5d4a; --red:#d9534f; --meadow:#a9cf8f;
+      --serif:Fraunces, Georgia, serif;
+      --sans:Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
+      color-scheme:light;
+    }
+    *{box-sizing:border-box}
+    html,body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 var(--sans);-webkit-font-smoothing:antialiased}
+    button,input{font:inherit;color:inherit}
+    button{cursor:pointer}
+    a{color:inherit}
+    img{display:block;max-width:100%}
+    .hidden{display:none !important}
+
+    /* ---------- lock ---------- */
+    #lock{position:fixed;inset:0;z-index:20;display:grid;place-items:center;padding:16px;background:linear-gradient(var(--sky),var(--bg));transition:opacity .6s}
+    #lock.fade{opacity:0}
+    .lockCard{width:min(360px,100%);text-align:center}
+    .lockCard img{width:240px;margin:0 auto 10px}
+    .lockCard h1{margin:0;font:700 26px/1.2 var(--serif)}
+    .lockCard p{margin:4px 0 20px;color:var(--muted)}
+    .field{display:flex;gap:8px;padding:6px;background:var(--paper);border:1px solid var(--line);border-radius:999px;box-shadow:0 8px 28px rgba(47,93,74,.1)}
+    .field input{flex:1;min-width:0;border:0;background:none;padding:8px 14px;outline:none}
+    .field button{border:0;border-radius:999px;padding:8px 18px;background:var(--forest);color:#fff;font-weight:500}
+    .field button:hover{background:#264d3d}
+    .field.bad{animation:shake .4s}
+    @keyframes shake{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+    .lockCard .lockMsg{min-height:1.6em;margin:12px 0 0;font-size:14px}
+    .lockMsg.bad{color:var(--red)}
+
+    /* ---------- hero ---------- */
+    .scene{position:relative;height:clamp(300px,36vw,460px);background:var(--sky);overflow:hidden}
+    .hero::after{content:"";display:block;height:44px;background:linear-gradient(var(--meadow),var(--bg))}
+    .scene img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center bottom}
+    .hero h1{position:relative;z-index:1;margin:0;padding:clamp(26px,4.5vw,52px) 16px 0;text-align:center;font-weight:400}
+    .hero .names{display:block;font:700 clamp(30px,5.4vw,56px)/1.05 var(--serif);letter-spacing:-.01em}
+    .hero .arcade{display:inline-block;margin-top:10px;padding:5px 14px;border-radius:999px;background:rgba(255,255,255,.8);font:600 12px/1.4 var(--sans);letter-spacing:.24em;text-transform:uppercase;color:var(--forest)}
+
+    /* ---------- home ---------- */
+    .wrap{width:min(880px,100%);margin:0 auto;padding:0 16px}
+    main.wrap{padding-top:10px;padding-bottom:40px}
+    body.playing main.wrap{padding-top:26px}
+    .intro{margin:0 auto 22px;max-width:520px;text-align:center;color:var(--muted)}
+    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+    .tile{display:flex;align-items:center;gap:16px;padding:16px;background:var(--paper);border:1px solid var(--line);border-radius:20px;text-decoration:none;transition:transform .25s,box-shadow .25s,border-color .25s}
+    .tile:hover{transform:translateY(-3px);border-color:#cfdcd6;box-shadow:0 14px 30px rgba(31,45,56,.09)}
+    .tile .icon{flex:none;display:grid;place-items:center;width:84px;height:84px;border-radius:22px;background:var(--tint)}
+    .tile .icon img{width:68px;height:68px;transition:transform .35s}
+    .tile:hover .icon img{transform:scale(1.06) rotate(-3deg)}
+    .tile h2{margin:4px 0 0;font:600 20px/1.25 var(--serif)}
+    .tile p{margin:2px 0 0;font-size:14px;color:var(--muted)}
+    .wip{display:inline-block;margin-top:6px;padding:2px 9px;border-radius:999px;background:#f1f4f2;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+
+    /* the red-white-red stripe that marks Alpine hiking trails, with the game number on it */
+    .blaze{display:inline-grid;place-items:center;width:34px;height:22px;border-radius:3px;background:linear-gradient(var(--red) 0 24%,#fff 24% 76%,var(--red) 76%);box-shadow:0 0 0 1px rgba(0,0,0,.08);font:700 11px/1 var(--sans);color:var(--ink)}
+
+    /* ---------- game screen ---------- */
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;background:var(--sky);border-bottom:1px solid var(--line)}
+    .topbar a{text-decoration:none;font-weight:500}
+    .topbar span{font:600 15px/1.2 var(--serif);color:var(--muted)}
+    .gameHead{display:flex;align-items:center;gap:16px;margin:0 0 18px}
+    .gameHead .icon{flex:none;display:grid;place-items:center;width:72px;height:72px;border-radius:20px;background:var(--tint)}
+    .gameHead .icon img{width:58px;height:58px}
+    .gameHead h2{margin:4px 0 0;font:700 26px/1.2 var(--serif)}
+    .gameHead p{margin:0;color:var(--muted)}
+    .stage{min-height:340px;background:var(--paper);border:1px solid var(--line);border-radius:22px;overflow:hidden}
+    .soon{max-width:460px;margin:0 auto;padding:36px 22px 40px;text-align:center}
+    .soon h3{margin:0 0 4px;font:600 21px/1.3 var(--serif)}
+    .soon > p{margin:0 0 18px;color:var(--muted)}
+    .steps{margin:0;padding:0;list-style:none;text-align:left;counter-reset:s}
+    .steps li{position:relative;padding:10px 0 10px 40px;border-top:1px solid var(--line);counter-increment:s}
+    .steps li::before{content:counter(s);position:absolute;left:0;top:9px;display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--sky);font-weight:600;font-size:13px;color:var(--forest)}
+    .sign{display:inline-block;margin-bottom:16px;padding:6px 14px;border-radius:6px;background:#f2c14e;font:700 12px/1.3 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:#3b3220;transform:rotate(-2deg)}
+
+    footer{padding:6px 0 40px;text-align:center}
+    footer p{margin:0 0 6px;font-size:13px;color:var(--muted)}
+    footer button{border:0;background:none;color:var(--muted);font-size:13px;text-decoration:underline;text-underline-offset:3px}
+    footer button:hover{color:var(--ink)}
+
+    body.playing .hero,body:not(.playing) .topbar{display:none}
+
+    @media (max-width:600px){
+      .scene{height:280px}
+      .grid{gap:10px}
+      .tile{flex-direction:column;justify-content:flex-start;gap:8px;padding:14px 10px;text-align:center}
+      .tile .icon{width:72px;height:72px;border-radius:18px}
+      .tile .icon img{width:58px;height:58px}
+      .tile h2{font-size:17px}
+      .tile p{font-size:13px;line-height:1.45}
+      .tile .wip{display:none}
+      .gameHead .icon{width:60px;height:60px}
+      .gameHead .icon img{width:48px;height:48px}
+      .gameHead h2{font-size:22px}
+    }
+    @media (prefers-reduced-motion:reduce){*{transition:none !important;animation:none !important}}
+  </style>
+</head>
+<body>
+
+<div id="lock">
+  <form class="lockCard" id="lockForm" autocomplete="off">
+    <img src="art/lock.svg" alt="" width="240" height="160">
+    <h1>Sarina and Andreas</h1>
+    <p>DIY Arcade. Enter the password to come in.</p>
+    <div class="field" id="field">
+      <input id="pw" type="password" placeholder="Password" aria-label="Password" autocomplete="off" required>
+      <button type="submit">Enter</button>
+    </div>
+    <p class="lockMsg" id="lockMsg" role="status"></p>
+  </form>
+</div>
+
+<div id="app" class="hidden">
+  <header class="hero">
+    <div class="scene">
+      <img src="art/hero.svg" alt="">
+      <h1><span class="names">Sarina and Andreas</span><span class="arcade">DIY Arcade</span></h1>
+    </div>
+  </header>
+  <nav class="topbar"><a href="#">← All games</a><span>Sarina and Andreas DIY Arcade</span></nav>
+  <main class="wrap" id="view"></main>
+  <footer><p>Made with love for the two of you.</p><button type="button" id="relock">Lock this page</button></footer>
+</div>
+
+<script type="module">
+import { GAMES } from './games.js';
+
+// Only a hash of the password lives here. The repo is public, so the gate keeps the page out of
+// casual view and nothing more: nothing private belongs in this folder.
+const CHECK_HASH = 'bfc2f8752d73ee39dd7a1309478da89f7095f8f5f1d8d1b0790d0a318af4d76e';
+const AUTH_KEY = 'sa-arcade-auth-v1';
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+const storeGet = k => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } };
+const storeSet = (k, v) => { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+async function sha256(text) {
+  const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
+  return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+/* ---------------- lock ---------------- */
+function boot() {
+  if (storeGet(AUTH_KEY) === CHECK_HASH) return enter(false);
+  $('#pw').focus();
+  $('#lockForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const msg = $('#lockMsg'), field = $('#field');
+    if (await sha256('sa-arcade-check:' + $('#pw').value.trim().toLowerCase()) !== CHECK_HASH) {
+      field.classList.remove('bad'); void field.offsetWidth; field.classList.add('bad');
+      msg.className = 'lockMsg bad'; msg.textContent = 'Not quite. Try again.';
+      return;
+    }
+    storeSet(AUTH_KEY, CHECK_HASH);
+    msg.className = 'lockMsg'; msg.textContent = 'Servus! Come on in.';
+    setTimeout(() => enter(true), 600);
+  });
+}
+function enter(animate) {
+  const lock = $('#lock');
+  if (animate) { lock.classList.add('fade'); setTimeout(() => lock.remove(), 600); } else lock.remove();
+  $('#app').classList.remove('hidden');
+  route();
+  addEventListener('hashchange', route);
+  $('#relock').addEventListener('click', () => { storeSet(AUTH_KEY, null); location.hash = ''; location.reload(); });
+}
+
+/* ---------------- routing ---------------- */
+// '#' is the game picker, '#play/<id>' opens a game.
+let stopGame = null;
+function route() {
+  stopGame?.(); stopGame = null;
+  const [view, id] = location.hash.slice(1).split('/');
+  const game = view === 'play' && GAMES.find(g => g.id === id);
+  document.body.classList.toggle('playing', Boolean(game));
+  if (game) playScreen(game); else home();
+  scrollTo({ top: 0 });
+}
+
+const blaze = n => `<span class="blaze" aria-hidden="true">${n}</span>`;
+
+function home() {
+  $('#view').innerHTML = `
+    <p class="intro">Four little games, made just for the two of you. Pick a trail.</p>
+    <div class="grid">${GAMES.map(g => `
+      <a class="tile" href="#play/${g.id}" style="--tint:${g.tint}">
+        <span class="icon"><img src="art/${g.icon}" alt="" width="68" height="68"></span>
+        <div>${blaze(g.n)}<h2>${esc(g.title)}</h2><p>${esc(g.tagline)}</p>${g.ready ? '' : '<span class="wip">In the works</span>'}</div>
+      </a>`).join('')}
+    </div>`;
+}
+
+async function playScreen(g) {
+  $('#view').innerHTML = `
+    <div class="gameHead" style="--tint:${g.tint}">
+      <span class="icon"><img src="art/${g.icon}" alt="" width="58" height="58"></span>
+      <div>${blaze(g.n)}<h2>${esc(g.title)}</h2><p>${esc(g.tagline)}</p></div>
+    </div>
+    <section class="stage" id="stage"></section>`;
+  const stage = $('#stage');
+  if (!g.ready) {
+    stage.innerHTML = `
+      <div class="soon">
+        <span class="sign">Trail under construction</span>
+        <h3>This game is still being built</h3>
+        <p>Here is how it will work:</p>
+        <ol class="steps">${g.steps.map(s => `<li>${esc(s)}</li>`).join('')}</ol>
+      </div>`;
+    return;
+  }
+  // a game module draws into the stage and may return a function that cleans up when the player leaves
+  const { start } = await import(`./games/${g.id}.js`);
+  if (location.hash === `#play/${g.id}`) stopGame = await start(stage, { game: g }) || null;
+}
+
+boot();
+</script>
+</body>
+</html>
