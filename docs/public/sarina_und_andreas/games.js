@@ -10,12 +10,12 @@
 
 export const GAMES = [
   {
-    id: 'wo', n: 1, title: 'Wo war das?', icon: 'icon-geo.svg', tint: '#e6eff5', ready: false,
+    id: 'wo', n: 1, title: 'Wo war das?', icon: 'icon-geo.svg', tint: '#e6eff5', ready: true,
     tagline: 'Urlaubsfotos und eine Nadel auf der Karte.',
     steps: [
       'Ein Foto von einer eurer Reisen erscheint.',
       'Tippt auf die Stelle der Karte, an der es entstanden ist.',
-      'Ihr seht, wie weit ihr danebenlagt. Je näher, desto mehr Punkte.',
+      'Ihr seht, wie weit ihr danebenlagt. Wer nah genug dran ist, liegt richtig.',
     ],
   },
   {
