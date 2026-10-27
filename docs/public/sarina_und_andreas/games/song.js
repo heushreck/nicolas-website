@@ -83,13 +83,16 @@ export async function start(stage) {
   let round, at, audio, step, answered, score, streak, bestStreak, results, stopTimer;
 
   // Wrong answers are two other songs by the same artist, so recognising the voice isn't enough,
-  // filled up with other titles from the list.
+  // filled up with other titles in the same language, so the language doesn't give it away either.
   function choices(song) {
     const picked = [song.title];
     const add = title => { if (picked.length < OPTIONS && !picked.some(p => same(p, title))) picked.push(title); };
+    const others = songs.filter(s => s !== song);
+    const sameLanguage = others.filter(s => s.lang === song.lang);
     shuffle([...song.decoys]).slice(0, 2).forEach(add);
-    shuffle(songs.filter(s => s !== song).map(s => s.title)).forEach(add);
-    shuffle(songs.flatMap(s => s.decoys)).forEach(add);
+    shuffle(sameLanguage.map(s => s.title)).forEach(add);
+    shuffle([...song.decoys, ...sameLanguage.flatMap(s => s.decoys)]).forEach(add);
+    shuffle(others.flatMap(s => [s.title, ...s.decoys])).forEach(add);
     return shuffle(picked);
   }
 
