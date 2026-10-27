@@ -1,8 +1,8 @@
 // wo.js: "Wo war das?". A photo appears, the players tap the map where it was taken, and the distance
 // decides whether it counts as right. The photos are listed in wo-photos.js and stored in wo/.
 import { PHOTOS, RIGHT_WITHIN_KM } from './wo-photos.js';
+import { loadLeaflet } from './leaflet.js';
 
-const LEAFLET = 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/';
 // the German OpenStreetMap style labels places in German (Lissabon, Rom) and needs no API key
 const TILES = 'https://tile.openstreetmap.de/{z}/{x}/{y}.png';
 const ATTRIBUTION = '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap-Mitwirkende</a>';
@@ -25,14 +25,6 @@ function shuffle(list) {
   return list;
 }
 
-let leaflet = null;
-function loadLeaflet() {
-  return leaflet ??= new Promise((resolve, reject) => {
-    document.head.append(Object.assign(document.createElement('link'), { rel: 'stylesheet', href: `${LEAFLET}leaflet.css` }));
-    document.head.append(Object.assign(document.createElement('script'), { src: `${LEAFLET}leaflet.js`, onload: () => resolve(window.L), onerror: reject }));
-  });
-}
-
 export async function start(stage) {
   injectStyle();
   if (!PHOTOS.length) {
@@ -44,7 +36,6 @@ export async function start(stage) {
   try {
     L = await loadLeaflet();
   } catch {
-    leaflet = null;
     stage.innerHTML = '<p class="woNote">Die Karte konnte nicht geladen werden. Versucht es gleich nochmal.</p>';
     return;
   }
