@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="en">
+<html lang="de">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="robots" content="noindex">
   <meta name="theme-color" content="#eef4f7">
-  <title>Sarina and Andreas DIY Arcade</title>
+  <title>Sarina und Andreas DIY Arcade</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -113,11 +113,11 @@
 <div id="lock">
   <form class="lockCard" id="lockForm" autocomplete="off">
     <img src="art/lock.svg" alt="" width="240" height="160">
-    <h1>Sarina and Andreas</h1>
-    <p>DIY Arcade. Enter the password to come in.</p>
+    <h1>Sarina und Andreas</h1>
+    <p>DIY Arcade. Gebt das Passwort ein, dann geht’s los.</p>
     <div class="field" id="field">
-      <input id="pw" type="password" placeholder="Password" aria-label="Password" autocomplete="off" required>
-      <button type="submit">Enter</button>
+      <input id="pw" type="password" placeholder="Passwort" aria-label="Passwort" autocomplete="off" required>
+      <button type="submit">Los</button>
     </div>
     <p class="lockMsg" id="lockMsg" role="status"></p>
   </form>
@@ -127,19 +127,19 @@
   <header class="hero">
     <div class="scene">
       <img src="art/hero.svg" alt="">
-      <h1><span class="names">Sarina and Andreas</span><span class="arcade">DIY Arcade</span></h1>
+      <h1><span class="names">Sarina und Andreas</span><span class="arcade">DIY Arcade</span></h1>
     </div>
   </header>
-  <nav class="topbar"><a href="#">← All games</a><span>Sarina and Andreas DIY Arcade</span></nav>
+  <nav class="topbar"><a href="#">← Alle Spiele</a><span>Sarina und Andreas DIY Arcade</span></nav>
   <main class="wrap" id="view"></main>
-  <footer><p>Made with love for the two of you.</p><button type="button" id="relock">Lock this page</button></footer>
+  <footer><p>Mit Liebe gemacht, für euch zwei.</p><button type="button" id="relock">Seite wieder sperren</button></footer>
 </div>
 
 <script type="module">
 import { GAMES } from './games.js';
 
 // Only a hash of the password lives here. The repo is public, so the gate keeps the page out of
-// casual view and nothing more: nothing private belongs in this folder.
+// casual view and nothing more.
 const CHECK_HASH = 'bfc2f8752d73ee39dd7a1309478da89f7095f8f5f1d8d1b0790d0a318af4d76e';
 const AUTH_KEY = 'sa-arcade-auth-v1';
 
@@ -161,11 +161,11 @@ function boot() {
     const msg = $('#lockMsg'), field = $('#field');
     if (await sha256('sa-arcade-check:' + $('#pw').value.trim().toLowerCase()) !== CHECK_HASH) {
       field.classList.remove('bad'); void field.offsetWidth; field.classList.add('bad');
-      msg.className = 'lockMsg bad'; msg.textContent = 'Not quite. Try again.';
+      msg.className = 'lockMsg bad'; msg.textContent = 'Leider falsch. Versucht’s nochmal.';
       return;
     }
     storeSet(AUTH_KEY, CHECK_HASH);
-    msg.className = 'lockMsg'; msg.textContent = 'Servus! Come on in.';
+    msg.className = 'lockMsg'; msg.textContent = 'Servus! Kommt rein.';
     setTimeout(() => enter(true), 600);
   });
 }
@@ -194,11 +194,11 @@ const blaze = n => `<span class="blaze" aria-hidden="true">${n}</span>`;
 
 function home() {
   $('#view').innerHTML = `
-    <p class="intro">Four little games, made just for the two of you. Pick a trail.</p>
+    <p class="intro">Vier kleine Spiele, nur für euch zwei. Welchen Weg nehmt ihr zuerst?</p>
     <div class="grid">${GAMES.map(g => `
       <a class="tile" href="#play/${g.id}" style="--tint:${g.tint}">
         <span class="icon"><img src="art/${g.icon}" alt="" width="68" height="68"></span>
-        <div>${blaze(g.n)}<h2>${esc(g.title)}</h2><p>${esc(g.tagline)}</p>${g.ready ? '' : '<span class="wip">In the works</span>'}</div>
+        <div>${blaze(g.n)}<h2>${esc(g.title)}</h2><p>${esc(g.tagline)}</p>${g.ready ? '' : '<span class="wip">In Arbeit</span>'}</div>
       </a>`).join('')}
     </div>`;
 }
@@ -214,9 +214,9 @@ async function playScreen(g) {
   if (!g.ready) {
     stage.innerHTML = `
       <div class="soon">
-        <span class="sign">Trail under construction</span>
-        <h3>This game is still being built</h3>
-        <p>Here is how it will work:</p>
+        <span class="sign">Weg im Bau</span>
+        <h3>Dieses Spiel ist noch in Arbeit</h3>
+        <p>So wird es funktionieren:</p>
         <ol class="steps">${g.steps.map(s => `<li>${esc(s)}</li>`).join('')}</ol>
       </div>`;
     return;
