@@ -52,6 +52,9 @@ export function start(stage) {
   const save = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify({ letters, given: [...given], verified: [...verified], tips: [...tips] })); } catch {} };
   const word = () => squares.get(active).words[dir];
   function isSolved() { return [...squares].every(([k, sq]) => letters[k] === sq.answer); }
+  // what the clues show about a word: 'done' once it was found right, 'wrong' while it is full but
+  // not right, and '' while squares are still empty
+  const status = w => (w.keys.every(k => verified.has(k)) ? 'done' : w.keys.every(k => letters[k]) ? 'wrong' : '');
 
   stage.innerHTML = `
     <div class="cw">
@@ -111,13 +114,14 @@ export function start(stage) {
       el.classList.toggle('given', given.has(k));
     }
     dockLabel.textContent = `${w.num} ${DIR_NAME[w.dir]}`;
+    dockLabel.dataset.status = status(w);
     dockClue.textContent = w.clue;
     dockTip.textContent = tips.has(w.id) ? `Tipp: ${w.hint}` : '';
     tipButton.disabled = tips.has(w.id);
     for (const li of stage.querySelectorAll('.cwLists li')) {
       const lw = wordById.get(li.dataset.word);
       li.classList.toggle('current', lw === w);
-      li.classList.toggle('filled', lw.keys.every(k => letters[k]));
+      li.dataset.status = status(lw);
       li.querySelector('small').textContent = tips.has(lw.id) ? `Tipp: ${lw.hint}` : '';
     }
     PUZZLE.solution.forEach(([r, c], i) => { stage.querySelector(`[data-sol="${i + 1}"]`).textContent = letters[keyOf(r, c)] || ''; });
@@ -326,7 +330,7 @@ function injectStyle() {
     .cwDock{position:relative;padding:10px 12px;border:1px solid var(--line);border-radius:14px;background:#fff}
     .cwClue{display:flex;align-items:center;gap:8px}
     .cwClue p{flex:1;min-height:2.9em;margin:0;display:flex;flex-direction:column;justify-content:center;line-height:1.35}
-    .cwClue b{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--forest)}
+    .cwClue b{position:relative;align-self:flex-start;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--forest)}
     .cwClue i{font-style:normal;font-size:14px;color:var(--blue)}
     .cwClue i:empty{display:none}
     .cwStep{flex:none;width:36px;height:36px;border:1px solid var(--line);border-radius:50%;background:#fff;font-size:20px;line-height:1;color:var(--muted)}
@@ -366,10 +370,12 @@ function injectStyle() {
     .cwLists h4{margin:0 0 4px;font:600 12px/1.4 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
     .cwLists ol{margin:0;padding:0;list-style:none}
     .cwLists li{display:flex;gap:10px;padding:6px 8px;border-radius:8px;cursor:pointer;font-size:14px;line-height:1.4}
-    .cwLists li b{flex:none;min-width:18px;text-align:right}
+    .cwLists li b{position:relative;flex:none;min-width:18px;text-align:right}
     .cwLists li:hover{background:#f6f8f7}
     .cwLists li.current{background:#fdf1cf}
-    .cwLists li.filled span{color:var(--muted)}
+    .cwLists li[data-status="done"] span{color:var(--muted)}
+    /* a full word that isn't right yet keeps its clue black and gets a small red dot */
+    .cwLists li[data-status="wrong"] b::after,.cwClue b[data-status="wrong"]::after{content:"";position:absolute;top:50%;right:-8px;width:5px;height:5px;margin-top:-2.5px;border-radius:50%;background:var(--red);opacity:.8}
     .cwLists li small{display:block;margin-top:2px;font-size:13px;color:var(--blue)}
     .cwLists li small:empty{display:none}
     .cwFoot{display:flex;align-items:center;gap:12px}
