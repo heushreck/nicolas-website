@@ -48,3 +48,5 @@ examples-temp
 node_modules
 pnpm-global
 TODOs.md
+# Python
+__pycache__

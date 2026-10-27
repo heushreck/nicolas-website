@@ -18,13 +18,28 @@ HERE = Path(__file__).parent
 SONGS_TXT = HERE / 'songs.txt'
 SONG_LIST = HERE.parents[1] / 'docs/public/sarina_und_andreas/games/song-list.js'
 STORE = 'DE'  # the German Apple Music storefront
-DECOYS = 6  # wrong answers kept per artist
+DECOYS = 6  # wrong answers kept per song
 
-# Apple's titles carry extras like "(feat. Weekend)" or "(Radio Edit)"; the game shows them without
-EXTRAS = re.compile(r'\s*[(\[](?:feat\.?|ft\.?|with|radio edit|single version|remaster)[^)\]]*[)\]]'
-                    r'|\s+-\s+(?:radio edit|single version|remaster).*$', re.I)
+# Apple's titles carry extras like "(feat. Weekend)" or "(2015 Remaster)"; the game shows them without
+EXTRAS = re.compile(r'\s*[(\[][^)\]]*\b(?:feat|ft|with|from|radio edit|single version|remaster(?:ed)?)\b[^)\]]*[)\]]'
+                    r'|\s+-\s+[^-]*\b(?:radio edit|single version|remaster(?:ed)?)\b.*$', re.I)
+VARIANT = re.compile(r'\b(?:live|remix|mix|acoustic|akustik|instrumental|karaoke|demo|version|session|unplugged|edit)\b',
+                     re.I)
 FEAT = re.compile(r'[(\[](?:feat\.?|ft\.?)\s*([^)\]]+)[)\]]', re.I)
 ARTIST_JOINS = re.compile(r'\s+(?:feat\.?|ft\.?|&|x|und|and|with)\s+|,', re.I)
+
+# Words and letters that mark a title as German, English or French. A song's language is read from its
+# title, or from the artist's other titles when its own doesn't tell, so wrong answers can match it.
+LANGUAGE_WORDS = {
+    'de': set('''der das und ich du nicht ein eine einen mit auf für ist wir ihr uns dich mich mir dir mein meine dein
+                deine wenn wie auch kein keine nur noch nie immer alles zu im zum vom aus nach über bist sind wird
+                nacht liebe leben herz tag tage welt zeit'''.split()),
+    'en': set('''the you your i i'm me my and to of is it on be love don't can't we all with for this that what when
+                baby oh yeah night girl boy one get let down up just like never ever time heart world day'''.split()),
+    'fr': set('''le la les je tu il elle et pas des un une est mon ma ton ta que qui avec pour dans au aux sur
+                amour nuit coeur'''.split()),
+}
+LANGUAGE_LETTERS = {'de': 'äöüß', 'fr': 'éèêàçùâîô'}
 
 
 def get(endpoint, **params):
@@ -50,6 +65,19 @@ def is_variant(title):
     return bool(re.search(r'[(\[]| - ', clean(title)))
 
 
+def language(titles):
+    """'de', 'en' or 'fr' for the language most of these titles are in, or '' when they don't tell."""
+    score = dict.fromkeys(LANGUAGE_WORDS, 0)
+    for title in titles:
+        text = title.casefold().replace('’', "'")
+        for lang, words in LANGUAGE_WORDS.items():
+            score[lang] += sum(word in words for word in re.findall(r"[\w']+", text))
+        for lang, letters in LANGUAGE_LETTERS.items():
+            score[lang] += sum(text.count(c) for c in letters)
+    best = max(score, key=score.get)
+    return best if score[best] else ''
+
+
 def find(artist, title, pinned):
     """Apple's track for one line of songs.txt, and whether it needs a second look."""
     if pinned:
@@ -60,25 +88,26 @@ def find(artist, title, pinned):
     term = f"{ARTIST_JOINS.sub(' ', artist)} {title}"
     results = get('search', term=term, entity='song', limit=25)
     by_artist = [r for r in results if plain(ARTIST_JOINS.split(artist)[0]) in plain(r['artistName'])]
-    exact = [r for r in by_artist if plain(clean(r['trackName'])) == plain(title)]
-    if exact:
-        return exact[0], False
+    # the title as given, or the title with a subtitle Apple adds, like "(Who Loves Me)"
+    named = [r for r in by_artist if plain(clean(r['trackName'])).startswith(plain(title))]
+    best = ([r for r in named if plain(clean(r['trackName'])) == plain(title)]
+            or [r for r in named if not VARIANT.search(clean(r['trackName']))])
+    if best:
+        return best[0], False
     if not results:
         sys.exit(f'Apple found nothing for "{artist} - {title}". Check the spelling or pin an ID.')
     return (by_artist or results)[0], True
 
 
-def decoys(artist_id, taken):
-    """The artist's best-known songs that aren't in the list, in Apple's order."""
-    titles, seen = [], set(taken)
+def catalog(artist_id):
+    """The artist's songs, best known first, without alternative recordings or repeats."""
+    titles, seen = [], set()
     for r in get('lookup', id=artist_id, entity='song', limit=100):
         title = clean(r['trackName'])
         if r['artistId'] != artist_id or is_variant(r['trackName']) or '*' in title or plain(title) in seen:
             continue
         seen.add(plain(title))
         titles.append(title)
-        if len(titles) == DECOYS:
-            break
     return titles
 
 
@@ -113,22 +142,26 @@ def main():
               f"  ({track['collectionName']}, {track['releaseDate'][:4]}, ID {track['trackId']})")
 
     taken = {plain(s['title']) for s in songs}
-    by_artist = {}
+    catalogs = {}
     for s in songs:
-        if s['artistId'] not in by_artist:
-            by_artist[s['artistId']] = decoys(s['artistId'], taken)
-            print(f"  decoys by {s['artist'].split(' feat. ')[0]}: {', '.join(by_artist[s['artistId']]) or 'none'}")
-        s['decoys'] = by_artist[s['artistId']]
+        if s['artistId'] not in catalogs:
+            catalogs[s['artistId']] = catalog(s['artistId'])
+        titles = catalogs[s['artistId']]
+        # the song's own title decides its language when it can, otherwise the artist's titles do
+        s['lang'] = language([s['title']]) or language(titles)
+        s['decoys'] = [t for t in titles if plain(t) not in taken and language([t]) in (s['lang'], '')][:DECOYS]
+        print(f"  {s['title']} [{s['lang'] or '?'}]  decoys: {', '.join(s['decoys']) or 'none'}")
 
     entries = ''.join(
-        f"  {{ id: {s['id']}, artist: {js(s['artist'])}, title: {js(s['title'])},\n"
+        f"  {{ id: {s['id']}, artist: {js(s['artist'])}, title: {js(s['title'])}, lang: {js(s['lang'])},\n"
         f"    decoys: [{', '.join(js(d) for d in s['decoys'])}] }},\n" for s in songs)
     SONG_LIST.write_text(f'''// song-list.js: the songs for "Wie heißt der Song?". Written by scripts/spielewiese/songs.py from
 // scripts/spielewiese/songs.txt, so edit that list and run the script rather than changing this file.
 //
-// Song: {{ id, artist, title, decoys }}
+// Song: {{ id, artist, title, lang, decoys }}
 //   id is the song's Apple Music ID; the game fetches its 30-second preview and cover from Apple.
-//   decoys are other songs by the same artist, offered as wrong answers.
+//   lang is the language of the title ('de', 'en', 'fr', or '' if unclear); wrong answers match it.
+//   decoys are other songs by the same artist in that language, offered as wrong answers.
 
 export const SONGS = [
 {entries}];
