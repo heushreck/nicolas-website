@@ -20,11 +20,12 @@ SONG_LIST = HERE.parents[1] / 'docs/public/sarina_und_andreas/games/song-list.js
 STORE = 'DE'  # the German Apple Music storefront
 DECOYS = 6  # wrong answers kept per song
 
-# Apple's titles carry extras like "(feat. Weekend)" or "(2015 Remaster)"; the game shows them without
-EXTRAS = re.compile(r'\s*[(\[][^)\]]*\b(?:feat|ft|with|from|radio edit|single version|remaster(?:ed)?)\b[^)\]]*[)\]]'
-                    r'|\s+-\s+[^-]*\b(?:radio edit|single version|remaster(?:ed)?)\b.*$', re.I)
-VARIANT = re.compile(r'\b(?:live|remix|mix|acoustic|akustik|instrumental|karaoke|demo|version|session|unplugged|edit)\b',
-                     re.I)
+# Apple's titles carry extras like "(feat. Weekend)", "[Radio Mix]", "(2020)" or "(2015 Remaster)"; the game
+# shows them without
+EXTRAS = re.compile(r'\s*[(\[][^)\]]*\b(?:feat|ft|with|from|radio (?:edit|mix)|single version|remaster(?:ed)?)\b'
+                    r'[^)\]]*[)\]]|\s*\(\d{4}\)|\s+-\s+[^-]*\b(?:radio edit|single version|remaster(?:ed)?)\b.*$', re.I)
+VARIANT = re.compile(r'\b(?:live|\w*mix|acoustic|akustik|instrumental|karaoke|demo|version|session|unplugged|edit|'
+                     r'intro|outro|medley)\b', re.I)
 FEAT = re.compile(r'[(\[](?:feat\.?|ft\.?)\s*([^)\]]+)[)\]]', re.I)
 ARTIST_JOINS = re.compile(r'\s+(?:feat\.?|ft\.?|&|x|und|and|with)\s+|,', re.I)
 
@@ -62,7 +63,7 @@ def clean(title):
 
 def is_variant(title):
     """A live, acoustic, remixed or otherwise alternative recording, which never makes a good decoy."""
-    return bool(re.search(r'[(\[]| - ', clean(title)))
+    return bool(re.search(r'[(\[]| - ', clean(title)) or VARIANT.search(clean(title)))
 
 
 def language(titles):
@@ -87,7 +88,10 @@ def find(artist, title, pinned):
         return found[0], False
     term = f"{ARTIST_JOINS.sub(' ', artist)} {title}"
     results = get('search', term=term, entity='song', limit=25)
-    by_artist = [r for r in results if plain(ARTIST_JOINS.split(artist)[0]) in plain(r['artistName'])]
+    lead = plain(ARTIST_JOINS.split(artist)[0])
+    # recordings by the artist asked for, those where they lead first (not a cover that features them)
+    by_artist = sorted((r for r in results if lead in plain(r['artistName'])),
+                       key=lambda r: not plain(r['artistName']).startswith(lead))
     # the title as given, or the title with a subtitle Apple adds, like "(Who Loves Me)"
     named = [r for r in by_artist if plain(clean(r['trackName'])).startswith(plain(title))]
     best = ([r for r in named if plain(clean(r['trackName'])) == plain(title)]
