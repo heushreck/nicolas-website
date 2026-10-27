@@ -151,7 +151,7 @@ export async function start(stage) {
       <ol>${order.map(f => {
         const p = byFile.get(f);
         return `<li class="${isRight(f) ? 'right' : 'wrong'}"><img src="${src(p)}" alt="" loading="lazy">
-          <div><b>${esc(p.place)}</b><span>${distanceText(guesses[f].km)}</span></div></li>`;
+          <div><b title="${esc(p.place)}">${esc(p.place)}</b><span>${distanceText(guesses[f].km)}</span></div></li>`;
       }).join('')}</ol>
       <button type="button" class="woGo" data-again>Nochmal spielen</button>`;
   }
@@ -182,27 +182,24 @@ function injectStyle() {
   const style = document.createElement('style');
   style.id = 'wo-style';
   style.textContent = `
-    .wo{padding:16px 18px 20px}
+    /* the photo and the map share whatever height the stage has: stacked on phones, side by side on wider screens */
+    .wo{height:100%;display:flex;flex-direction:column;padding:14px 18px 18px}
     .wo [hidden]{display:none}
     .woNote{margin:0;padding:70px 20px;text-align:center;color:var(--muted)}
-    .woBar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px;font-size:14px;color:var(--muted)}
+    .woBar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px;font-size:14px;color:var(--muted)}
     .woScore{padding:4px 12px;border-radius:999px;background:var(--sky)}
     .woScore b{color:var(--ink)}
 
-    .woPlay{display:grid;gap:14px}
-    .woPhoto{margin:0;display:grid;place-items:center;background:#1f2d38;border-radius:14px;overflow:hidden;cursor:zoom-in}
-    .woPhoto img{width:100%;max-height:48vh;object-fit:contain}
+    .woPlay{flex:1;min-height:0;display:flex;flex-direction:column;gap:12px}
+    .woPhoto{position:relative;flex:1 1 0;min-height:120px;margin:0;background:#1f2d38;border-radius:14px;overflow:hidden;cursor:zoom-in}
+    .woPhoto img{position:absolute;inset:0;width:100%;height:100%;object-fit:contain}
     .woPhoto.zoom{position:fixed;inset:0;z-index:60;border-radius:0;background:rgba(15,22,28,.94);cursor:zoom-out}
-    .woPhoto.zoom img{height:100%;max-height:none}
-    .woSide{display:flex;flex-direction:column;gap:10px}
-    .woMap{position:relative;z-index:0;height:300px;border:1px solid var(--line);border-radius:14px;background:#eef1f0}
+    .woSide{flex:1.2 1 0;min-height:0;display:flex;flex-direction:column;gap:10px}
+    .woMap{position:relative;z-index:0;flex:1;min-height:150px;border:1px solid var(--line);border-radius:14px;background:#eef1f0}
     .woMap.leaflet-container{font:inherit}
     .woTip{font:600 13px/1.3 var(--sans);color:var(--forest)}
     @media (min-width:760px){
-      .woPlay{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
-      .woPhoto{height:460px}
-      .woPhoto img{height:100%;max-height:none}
-      .woMap{flex:1;height:auto;min-height:260px}
+      .woPlay{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:minmax(0,1fr)}
     }
 
     .woResult{padding:10px 14px;border-radius:12px;background:#f6f8f7;font-size:14px;color:var(--muted)}
@@ -214,13 +211,14 @@ function injectStyle() {
     .woGo{padding:11px 18px;border:0;border-radius:999px;background:var(--forest);font-size:15px;font-weight:600;color:#fff}
     .woGo:disabled{background:#c9d3cf;cursor:default}
 
-    .woEnd{max-width:520px;margin:0 auto;text-align:center}
+    .woEnd{flex:1;min-height:0;overflow:auto;text-align:center}
     .woEnd .k{margin:0;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
-    .woEnd .big{margin:4px 0 18px;font:700 32px/1.2 var(--serif)}
-    .woEnd ol{display:grid;gap:8px;margin:0 0 20px;padding:0;list-style:none;text-align:left}
-    .woEnd li{display:flex;align-items:center;gap:12px;padding:8px;border:1px solid var(--line);border-radius:12px}
-    .woEnd li img{flex:none;width:56px;height:56px;object-fit:cover;border-radius:8px}
-    .woEnd li b{display:block}
+    .woEnd .big{margin:2px 0 14px;font:700 30px/1.2 var(--serif)}
+    .woEnd ol{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px;margin:0 0 16px;padding:0;list-style:none;text-align:left}
+    .woEnd li{display:flex;align-items:center;gap:10px;padding:6px;border:1px solid var(--line);border-radius:12px;font-size:14px;line-height:1.35}
+    .woEnd li img{flex:none;width:44px;height:44px;object-fit:cover;border-radius:8px}
+    .woEnd li div{min-width:0}
+    .woEnd li b{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
     .woEnd li span{font-size:13px;color:var(--muted)}
     .woEnd li.right span::before{content:"✓ ";color:var(--forest)}
     .woEnd li.wrong span::before{content:"✗ ";color:var(--red)}

@@ -55,32 +55,31 @@ export function start(stage) {
 
   stage.innerHTML = `
     <div class="cw">
-      <div class="cwDock">
-        <div class="cwClue">
-          <button type="button" class="cwStep" data-step="-1" aria-label="Vorheriger Hinweis">‹</button>
-          <p aria-live="polite"><b></b><span></span><i></i></p>
-          <button type="button" class="cwStep" data-step="1" aria-label="Nächster Hinweis">›</button>
-        </div>
-        <div class="cwActs">
-          <button type="button" data-act="tip">Tipp</button>
-          <button type="button" data-act="check">Wort prüfen</button>
-          <button type="button" data-act="reveal">Buchstabe zeigen</button>
-        </div>
-        <p class="cwToast" role="status"></p>
-        <div class="cwKeys">${KEY_ROWS.map((row, i) => `<div>${[...row].map(ch => `<button type="button" data-key="${ch}">${ch}</button>`).join('')}${i === 2 ? '<button type="button" data-key="Backspace" class="wide" aria-label="Löschen">⌫</button>' : ''}</div>`).join('')}</div>
+      <div class="cwBoard">
+        <div class="cwGrid" style="--cols:${PUZZLE.cols};--rows:${PUZZLE.rows}">${gridHtml()}</div>
+        <div class="cwSol"><span>Lösungswort</span><div>${PUZZLE.solution.map((_, i) => `<b data-sol="${i + 1}"></b>`).join('')}</div></div>
       </div>
-      <div class="cwMain">
-        <div>
-          <div class="cwGrid" style="--cols:${PUZZLE.cols}">${gridHtml()}</div>
-          <div class="cwSol"><span>Lösungswort</span><div>${PUZZLE.solution.map((_, i) => `<b data-sol="${i + 1}"></b>`).join('')}</div></div>
-          <div class="cwTools"><button type="button" data-act="reset">Neu anfangen</button></div>
+      <div class="cwSide">
+        <div class="cwDock">
+          <div class="cwClue">
+            <button type="button" class="cwStep" data-step="-1" aria-label="Vorheriger Hinweis">‹</button>
+            <p aria-live="polite"><b></b><span></span><i></i></p>
+            <button type="button" class="cwStep" data-step="1" aria-label="Nächster Hinweis">›</button>
+          </div>
+          <div class="cwActs">
+            <button type="button" data-act="tip">Tipp</button>
+            <button type="button" data-act="check">Wort prüfen</button>
+            <button type="button" data-act="reveal">Buchstabe zeigen</button>
+          </div>
+          <p class="cwToast" role="status"></p>
+          <div class="cwKeys">${KEY_ROWS.map((row, i) => `<div>${[...row].map(ch => `<button type="button" data-key="${ch}">${ch}</button>`).join('')}${i === 2 ? '<button type="button" data-key="Backspace" class="wide" aria-label="Löschen">⌫</button>' : ''}</div>`).join('')}</div>
         </div>
         <div class="cwLists">${['A', 'D'].map(d => `
           <section><h4>${d === 'A' ? 'Waagerecht' : 'Senkrecht'}</h4><ol>${order.filter(w => w.dir === d).map(w => `
             <li data-word="${w.id}"><b>${w.num}</b><span>${esc(w.clue)}<small></small></span></li>`).join('')}</ol></section>`).join('')}
         </div>
+        <div class="cwFoot"><button type="button" data-act="reset">Neu anfangen</button><p>Umlaute schreibt ihr aus: Ü wird UE, ß wird SS.</p></div>
       </div>
-      <p class="cwNote">Umlaute schreibt ihr aus: Ü wird UE, ß wird SS.</p>
     </div>`;
 
   function gridHtml() {
@@ -98,6 +97,10 @@ export function start(stage) {
   const [dockLabel, dockClue, dockTip] = stage.querySelector('.cwClue p').children;
   const tipButton = stage.querySelector('[data-act="tip"]');
   const toastEl = stage.querySelector('.cwToast');
+  // the grid's squares are sized to leave room for the dock wherever it sits below the grid
+  const dock = stage.querySelector('.cwDock');
+  const dockSize = new ResizeObserver(() => stage.querySelector('.cw').style.setProperty('--dock', `${dock.offsetHeight}px`));
+  dockSize.observe(dock);
 
   function paint() {
     const w = word();
@@ -277,6 +280,7 @@ export function start(stage) {
   paint();
   return () => {
     document.removeEventListener('keydown', onKey);
+    dockSize.disconnect();
     clearTimeout(toastTimer);
     closeCelebration();
   };
@@ -308,9 +312,12 @@ function injectStyle() {
   const style = document.createElement('style');
   style.id = 'cw-style';
   style.textContent = `
-    .stage:has(.cw){overflow:clip}
-    .cw{--blue:#3a6fb0;padding:16px 18px 20px}
-    .cwDock{position:sticky;top:0;z-index:5;margin:-16px -18px 16px;padding:10px 12px;background:rgba(255,255,255,.94);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);border-bottom:1px solid var(--line)}
+    /* The grid sits beside the clues and is as big as the stage's height allows, so the whole
+       puzzle shows at once. --below is the room it leaves underneath for the dock. */
+    .cw{--blue:#3a6fb0;--board-w:55cqw;--below:0px;container-type:size;height:100%;overflow:auto;display:grid;grid-template-columns:auto minmax(0,1fr);align-items:start;gap:24px;padding:16px 18px}
+    .cwBoard{display:flex;flex-direction:column;align-items:center}
+    .cwSide{display:flex;flex-direction:column;gap:14px;height:100cqh}
+    .cwDock{position:relative;padding:10px 12px;border:1px solid var(--line);border-radius:14px;background:#fff}
     .cwClue{display:flex;align-items:center;gap:8px}
     .cwClue p{flex:1;min-height:2.9em;margin:0;display:flex;flex-direction:column;justify-content:center;line-height:1.35}
     .cwClue b{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--forest)}
@@ -327,33 +334,27 @@ function injectStyle() {
     .cwToast.good{background:var(--forest)}
     .cwKeys{display:none}
 
-    .cwMain{display:grid;gap:22px}
-    @media (min-width:760px){.cwMain{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);align-items:start}}
-    .cwGrid{container-type:inline-size;display:grid;grid-template-columns:repeat(var(--cols),1fr);gap:2px;width:min(100%,calc(var(--cols) * 34px));margin:0 auto}
-    .cwSq{position:relative;aspect-ratio:1;display:grid;place-items:center;background:#fff;border:1.5px solid #c5d0cc;border-radius:4px;cursor:pointer;-webkit-tap-highlight-color:transparent;scroll-margin:90px 0 24px}
+    .cwGrid{--cell:clamp(16px,min(calc((var(--board-w) - (var(--cols) - 1) * 2px) / var(--cols)),calc((100cqh - 48px - var(--below) - (var(--rows) - 1) * 2px) / var(--rows))),40px);display:grid;grid-template-columns:repeat(var(--cols),var(--cell));grid-auto-rows:var(--cell);gap:2px}
+    .cwSq{position:relative;display:grid;place-items:center;background:#fff;border:1.5px solid #c5d0cc;border-radius:4px;cursor:pointer;-webkit-tap-highlight-color:transparent;scroll-margin:8px}
     .cwSq.ok{background:#eaf5ec;border-color:#a9cfb0}
     .cwSq.inWord{background:#fdf1cf;border-color:#e7c66b}
     .cwSq.active{background:#f2c14e;border-color:#c99a2a}
-    .cwSq .l{font:700 calc(100cqw / var(--cols) * .52)/1 var(--sans);color:var(--ink)}
+    .cwSq .l{font:700 calc(var(--cell) * .55)/1 var(--sans);color:var(--ink)}
     .cwSq.ok .l{color:#2e7d4f}
     .cwSq.given .l{color:var(--blue)}
     .cwSq.given::after{content:"";position:absolute;top:0;right:0;border:4px solid transparent;border-top-color:var(--blue);border-right-color:var(--blue);border-top-right-radius:2px}
     .cwSq.nope{animation:cwNope .45s}
     @keyframes cwNope{20%,60%{transform:translateX(-3px);border-color:var(--red)}40%,80%{transform:translateX(3px);border-color:var(--red)}}
     @media (prefers-reduced-motion:reduce){.cwSq.nope{animation-name:cwNopeStill}@keyframes cwNopeStill{20%,80%{border-color:var(--red)}}}
-    .cwSq .n{position:absolute;top:1px;left:2px;font:600 calc(100cqw / var(--cols) * .22)/1 var(--sans);color:var(--muted)}
+    .cwSq .n{position:absolute;top:1px;left:2px;font:600 max(7px,calc(var(--cell) * .26))/1 var(--sans);color:var(--muted)}
     .cwSq .o{position:absolute;inset:12%;border:1.5px solid rgba(217,83,79,.55);border-radius:50%;pointer-events:none}
-    .cwSq .s{position:absolute;right:2px;bottom:1px;font:700 calc(100cqw / var(--cols) * .2)/1 var(--sans);color:var(--red)}
+    .cwSq .s{position:absolute;right:2px;bottom:1px;font:700 max(7px,calc(var(--cell) * .24))/1 var(--sans);color:var(--red)}
 
-    .cwSol{display:flex;align-items:center;justify-content:center;gap:12px;margin:18px 0 0}
+    .cwSol{display:flex;align-items:center;justify-content:center;gap:12px;margin:14px 0 0}
     .cwSol span{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
     .cwSol div{display:flex;gap:4px}
     .cwSol b{display:grid;place-items:center;width:30px;height:34px;border:1.5px solid rgba(217,83,79,.55);border-radius:6px;background:#fff;font:700 17px/1 var(--sans)}
-    .cwTools{display:flex;justify-content:center;margin:14px 0 0}
-    .cwTools button{padding:7px 14px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:14px}
-    .cwTools button:hover{border-color:#cfdcd6;background:#f6f8f7}
-
-    .cwLists{display:grid;gap:18px}
+    .cwLists{flex:1;min-height:0;overflow:auto;display:grid;align-content:start;gap:14px}
     .cwLists h4{margin:0 0 4px;font:600 12px/1.4 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
     .cwLists ol{margin:0;padding:0;list-style:none}
     .cwLists li{display:flex;gap:10px;padding:6px 8px;border-radius:8px;cursor:pointer;font-size:14px;line-height:1.4}
@@ -363,7 +364,10 @@ function injectStyle() {
     .cwLists li.filled span{color:var(--muted)}
     .cwLists li small{display:block;margin-top:2px;font-size:13px;color:var(--blue)}
     .cwLists li small:empty{display:none}
-    .cwNote{margin:18px 0 0;text-align:center;font-size:13px;color:var(--muted)}
+    .cwFoot{display:flex;align-items:center;gap:12px}
+    .cwFoot button{flex:none;padding:6px 13px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:13px}
+    .cwFoot button:hover{border-color:#cfdcd6;background:#f6f8f7}
+    .cwFoot p{margin:0;font-size:12px;line-height:1.4;color:var(--muted)}
 
     .cwWin{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:16px;background:rgba(31,45,56,.35)}
     .cwWin canvas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
@@ -372,22 +376,32 @@ function injectStyle() {
     .cwWin .w{margin:4px 0 10px;font:700 40px/1.1 var(--serif);letter-spacing:.12em;color:var(--red)}
     .cwWin button{margin-top:10px;padding:9px 18px;border:0;border-radius:999px;background:var(--forest);color:#fff;font-weight:500}
 
+    /* narrow windows stack the clues under the grid, so the grid leaves room for the dock */
+    @media (max-width:759px){
+      .cw{--board-w:100cqw;--below:calc(var(--dock,120px) + 12px);grid-template-columns:minmax(0,1fr);gap:12px;padding:12px 8px}
+      .cwSide{height:auto}
+      .cwLists{overflow:visible}
+    }
     @media (max-width:600px){
       .stage:has(.cw){margin:0 -16px;border-radius:0;border-left:0;border-right:0}
-      .cw{padding:12px 8px 20px}
-      .cwDock{margin:-12px -8px 12px}
     }
-    /* phones and tablets get an on-screen keyboard docked to the bottom, like the NYT apps */
+    /* phones and tablets get an on-screen keyboard docked to the bottom, like the NYT apps; the
+       space it covers is padding, which the grid's height already leaves out */
     @media (pointer:coarse){
-      .cw{padding-bottom:300px}
-      .cwSq{scroll-margin:16px 0 310px}
-      .cwDock{position:fixed;top:auto;left:0;right:0;bottom:0;margin:0;padding:8px 6px calc(8px + env(safe-area-inset-bottom));border-top:1px solid var(--line);border-bottom:0;box-shadow:0 -6px 20px rgba(31,45,56,.08)}
+      .cw{--below:0px;padding-bottom:calc(var(--dock,240px) + 8px)}
+      .cwSq{scroll-margin:8px 8px calc(var(--dock,240px) + 8px)}
+      .cwDock{position:fixed;left:0;right:0;bottom:0;z-index:5;padding:8px 6px calc(8px + env(safe-area-inset-bottom));border:0;border-top:1px solid var(--line);border-radius:0;box-shadow:0 -6px 20px rgba(31,45,56,.08)}
       .cwToast{top:auto;bottom:calc(100% + 8px)}
       .cwKeys{display:grid;gap:6px;margin-top:8px}
       .cwKeys div{display:flex;justify-content:center;gap:4px}
       .cwKeys button{flex:1;max-width:40px;height:44px;padding:0;border:0;border-radius:6px;background:#eef1f0;font:600 16px/1 var(--sans);color:var(--ink)}
       .cwKeys button:active{background:#d9e0dd}
       .cwKeys .wide{max-width:64px;flex:1.6}
+    }
+    /* a phone can't fit the tall grid above a keyboard at a size you can still tap, so there the
+       grid takes the full width and scrolls above the keyboard */
+    @media (pointer:coarse) and (max-width:759px){
+      .cwGrid{--cell:min(40px,calc((100cqw - (var(--cols) - 1) * 2px) / var(--cols)))}
     }`;
   document.head.append(style);
 }
