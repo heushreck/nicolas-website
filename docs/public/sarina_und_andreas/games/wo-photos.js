@@ -25,14 +25,14 @@ export const PHOTOS = [
   { file: 'nebelhorn.webp', place: 'Nebelhorn', lat: 47.4219, lng: 10.3423, note: 'Februar 2022' },
   { file: 'hopfensee.jpg', place: 'Hopfensee', lat: 47.5998, lng: 10.669, note: 'Januar 2022' },
   { file: 'iseler.jpg', place: 'Iseler', lat: 47.4996, lng: 10.4209, note: 'November 2021' },
-  { file: 'hoernerbahn.jpg', place: 'Hörnerbahn, Bolsterlang', lat: 47.4607, lng: 10.2056 },
-  { file: 'neuschwanstein.jpg', place: 'Schloss Neuschwanstein', lat: 47.5576, lng: 10.7497 },
+  { file: 'hoernerbahn.jpg', place: 'Hörnerbahn, Bolsterlang', lat: 47.4607, lng: 10.2056, note: '2025' },
+  { file: 'neuschwanstein.jpg', place: 'Schloss Neuschwanstein', lat: 47.5576, lng: 10.7497, note: '2021' },
 
   // Oberbayern
   { file: 'baumgartenschneid.jpg', place: 'Baumgartenschneid über dem Tegernsee', lat: 47.7022, lng: 11.8112, note: '2023' },
   { file: 'spitzingsee.jpg', place: 'Spitzingsee', lat: 47.6651, lng: 11.8853, note: '2022' },
   { file: 'zugspitze.webp', place: 'Zugspitze', lat: 47.4212, lng: 10.9863, note: 'September 2022' },
-  { file: 'hoernle.jpg', place: 'Hörnle-Schwebebahn, Bad Kohlgrub', lat: 47.6445, lng: 11.0548 },
+  { file: 'hoernle.jpg', place: 'Hörnle-Schwebebahn, Bad Kohlgrub', lat: 47.6445, lng: 11.0548, note: '2024' },
 
   // weiter weg
   { file: 'aggstein.webp', place: 'Burgruine Aggstein, Wachau', lat: 48.3139, lng: 15.4216, note: 'April 2026' },
