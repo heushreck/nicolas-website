@@ -90,9 +90,9 @@ function thumbnail(trip, strokes) {
   return `<svg class="wegThumb" viewBox="0 0 56 56" aria-hidden="true"><path d="${path(route)}" class="real"/>${drawn.map(l => `<path d="${path(l)}" class="mine"/>`).join('')}</svg>`;
 }
 
-// The intro shows a way being drawn and checked on a made-up map, then the rules from games.js.
-const DEMO = `
-  <svg class="wegDemo" viewBox="0 0 320 168" role="img" aria-label="Ein Finger zeichnet einen Weg vom Haus zur Fahne, dann erscheint die echte Route.">
+// The "So geht’s" pop-up shows a way being drawn and checked on a made-up map above the rules.
+export const INTRO_ART = `
+  <svg viewBox="0 0 320 168" data-still="5.8" role="img" aria-label="Ein Finger zeichnet einen Weg vom Haus zur Fahne, dann erscheint die echte Route.">
     <defs><filter id="wegDemoBlur"><feGaussianBlur stdDeviation="5"/></filter><clipPath id="wegDemoClip"><rect width="320" height="168" rx="14"/></clipPath></defs>
     <g clip-path="url(#wegDemoClip)">
       <rect width="320" height="168" fill="#7b8f5c"/>
@@ -121,7 +121,7 @@ const DEMO = `
     </g>
   </svg>`;
 
-export async function start(stage, { game }) {
+export async function start(stage) {
   injectStyle();
   stage.innerHTML = '<p class="wegNote">Die Karte wird geladen …</p>';
   let L;
@@ -137,13 +137,11 @@ export async function start(stage, { game }) {
   // added to weg-routes.js later are simply still to play.
   const saved = (() => { try { return JSON.parse(localStorage.getItem(SAVE_KEY)) || {}; } catch { return {}; } })();
   const done = Object.fromEntries(Object.entries(saved.done || {}).filter(([k]) => TRIPS.some(t => keyOf(t) === k)));
-  let seenIntro = Boolean(saved.seenIntro);
-  const save = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify({ done, seenIntro })); } catch {} };
+  const save = () => { try { localStorage.setItem(SAVE_KEY, JSON.stringify({ done })); } catch {} };
 
   stage.innerHTML = `
     <div class="weg">
-      <div class="wegBar"><span class="wegNum"></span><span class="wegRight"><span class="wegScore"></span>
-        <button type="button" class="wegHelp" aria-label="So geht’s" title="So geht’s">?</button></span></div>
+      <div class="wegBar"><span class="wegNum"></span><span class="wegScore"></span></div>
       <div class="wegPlay">
         <h3 class="wegTitle"></h3>
         <div class="wegMapBox">
@@ -159,21 +157,10 @@ export async function start(stage, { game }) {
         </div>
       </div>
       <div class="wegEnd" hidden></div>
-      <div class="wegIntro" hidden>
-        <div class="wegCard">
-          ${DEMO}
-          <h3>So geht’s</h3>
-          <ol class="wegSteps">${game.steps.map(s => `<li>${esc(s)}</li>`).join('')}</ol>
-          <p class="wegTip">Abgesetzt? Einfach weiterzeichnen. Verzeichnet? „Rückgängig“ nimmt den letzten Strich zurück.</p>
-          <button type="button" class="wegGo" data-close>Los geht’s</button>
-        </div>
-      </div>
     </div>`;
   const $ = sel => stage.querySelector(sel);
-  const [play, end, intro, mapBox, hint, title, result, undo, go] =
-    ['.wegPlay', '.wegEnd', '.wegIntro', '.wegMapBox', '.wegHint', '.wegTitle', '.wegResult', '.wegUndo', '.wegFoot .wegGo'].map($);
-  const demo = $('.wegDemo');
-  if (matchMedia('(prefers-reduced-motion: reduce)').matches) { demo.pauseAnimations(); demo.setCurrentTime(5.8); }
+  const [play, end, mapBox, hint, title, result, undo, go] =
+    ['.wegPlay', '.wegEnd', '.wegMapBox', '.wegHint', '.wegTitle', '.wegResult', '.wegUndo', '.wegFoot .wegGo'].map($);
 
   // The map stays put, so every drag on it draws.
   const map = L.map($('.wegMap'), {
@@ -299,11 +286,6 @@ export async function start(stage, { game }) {
       <button type="button" class="wegGo" data-again>Nochmal spielen</button>`;
   }
 
-  function showIntro(open) {
-    intro.hidden = !open;
-    if (!open && !seenIntro) { seenIntro = true; save(); }
-  }
-
   const mapEl = $('.wegMap');
   mapEl.addEventListener('pointerdown', e => {
     if (revealed || !trip || e.button > 0 || e.target.closest('.leaflet-control')) return;
@@ -338,15 +320,9 @@ export async function start(stage, { game }) {
     save();
     next();
   });
-  $('.wegHelp').addEventListener('click', () => showIntro(intro.hidden));
-  intro.addEventListener('click', e => { if (e.target === intro || e.target.closest('[data-close]')) showIntro(false); });
-  const onKey = e => { if (e.key === 'Escape' && !intro.hidden) showIntro(false); };
-  document.addEventListener('keydown', onKey);
 
   next();
-  if (!seenIntro) showIntro(true);
   return () => {
-    document.removeEventListener('keydown', onKey);
     resize.disconnect();
     map.remove();
   };
@@ -358,16 +334,13 @@ function injectStyle() {
   style.id = 'weg-style';
   style.textContent = `
     /* --route is the real route's green, as in ROUTE_STYLE */
-    .weg{--route:#2e9b5b;position:relative;height:100%;display:flex;flex-direction:column;padding:14px 18px 18px}
+    .weg{--route:#2e9b5b;height:100%;display:flex;flex-direction:column;padding:14px 18px 18px}
     .weg [hidden]{display:none}
     .wegNote{margin:0;padding:70px 20px;text-align:center;color:var(--muted)}
     .wegBar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:8px;font-size:14px;color:var(--muted)}
-    .wegRight{display:flex;align-items:center;gap:8px}
     .wegScore{padding:4px 12px;border-radius:999px;background:var(--sky)}
     .wegScore:empty{display:none}
     .wegScore b{color:var(--ink)}
-    .wegHelp{width:30px;height:30px;padding:0;border:1px solid var(--line);border-radius:50%;background:var(--paper);font-weight:600;color:var(--forest)}
-    .wegHelp:hover{border-color:var(--forest)}
 
     .wegPlay{flex:1;min-height:0;display:flex;flex-direction:column;gap:10px}
     .wegTitle{margin:0;font:600 20px/1.25 var(--serif)}
@@ -407,16 +380,6 @@ function injectStyle() {
     .wegUndo:disabled{color:#b3bfba;cursor:default}
     .wegGo{padding:11px 22px;border:0;border-radius:999px;background:var(--forest);font-size:15px;font-weight:600;color:#fff}
     .wegGo:disabled{background:#c9d3cf;cursor:default}
-
-    .wegIntro{position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;padding:14px;border-radius:inherit;background:var(--paper);overflow:auto}
-    /* the demo gives way so the whole card fits without scrolling */
-    .wegCard{display:flex;flex-direction:column;width:min(440px,100%);max-height:100%;text-align:center}
-    .wegDemo{display:block;flex:0 1 auto;width:100%;height:34vh;min-height:90px;margin:0 auto 6px}
-    .wegCard h3{margin:0 0 6px;font:600 20px/1.3 var(--serif)}
-    .wegSteps{margin:0;padding:0;list-style:none;text-align:left;font-size:14px;line-height:1.45;counter-reset:s}
-    .wegSteps li{position:relative;padding:7px 0 7px 36px;border-top:1px solid var(--line);counter-increment:s}
-    .wegSteps li::before{content:counter(s);position:absolute;left:0;top:6px;display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--sky);font-weight:600;font-size:12px;color:var(--forest)}
-    .wegTip{margin:6px 0 12px;font-size:13px;color:var(--muted)}
 
     .wegEnd{flex:1;min-height:0;overflow:auto;text-align:center}
     .wegEnd .k{margin:0;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}

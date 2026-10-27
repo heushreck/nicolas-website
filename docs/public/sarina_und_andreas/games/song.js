@@ -5,12 +5,11 @@
 import { SONGS } from './song-list.js';
 
 const LOOKUP = 'https://itunes.apple.com/lookup';
-const ROUND = 10; // songs per game
 const OPTIONS = 4;
 // how much of the clip the players may hear, and what a right answer is worth after hearing that much
 const STEPS = [{ seconds: 3, points: 3 }, { seconds: 10, points: 2 }, { seconds: 30, points: 1 }];
 const FULL = STEPS.at(-1).seconds;
-const BEST_KEY = 'sa-song-best-v2';
+const BEST_KEY = 'sa-song-best-v3'; // v3: a game plays every song, so records from shorter games don't count
 
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const same = (a, b) => a.toLowerCase() === b.toLowerCase();
@@ -132,36 +131,27 @@ export async function start(stage) {
   }
 
   function newGame() {
-    round = shuffle([...songs]).slice(0, ROUND);
+    round = shuffle([...songs]); // every song, in a new order each game
     at = -1;
-    step = 0;
-    answered = false;
     score = streak = bestStreak = 0;
     results = [];
     play.hidden = false;
     end.hidden = true;
-    counters();
-    setDisc('ready');
-    drawRing();
-    cover.removeAttribute('src');
-    now.textContent = 'Tippt auf die Platte, dann läuft der erste Song.';
-    more.hidden = true;
-    opts.innerHTML = '';
-    say.className = 'sgSay';
-    const [first, ...longer] = STEPS;
-    say.textContent = `Ihr hört erst ${first.seconds} Sekunden. Wisst ihr den Titel, gibt das ${pointsText(first.points)}. `
-      + `Sonst könnt ihr mehr hören: ${longer.map(s => `${s.seconds} Sekunden für ${pointsText(s.points)}`).join(', dann ')}. `
-      + 'Tippt auf die Platte, um die Stelle nochmal zu hören.';
-    go.hidden = false;
-    go.textContent = 'Los geht’s';
+    next();
   }
 
   function setDisc(state) {
-    disc.dataset.state = state; // ready, loading, playing, paused or over
+    disc.dataset.state = state; // loading, playing, paused or over
     disc.setAttribute('aria-label', state === 'playing' ? 'Pause' : 'Abspielen');
   }
 
-  // Playing starts from a tap, which phones require before a page may play sound.
+  // Sound only ever starts from the players: a tap on the record, or asking to hear more. Answering
+  // and moving on to the next song stop it. (Phones also require a tap before a page may play sound.)
+  function playClip() {
+    setDisc('loading');
+    audio.play().catch(() => setDisc('paused'));
+  }
+
   function next() {
     stopAudio();
     at++;
@@ -172,15 +162,20 @@ export async function start(stage) {
     counters();
     cover.removeAttribute('src');
     more.hidden = false;
+    more.disabled = true;
     showStep();
     opts.innerHTML = choices(song).map((t, i) => `<button type="button" data-title="${esc(t)}" disabled><kbd>${i + 1}</kbd>${esc(t)}</button>`).join('');
-    say.textContent = '';
+    say.className = 'sgSay';
+    say.textContent = `${at ? '' : 'Jeder dieser Songs lief an eurer Hochzeit. '}Tippt auf die Platte, dann geht’s los.`;
     go.hidden = true;
     // the events of a song that was already stopped can still arrive, so each listener checks
     const clip = audio = new Audio(song.preview);
+    clip.preload = 'auto';
     clip.addEventListener('playing', () => {
       if (clip !== audio) return;
       setDisc('playing');
+      if (!answered) say.textContent = '';
+      more.disabled = false;
       for (const b of opts.children) b.disabled = answered;
       holdAtLimit();
       requestAnimationFrame(animateRing);
@@ -195,8 +190,7 @@ export async function start(stage) {
       more.hidden = true;
       for (const b of opts.children) b.disabled = false;
     });
-    setDisc('loading');
-    clip.play().catch(() => setDisc('paused'));
+    setDisc('paused');
     if (round[at + 1]) new Audio(round[at + 1].preview).preload = 'auto';
   }
 
@@ -204,7 +198,7 @@ export async function start(stage) {
     if (answered || !audio || !STEPS[step + 1]) return;
     step++;
     showStep();
-    if (audio.paused) audio.play().catch(() => {}); // carries on from where it stopped
+    if (audio.paused) playClip(); // carries on from where it stopped
     else holdAtLimit();
   }
 
@@ -240,7 +234,7 @@ export async function start(stage) {
     go.textContent = at + 1 < round.length ? 'Nächster Song' : 'Zum Ergebnis';
     counters();
     drawRing();
-    if (audio.paused && !audio.ended) audio.play().catch(() => {}); // now the rest of the clip plays
+    audio.pause(); // a tap on the record plays the rest
   }
 
   function showEnd() {
@@ -273,7 +267,6 @@ export async function start(stage) {
   }
 
   disc.addEventListener('click', () => {
-    if (disc.dataset.state === 'ready') return next();
     if (!audio) return;
     if (!audio.paused) {
       if (answered) audio.pause();
@@ -281,7 +274,7 @@ export async function start(stage) {
     }
     // before the answer a tap replays the part they may hear; afterwards it carries on with the song
     if (!answered || audio.ended) audio.currentTime = 0;
-    audio.play().catch(() => {});
+    playClip();
   });
   more.addEventListener('click', listenLonger);
   go.addEventListener('click', next);
@@ -338,7 +331,8 @@ function injectStyle() {
     .sgNow{min-height:2.8em;margin:0;text-align:center;line-height:1.4;color:var(--muted)}
     .sgNow b{display:block;font:700 19px/1.3 var(--serif);color:var(--ink)}
     .sgMore{padding:7px 16px;border:1.5px solid var(--line);border-radius:999px;background:#fff;font-size:14px;font-weight:600;color:var(--forest)}
-    .sgMore:hover{border-color:#cfdcd6;background:#f6f8f7}
+    .sgMore:hover:not(:disabled){border-color:#cfdcd6;background:#f6f8f7}
+    .sgMore:disabled{opacity:.45;cursor:default}
     .sgMore.off{visibility:hidden}
     .sgDeck:has(.sgMore[hidden]){--below:64px}
 

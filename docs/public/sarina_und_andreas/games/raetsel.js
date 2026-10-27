@@ -40,7 +40,7 @@ export function start(stage) {
   const saved = (() => { try { return JSON.parse(localStorage.getItem(SAVE_KEY)) || {}; } catch { return {}; } })();
   const letters = saved.letters || {};
   const given = new Set(saved.given);       // squares filled in by "Buchstabe zeigen"
-  const verified = new Set(saved.verified); // squares of words confirmed by "Wort prüfen"
+  const verified = new Set(saved.verified); // squares of words found right, which lock
   const tips = new Set(saved.tips);         // words whose second, easier hint is showing
   const locked = k => given.has(k) || verified.has(k);
   let solved = isSolved();
@@ -68,7 +68,6 @@ export function start(stage) {
           </div>
           <div class="cwActs">
             <button type="button" data-act="tip">Tipp</button>
-            <button type="button" data-act="check">Wort prüfen</button>
             <button type="button" data-act="reveal">Buchstabe zeigen</button>
           </div>
           <p class="cwToast" role="status"></p>
@@ -124,10 +123,10 @@ export function start(stage) {
     PUZZLE.solution.forEach(([r, c], i) => { stage.querySelector(`[data-sol="${i + 1}"]`).textContent = letters[keyOf(r, c)] || ''; });
   }
 
-  // tone 'good' shows the message in green; it stays up longer the more there is to read
-  function toast(text, tone = '') {
+  // the message stays up longer the more there is to read
+  function toast(text) {
     toastEl.textContent = text;
-    toastEl.className = `cwToast show ${tone}`;
+    toastEl.classList.add('show');
     clearTimeout(toastTimer);
     toastTimer = setTimeout(() => toastEl.classList.remove('show'), 1500 + text.length * 45);
   }
@@ -148,12 +147,13 @@ export function start(stage) {
     selectWord(order[(i + step + order.length) % order.length]);
   }
 
-  // checked and revealed letters are known to be right, so typing passes over them
+  // checked and revealed letters are known to be right, so typing passes over them; a word that
+  // turns out right hands over to the next one
   function type(ch) {
-    if (!locked(active)) letters[active] = ch;
     const w = word(), i = w.keys.indexOf(active);
-    if (i < w.keys.length - 1) select(w.keys[i + 1], false);
-    else stepWord(1);
+    if (!locked(active)) letters[active] = ch;
+    if (judge(active).includes(w) || i === w.keys.length - 1) stepWord(1);
+    else select(w.keys[i + 1], false);
     afterChange();
   }
   function erase() {
@@ -179,16 +179,29 @@ export function start(stage) {
     paint();
     if (solved || [...squares.keys()].some(k => !letters[k])) return;
     if (isSolved()) { solved = true; celebrate(); }
-    else toast('Alles ausgefüllt, aber irgendwo hakt es noch. „Wort prüfen“ hilft beim Suchen.');
+    else toast('Alles ausgefüllt, aber manche Wörter sind noch nicht grün.');
   }
 
-  function shake(w) {
-    for (const k of w.keys) {
-      const el = els.get(k);
-      el.classList.remove('nope');
-      void el.offsetWidth; // restarts the animation
-      el.classList.add('nope');
+  // Each word is checked once its last square is filled: a right one glows green and locks, a wrong
+  // one flashes red, never saying which letter is off. Returns the words found right.
+  function judge(k) {
+    const right = [];
+    for (const w of Object.values(squares.get(k).words)) {
+      if (w.keys.some(key => !letters[key]) || w.keys.every(key => verified.has(key))) continue;
+      const ok = w.keys.every(key => letters[key] === squares.get(key).answer);
+      if (ok) { w.keys.forEach(key => verified.add(key)); right.push(w); }
+      flash(w, ok ? 'won' : 'nope');
     }
+    return right;
+  }
+  function flash(w, kind) {
+    w.keys.forEach((k, i) => {
+      const el = els.get(k);
+      el.classList.remove('won', 'nope');
+      void el.offsetWidth; // restarts the animation
+      el.style.setProperty('--i', i);
+      el.classList.add(kind);
+    });
   }
 
   function act(name) {
@@ -197,18 +210,11 @@ export function start(stage) {
       tips.add(w.id);
       save();
       paint();
-    } else if (name === 'check') {
-      // only says right or wrong, never which letter is off
-      if (w.keys.some(k => !letters[k])) return toast('Füllt erst das ganze Wort aus.');
-      if (w.keys.some(k => letters[k] !== squares.get(k).answer)) { shake(w); return toast('Noch nicht ganz richtig.'); }
-      w.keys.forEach(k => verified.add(k));
-      save();
-      paint();
-      toast('Stimmt!', 'good');
     } else if (name === 'reveal') {
       if (locked(active)) return toast('Dieser Buchstabe steht schon fest.');
       letters[active] = squares.get(active).answer;
       given.add(active);
+      judge(active);
       afterChange();
     } else if (name === 'reset' && confirm('Wirklich alle Buchstaben und Tipps löschen?')) {
       for (const k of Object.keys(letters)) delete letters[k];
@@ -331,21 +337,23 @@ function injectStyle() {
     .cwActs button:disabled{opacity:.45;cursor:default}
     .cwToast{position:absolute;left:50%;top:calc(100% + 8px);width:max-content;max-width:calc(100% - 24px);margin:0;padding:7px 14px;border-radius:12px;background:var(--ink);color:#fff;font-size:14px;text-align:center;transform:translateX(-50%);opacity:0;pointer-events:none;transition:opacity .2s}
     .cwToast.show{opacity:1}
-    .cwToast.good{background:var(--forest)}
     .cwKeys{display:none}
 
     .cwGrid{--cell:clamp(16px,min(calc((var(--board-w) - (var(--cols) - 1) * 2px) / var(--cols)),calc((100cqh - 48px - var(--below) - (var(--rows) - 1) * 2px) / var(--rows))),40px);display:grid;grid-template-columns:repeat(var(--cols),var(--cell));grid-auto-rows:var(--cell);gap:2px}
     .cwSq{position:relative;display:grid;place-items:center;background:#fff;border:1.5px solid #c5d0cc;border-radius:4px;cursor:pointer;-webkit-tap-highlight-color:transparent;scroll-margin:8px}
-    .cwSq.ok{background:#eaf5ec;border-color:#a9cfb0}
     .cwSq.inWord{background:#fdf1cf;border-color:#e7c66b}
+    .cwSq.ok{background:#eaf5ec;border-color:#a9cfb0}
     .cwSq.active{background:#f2c14e;border-color:#c99a2a}
     .cwSq .l{font:700 calc(var(--cell) * .55)/1 var(--sans);color:var(--ink)}
     .cwSq.ok .l{color:#2e7d4f}
     .cwSq.given .l{color:var(--blue)}
     .cwSq.given::after{content:"";position:absolute;top:0;right:0;border:4px solid transparent;border-top-color:var(--blue);border-right-color:var(--blue);border-top-right-radius:2px}
-    .cwSq.nope{animation:cwNope .45s}
-    @keyframes cwNope{20%,60%{transform:translateX(-3px);border-color:var(--red)}40%,80%{transform:translateX(3px);border-color:var(--red)}}
-    @media (prefers-reduced-motion:reduce){.cwSq.nope{animation-name:cwNopeStill}@keyframes cwNopeStill{20%,80%{border-color:var(--red)}}}
+    .cwSq.nope{animation:cwNope .6s}
+    @keyframes cwNope{25%,50%{background:#fbe4e3;border-color:var(--red)}}
+    .cwSq.won{z-index:1;animation:cwGlow 1.1s}
+    .cwSq.won .l{animation:cwHop .45s calc(var(--i) * 60ms)}
+    @keyframes cwGlow{30%{border-color:#5fae75;box-shadow:0 0 10px 2px rgba(46,125,79,.35)}}
+    @keyframes cwHop{40%{transform:translateY(-30%)}}
     .cwSq .n{position:absolute;top:1px;left:2px;font:600 max(7px,calc(var(--cell) * .26))/1 var(--sans);color:var(--muted)}
     .cwSq .o{position:absolute;inset:12%;border:1.5px solid rgba(217,83,79,.55);border-radius:50%;pointer-events:none}
     .cwSq .s{position:absolute;right:2px;bottom:1px;font:700 max(7px,calc(var(--cell) * .24))/1 var(--sans);color:var(--red)}
