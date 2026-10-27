@@ -141,7 +141,8 @@ export async function start(stage) {
 
   stage.innerHTML = `
     <div class="weg">
-      <div class="wegBar"><span class="wegNum"></span><span class="wegScore"></span></div>
+      <div class="wegBar"><span class="wegNum"></span><span class="wegTools"><span class="wegScore"></span>
+        <button type="button" class="wegReset" title="Neu anfangen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"/><path d="M4.5 4v4.5H9"/></svg><span>Neu anfangen</span></button></span></div>
       <div class="wegPlay">
         <h3 class="wegTitle"></h3>
         <div class="wegMapBox">
@@ -314,11 +315,16 @@ export async function start(stage) {
 
   undo.addEventListener('click', () => { strokes.pop()?.line.remove(); buttons(); });
   go.addEventListener('click', () => (revealed ? next() : reveal()));
-  end.addEventListener('click', e => {
-    if (!e.target.closest('[data-again]')) return;
+  function again() {
     for (const k of Object.keys(done)) delete done[k];
     save();
     next();
+  }
+  end.addEventListener('click', e => { if (e.target.closest('[data-again]')) again(); });
+  // progress is kept between visits, so starting over mid-run is always on offer
+  $('.wegReset').addEventListener('click', () => {
+    if (Object.keys(done).length && !confirm('Wirklich von vorne anfangen? Eure Wege werden gelöscht.')) return;
+    again();
   });
 
   next();
@@ -341,6 +347,10 @@ function injectStyle() {
     .wegScore{padding:4px 12px;border-radius:999px;background:var(--sky)}
     .wegScore:empty{display:none}
     .wegScore b{color:var(--ink)}
+    .wegTools{display:flex;align-items:center;gap:8px}
+    .wegReset{display:flex;align-items:center;gap:6px;height:30px;padding:0 12px;border:1px solid var(--line);border-radius:999px;background:var(--paper);font-size:13px;font-weight:600;color:var(--forest)}
+    .wegReset:hover{border-color:var(--forest)}
+    .wegReset svg{flex:none;width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 
     .wegPlay{flex:1;min-height:0;display:flex;flex-direction:column;gap:10px}
     .wegTitle{margin:0;font:600 20px/1.25 var(--serif)}
@@ -397,6 +407,8 @@ function injectStyle() {
 
     @media (max-width:600px){
       .weg{padding:12px}
+      .wegReset{padding:0 8px}
+      .wegReset span{display:none}
       .wegTitle{font-size:18px}
       .wegResult{padding:7px 12px;font-size:13px}
       .wegEnd .big{margin-bottom:10px;font-size:26px}

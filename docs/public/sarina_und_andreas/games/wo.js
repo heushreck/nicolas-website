@@ -83,6 +83,7 @@ export async function start(stage) {
           <span><small>Gesamt</small><b data-stat="total"></b></span>
           <span><small>Ø pro Foto</small><b data-stat="average"></b></span>
           <span><small>Bester Tipp</small><b data-stat="best"></b></span>
+          <button type="button" class="woReset" title="Neu anfangen"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3"/><path d="M4.5 4v4.5H9"/></svg><span>Neu anfangen</span></button>
         </div>
       </div>
       <div class="woPlay">
@@ -118,7 +119,9 @@ export async function start(stage) {
 
   function counters(round) {
     const { done, total, average, best } = tally();
-    $('.woNum').textContent = round ? `Foto ${round} von ${order.length}` : `${order.length} Fotos`;
+    // phones show the short form, so the stats and the restart button fit beside it
+    $('.woNum').innerHTML = `<span class="long">${round ? `Foto ${round} von ${order.length}` : `${order.length} Fotos`}</span>`
+      + `<span class="short">${round || done.length}/${order.length}</span>`;
     $('[data-stat="total"]').textContent = done.length ? distanceText(total) : '–';
     $('[data-stat="average"]').textContent = done.length ? distanceText(average) : '–';
     $('[data-stat="best"]').textContent = best ? distanceText(guesses[best].km) : '–';
@@ -196,6 +199,11 @@ export async function start(stage) {
 
   go.addEventListener('click', () => (revealed ? next() : reveal()));
   end.addEventListener('click', e => { if (e.target.closest('[data-again]')) again(); });
+  // progress is kept between visits, so starting over mid-run is always on offer
+  $('.woReset').addEventListener('click', () => {
+    if (Object.keys(guesses).length && !confirm('Wirklich von vorne anfangen? Eure Kilometer werden gelöscht.')) return;
+    again();
+  });
   photo.addEventListener('click', () => photo.classList.toggle('zoom'));
   const onKey = e => { if (e.key === 'Escape') photo.classList.remove('zoom'); };
   document.addEventListener('keydown', onKey);
@@ -218,10 +226,14 @@ function injectStyle() {
     .wo [hidden]{display:none}
     .woNote{margin:0;padding:70px 20px;text-align:center;color:var(--muted)}
     .woBar{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px;font-size:14px;color:var(--muted)}
+    .woNum .short{display:none}
     .woStats{display:flex;gap:6px}
-    .woStats span{display:flex;flex-direction:column;align-items:center;min-width:64px;padding:3px 10px;border-radius:10px;background:var(--sky);line-height:1.25}
+    .woStats > span{display:flex;flex-direction:column;align-items:center;min-width:64px;padding:3px 10px;border-radius:10px;background:var(--sky);line-height:1.25}
     .woStats small{font-size:11px}
     .woStats b{color:var(--ink);white-space:nowrap}
+    .woReset{display:flex;align-items:center;gap:6px;padding:0 12px;border:1px solid var(--line);border-radius:10px;background:var(--paper);font-size:13px;font-weight:600;color:var(--forest)}
+    .woReset:hover{border-color:var(--forest)}
+    .woReset svg{flex:none;width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 
     .woPlay{flex:1;min-height:0;display:flex;flex-direction:column;gap:12px}
     .woPhoto{position:relative;flex:1 1 0;min-height:120px;margin:0;background:#1f2d38;border-radius:14px;overflow:hidden;cursor:zoom-in}
@@ -257,8 +269,13 @@ function injectStyle() {
 
     @media (max-width:600px){
       .wo{padding:12px}
+      .woNum .long{display:none}
+      .woNum .short{display:inline}
       .woStats{gap:4px}
-      .woStats span{min-width:0;padding:3px 7px}
+      .woStats > span{min-width:0;padding:3px 6px}
+      .woStats b{font-size:13px}
+      .woReset{padding:0 8px}
+      .woReset span{display:none}
     }`;
   document.head.append(style);
 }
