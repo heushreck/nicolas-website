@@ -2,9 +2,11 @@
 //
 // Game: { id, n, title, tagline, icon, tint, steps, ready }
 //   icon is a file in art/; tint is the soft colour behind it.
-//   steps are the "how it works" lines shown before a game starts.
+//   steps are the "how it works" lines shown while a game is still being built.
 //   ready: false shows the "still being built" screen. Once a game exists as games/<id>.js
 //   (exporting `start(stage, ctx)`), flip it to true and the page loads that module instead.
+// The page is served both with and without a trailing slash, so links use absolute paths and game
+// modules load their own files relative to import.meta.url.
 
 export const GAMES = [
   {
@@ -35,12 +37,12 @@ export const GAMES = [
     ],
   },
   {
-    id: 'raetsel', n: 4, title: 'Kreuzworträtsel', icon: 'icon-crossword.svg', tint: '#f3e8ea', ready: false,
+    id: 'raetsel', n: 4, title: 'Kreuzworträtsel', icon: 'icon-crossword.svg', tint: '#f3e8ea', ready: true,
     tagline: 'Ein kleines Rätsel, nur über euch zwei.',
     steps: [
-      'Ein Mini-Kreuzworträtsel mit Begriffen aus eurem gemeinsamen Leben.',
-      'Tippt auf ein Kästchen, lest den Hinweis und schreibt die Antwort hinein.',
-      'Wenn alles stimmt, wartet eine kleine Überraschung.',
+      'Fünfzehn Begriffe aus eurem gemeinsamen Leben.',
+      'Tippt auf ein Kästchen, lest den Hinweis und schreibt die Antwort hinein. Umlaute schreibt ihr aus (Ü wird UE).',
+      'Die eingekreisten Buchstaben ergeben das Lösungswort.',
     ],
   },
 ];
