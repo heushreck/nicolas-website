@@ -5,13 +5,11 @@
 import { SONGS } from './song-list.js';
 
 const LOOKUP = 'https://itunes.apple.com/lookup';
-const ROUND = 10; // songs per game
 const OPTIONS = 4;
 // how much of the clip the players may hear, and what a right answer is worth after hearing that much
 const STEPS = [{ seconds: 3, points: 3 }, { seconds: 10, points: 2 }, { seconds: 30, points: 1 }];
 const FULL = STEPS.at(-1).seconds;
-const BEST_KEY = 'sa-song-best-v2';
-const QUEUE_KEY = 'sa-song-queue-v1';
+const BEST_KEY = 'sa-song-best-v3'; // v3: a game plays every song, so records from shorter games don't count
 
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const same = (a, b) => a.toLowerCase() === b.toLowerCase();
@@ -83,17 +81,6 @@ export async function start(stage) {
 
   let round, at, audio, step, answered, score, streak, bestStreak, results, stopTimer;
 
-  // Every song comes up once before any comes up twice: the songs still to play wait in a queue that
-  // outlives the game, and each game takes the next ROUND of them.
-  function nextRound() {
-    const byId = new Map(songs.map(s => [s.id, s]));
-    const queue = (() => { try { return JSON.parse(localStorage.getItem(QUEUE_KEY)) || []; } catch { return []; } })()
-      .filter(id => byId.has(id));
-    if (queue.length < ROUND) queue.push(...shuffle([...byId.keys()].filter(id => !queue.includes(id))));
-    try { localStorage.setItem(QUEUE_KEY, JSON.stringify(queue.slice(ROUND))); } catch {}
-    return queue.slice(0, ROUND).map(id => byId.get(id));
-  }
-
   // Wrong answers are two other songs by the same artist, so recognising the voice isn't enough,
   // filled up with other titles in the same language, so the language doesn't give it away either.
   function choices(song) {
@@ -144,7 +131,7 @@ export async function start(stage) {
   }
 
   function newGame() {
-    round = nextRound();
+    round = shuffle([...songs]); // every song, in a new order each game
     at = -1;
     score = streak = bestStreak = 0;
     results = [];
