@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="robots" content="noindex">
   <meta name="theme-color" content="#eef4f7">
-  <title>Sarina und Andreas DIY Arcade</title>
+  <title>Sarina und Andreas Spielewiese</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -41,19 +41,25 @@
     .lockCard .lockMsg{min-height:1.6em;margin:12px 0 0;font-size:14px}
     .lockMsg.bad{color:var(--red)}
 
+    /* ---------- page ---------- */
+    /* Every screen fits the window: the hero takes what the game tiles leave over, and on a game
+       screen the stage fills the space below the header, so each game sizes itself to that. */
+    #app{display:flex;flex-direction:column;min-height:100vh;min-height:100dvh}
+    body.playing #app{height:max(100vh,560px);height:max(100dvh,560px)}
+
     /* ---------- hero ---------- */
-    .scene{position:relative;height:clamp(300px,36vw,460px);background:var(--sky);overflow:hidden}
-    .hero::after{content:"";display:block;height:44px;background:linear-gradient(var(--meadow),var(--bg))}
-    .scene img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center bottom}
+    .scene{position:relative;height:clamp(170px,calc(100vh - 495px),340px);height:clamp(170px,calc(100dvh - 495px),340px);background:var(--sky);overflow:hidden}
+    .hero::after{content:"";display:block;height:24px;background:linear-gradient(var(--meadow),var(--bg))}
+    .scene img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 30%}
     .hero h1{position:relative;z-index:1;margin:0;padding:clamp(26px,4.5vw,52px) 16px 0;text-align:center;font-weight:400}
     .hero .names{display:block;font:700 clamp(30px,5.4vw,56px)/1.05 var(--serif);letter-spacing:-.01em}
     .hero .arcade{display:inline-block;margin-top:10px;padding:5px 14px;border-radius:999px;background:rgba(255,255,255,.8);font:600 12px/1.4 var(--sans);letter-spacing:.24em;text-transform:uppercase;color:var(--forest)}
 
     /* ---------- home ---------- */
     .wrap{width:min(880px,100%);margin:0 auto;padding:0 16px}
-    main.wrap{padding-top:10px;padding-bottom:40px}
-    body.playing main.wrap{padding-top:26px}
-    .intro{margin:0 auto 22px;max-width:520px;text-align:center;color:var(--muted)}
+    main.wrap{flex:1 0 auto;padding-top:6px;padding-bottom:16px}
+    body.playing main.wrap{display:flex;flex-direction:column;flex:1 1 0;min-height:0;width:min(1080px,100%);padding-top:22px}
+    .intro{margin:0 auto 14px;max-width:520px;text-align:center;color:var(--muted)}
     .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
     .tile{display:flex;align-items:center;gap:16px;padding:16px;background:var(--paper);border:1px solid var(--line);border-radius:20px;text-decoration:none;transition:transform .25s,box-shadow .25s,border-color .25s}
     .tile:hover{transform:translateY(-3px);border-color:#cfdcd6;box-shadow:0 14px 30px rgba(31,45,56,.09)}
@@ -68,15 +74,17 @@
     .blaze{display:inline-grid;place-items:center;width:34px;height:22px;border-radius:3px;background:linear-gradient(var(--red) 0 24%,#fff 24% 76%,var(--red) 76%);box-shadow:0 0 0 1px rgba(0,0,0,.08);font:700 11px/1 var(--sans);color:var(--ink)}
 
     /* ---------- game screen ---------- */
-    .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;background:var(--sky);border-bottom:1px solid var(--line)}
-    .topbar a{text-decoration:none;font-weight:500}
-    .topbar span{font:600 15px/1.2 var(--serif);color:var(--muted)}
-    .gameHead{display:flex;align-items:center;gap:16px;margin:0 0 18px}
-    .gameHead .icon{flex:none;display:grid;place-items:center;width:72px;height:72px;border-radius:20px;background:var(--tint)}
-    .gameHead .icon img{width:58px;height:58px}
-    .gameHead h2{margin:4px 0 0;font:700 26px/1.2 var(--serif)}
-    .gameHead p{margin:0;color:var(--muted)}
-    .stage{min-height:340px;background:var(--paper);border:1px solid var(--line);border-radius:22px;overflow:hidden}
+    /* a slim version of the hero: sky, the game's name in the middle, a mountain ridge below */
+    .topbar{position:relative;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;height:150px;padding:12px 16px 74px;background:url(/sarina_und_andreas/art/ridge.svg) repeat-x center bottom/auto 110px,linear-gradient(var(--sky),#f8fbfb)}
+    .topbar::after{content:"";position:absolute;left:0;right:0;top:100%;height:18px;background:linear-gradient(var(--meadow),var(--bg))}
+    .back{justify-self:start;display:inline-flex;align-items:center;gap:6px;padding:7px 14px 7px 10px;border-radius:999px;background:rgba(255,255,255,.85);box-shadow:0 2px 10px rgba(47,93,74,.12);font:600 14px/1 var(--sans);color:var(--forest);text-decoration:none;transition:background .2s,box-shadow .2s}
+    .back:hover{background:#fff;box-shadow:0 4px 14px rgba(47,93,74,.18)}
+    .back svg{transition:transform .2s}
+    .back:hover svg{transform:translateX(-2px)}
+    .barTitle{text-align:center}
+    .barTitle h1{display:flex;align-items:center;justify-content:center;gap:10px;margin:0;font:700 26px/1.2 var(--serif)}
+    .barTitle p{margin:2px 0 0;font-size:14px;color:var(--muted)}
+    .stage{flex:1;min-height:0;background:var(--paper);border:1px solid var(--line);border-radius:22px;overflow:auto}
     .soon{max-width:460px;margin:0 auto;padding:36px 22px 40px;text-align:center}
     .soon h3{margin:0 0 4px;font:600 21px/1.3 var(--serif)}
     .soon > p{margin:0 0 18px;color:var(--muted)}
@@ -85,25 +93,31 @@
     .steps li::before{content:counter(s);position:absolute;left:0;top:9px;display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--sky);font-weight:600;font-size:13px;color:var(--forest)}
     .sign{display:inline-block;margin-bottom:16px;padding:6px 14px;border-radius:6px;background:#f2c14e;font:700 12px/1.3 var(--sans);letter-spacing:.14em;text-transform:uppercase;color:#3b3220;transform:rotate(-2deg)}
 
-    footer{padding:6px 0 40px;text-align:center}
-    footer p{margin:0 0 6px;font-size:13px;color:var(--muted)}
-    footer button{border:0;background:none;color:var(--muted);font-size:13px;text-decoration:underline;text-underline-offset:3px}
-    footer button:hover{color:var(--ink)}
+    footer{padding:0 16px 14px;text-align:center;font-size:12px;color:#a7b2b9}
 
-    body.playing .hero,body:not(.playing) .topbar{display:none}
+    body.playing .hero,body.playing footer,body:not(.playing) .topbar{display:none}
 
     @media (max-width:600px){
-      .scene{height:280px}
-      .grid{gap:10px}
-      .tile{flex-direction:column;justify-content:flex-start;gap:8px;padding:14px 10px;text-align:center}
-      .tile .icon{width:72px;height:72px;border-radius:18px}
-      .tile .icon img{width:58px;height:58px}
-      .tile h2{font-size:17px}
-      .tile p{font-size:13px;line-height:1.45}
+      .grid{grid-template-columns:1fr;gap:8px}
+      .tile{gap:12px;padding:10px 12px;border-radius:16px}
+      .tile .icon{width:56px;height:56px;border-radius:14px}
+      .tile .icon img{width:46px;height:46px}
+      .tile h2{display:inline-block;margin:0 0 0 8px;vertical-align:middle;font-size:17px}
+      .tile p{font-size:13px;line-height:1.4}
       .tile .wip{display:none}
-      .gameHead .icon{width:60px;height:60px}
-      .gameHead .icon img{width:48px;height:48px}
-      .gameHead h2{font-size:22px}
+      .topbar{height:104px;padding:8px 12px 50px;background-size:auto 76px,auto}
+      .back{padding:8px}
+      .back span{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+      .barTitle h1{gap:8px;font-size:20px}
+      .barTitle p{display:none}
+      body.playing main.wrap{padding-top:18px;padding-bottom:10px}
+    }
+    /* short windows give the game the height a tall band would take */
+    @media (min-width:601px) and (max-height:720px){
+      .topbar{height:110px;padding:8px 16px 54px;background-size:auto 80px,auto}
+      .barTitle h1{font-size:22px}
+      .barTitle p{display:none}
+      body.playing main.wrap{padding-top:16px;padding-bottom:12px}
     }
     @media (prefers-reduced-motion:reduce){*{transition:none !important;animation:none !important}}
   </style>
@@ -114,7 +128,7 @@
   <form class="lockCard" id="lockForm" autocomplete="off">
     <img src="/sarina_und_andreas/art/lock.svg" alt="" width="240" height="160">
     <h1>Sarina und Andreas</h1>
-    <p>DIY Arcade. Gebt das Passwort ein, dann geht’s los.</p>
+    <p>Spielewiese. Gebt das Passwort ein, dann geht’s los.</p>
     <div class="field" id="field">
       <input id="pw" type="password" placeholder="Passwort" aria-label="Passwort" autocomplete="off" required>
       <button type="submit">Los</button>
@@ -127,12 +141,15 @@
   <header class="hero">
     <div class="scene">
       <img src="/sarina_und_andreas/art/hero.svg" alt="">
-      <h1><span class="names">Sarina und Andreas</span><span class="arcade">DIY Arcade</span></h1>
+      <h1><span class="names">Sarina und Andreas</span><span class="arcade">Spielewiese</span></h1>
     </div>
   </header>
-  <nav class="topbar"><a href="#">← Alle Spiele</a><span>Sarina und Andreas DIY Arcade</span></nav>
+  <nav class="topbar">
+    <a class="back" href="#"><svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 3 5 8l5 5"/></svg><span>Alle Spiele</span></a>
+    <div class="barTitle" id="barTitle"></div>
+  </nav>
   <main class="wrap" id="view"></main>
-  <footer><p>Mit Liebe gemacht, für euch zwei.</p><button type="button" id="relock">Seite wieder sperren</button></footer>
+  <footer>von Nicolas für Sarina und Andreas</footer>
 </div>
 
 <script type="module">
@@ -146,7 +163,7 @@ const AUTH_KEY = 'sa-arcade-auth-v1';
 const $ = s => document.querySelector(s);
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 const storeGet = k => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } };
-const storeSet = (k, v) => { try { v == null ? localStorage.removeItem(k) : localStorage.setItem(k, JSON.stringify(v)); } catch {} };
+const storeSet = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} };
 async function sha256(text) {
   const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(text));
   return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
@@ -175,7 +192,6 @@ function enter(animate) {
   $('#app').classList.remove('hidden');
   route();
   addEventListener('hashchange', route);
-  $('#relock').addEventListener('click', () => { storeSet(AUTH_KEY, null); location.hash = ''; location.reload(); });
 }
 
 /* ---------------- routing ---------------- */
@@ -204,12 +220,8 @@ function home() {
 }
 
 async function playScreen(g) {
-  $('#view').innerHTML = `
-    <div class="gameHead" style="--tint:${g.tint}">
-      <span class="icon"><img src="/sarina_und_andreas/art/${g.icon}" alt="" width="58" height="58"></span>
-      <div>${blaze(g.n)}<h2>${esc(g.title)}</h2><p>${esc(g.tagline)}</p></div>
-    </div>
-    <section class="stage" id="stage"></section>`;
+  $('#barTitle').innerHTML = `<h1>${blaze(g.n)}${esc(g.title)}</h1><p>${esc(g.tagline)}</p>`;
+  $('#view').innerHTML = '<section class="stage" id="stage"></section>';
   const stage = $('#stage');
   if (!g.ready) {
     stage.innerHTML = `
